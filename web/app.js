@@ -26,6 +26,7 @@
   let guidedStartPending = false;
   let requestInFlight = false;
   let playMode = "learn";
+  let nextStepAction = null;
   function setPlayMode(mode) {
     playMode = mode === "benchmark" ? "benchmark" : "learn";
     window.playbookMode = playMode;
@@ -216,6 +217,8 @@
   }
 
   function selectComposerTab(name) {
+    const requested = document.querySelector(`#tabs button[data-tab="${name}"]`);
+    if (requested?.disabled) return;
     document.querySelectorAll("#tabs button").forEach((button) => {
       button.classList.toggle("active", button.dataset.tab === name);
     });
@@ -224,6 +227,63 @@
     });
     if (mobileMedia.matches) setMobileView("work");
   }
+
+  function firstUnreadSection(documentId) {
+    return document.querySelector(`.sections a[data-document="${documentId}"]:not(.read)`);
+  }
+
+  function hasReadDocument(documentId) {
+    return [...readSections].some((key) => key.startsWith(documentId + "§"));
+  }
+
+  function updateNextStep() {
+    const redlineTab = document.querySelector('#tabs button[data-tab="redline"]');
+    redlineTab.disabled = submittedIssues.size === 0 || finished;
+    redlineTab.title = submittedIssues.size ? "Draft language for a submitted issue" : "Submit an issue first";
+    if (finished || playMode !== "learn") return;
+
+    let title, copy, label, action;
+    const instructions = firstUnreadSection("instructions");
+    const playbook = firstUnreadSection("playbook");
+    const undrafted = [...submittedIssues.values()].find((issue) => !redlinedLabels.has(issue.issue_id));
+    if (instructions && !hasReadDocument("instructions")) {
+      title = "Start with context";
+      copy = "Read the supervising-lawyer instructions before reviewing contract language.";
+      label = "Open instructions";
+      action = () => instructions.click();
+    } else if (playbook && !hasReadDocument("playbook")) {
+      title = "Learn the client position";
+      copy = "Open the playbook so you can compare the contract against the approved position.";
+      label = "Open playbook";
+      action = () => playbook.click();
+    } else if (questionsAsked === 0) {
+      title = "Resolve a decision-changing fact";
+      copy = "Ask one focused question that could change the advice or negotiating position.";
+      label = "Ask the client";
+      action = () => { selectComposerTab("ask"); $("ask-question").focus(); };
+    } else if (!submittedIssues.size) {
+      title = "Record the first material issue";
+      copy = "Connect the contract language, client playbook, and business consequence.";
+      label = "Add an issue";
+      action = () => { selectComposerTab("issue"); $("issue-label").focus(); };
+    } else if (undrafted && stepsRemaining > 5) {
+      title = "Turn analysis into language";
+      copy = `Draft an operative fix for “${undrafted.title}.”`;
+      label = "Draft the redline";
+      action = () => draftRedline(undrafted);
+    } else {
+      title = stepsRemaining <= 5 ? "Finish before time runs out" : "Review and close the loop";
+      copy = "Check your submitted issues, then give the supervising lawyer a concise priority update.";
+      label = "Review and finish";
+      action = () => { showWorkspace("review"); selectComposerTab("finish"); };
+    }
+    $("next-step-title").textContent = title;
+    $("next-step-copy").textContent = copy;
+    $("next-step-action").textContent = label;
+    nextStepAction = action;
+  }
+
+  $("next-step-action").addEventListener("click", () => nextStepAction?.());
 
   function draftRedline(issue) {
     const redlineDirty = ["redline-section", "redline-text", "redline-rationale"]
@@ -331,6 +391,8 @@
       for (const sec of doc.sections) {
         const a = el("a", readSections.has(doc.id + "§" + sec) ? "read" : "", "§" + sec);
         a.href = "#";
+        a.dataset.document = doc.id;
+        a.dataset.section = sec;
         a.addEventListener("click", (e) => {
           e.preventDefault();
           if (!finished) readSection(doc.id, sec, a);
@@ -392,6 +454,7 @@
       markProgress("read");
     }
     addEntry(`read ${docId} §${sec}`, resp.reward, body);
+    updateNextStep();
     maybeScore(resp);
   }
 
@@ -408,6 +471,7 @@
     }
     addEntry("ask_client", resp.reward, body);
     showWorkspace("activity");
+    updateNextStep();
     maybeScore(resp);
     return !lr.error;
   }
@@ -449,6 +513,7 @@
     }
     addEntry(`submit_issue [${payload.issue_id}]`, resp.reward, body);
     showWorkspace("activity");
+    updateNextStep();
     maybeScore(resp);
     return !lr.error;
   }
@@ -468,6 +533,7 @@
     addEntry(`propose_redline [${payload.issue_id}] ${payload.document_id} §${payload.section}`,
       resp.reward, body);
     showWorkspace("activity");
+    updateNextStep();
     maybeScore(resp);
     return !lr.error;
   }
@@ -779,6 +845,7 @@
     enableComposer();
     renderDocs(obs);
     updateBudgets(obs);
+    updateNextStep();
     budgetsEl.hidden = false;
     $("boot").hidden = true;
     $("main").hidden = false;

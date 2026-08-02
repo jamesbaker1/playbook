@@ -196,6 +196,11 @@ button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(-
 .progress li::before { content: "○"; display: inline-block; width: 16px; }
 .progress li.done { color: var(--green); }
 .progress li.done::before { content: "●"; }
+.next-step { margin-bottom: 13px; padding: 13px; border: 1px solid var(--ink); background: #fff; }
+.next-step strong { display: block; margin-top: 3px; font-family: Georgia, "Times New Roman", serif; font-size: 18px; font-weight: 400; }
+.next-step > p:not(.eyebrow) { margin: 5px 0 10px; color: var(--muted); font-size: 12px; }
+.next-step button { width: 100%; border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.next-step button:hover:not(:disabled) { border-color: var(--red); background: var(--red); }
 .form-help { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
 .tabform label { color: #5e5953; font-size: 11px; margin-bottom: -5px; }
 
