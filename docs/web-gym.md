@@ -13,8 +13,9 @@ are synthetic.
 
 1. Open the web gym and wait briefly for **matters ready** while the page checks the
    scoring service. No Python runtime or matter internals are downloaded.
-2. Choose **Open the guided matter** for the recommended introduction, or select a
-   matter in the header and choose **start matter**.
+2. Choose **Learn** for workflow guidance and a final completeness check, or
+   **Benchmark** for a sealed attempt with no prompts or pre-submit warnings. Then
+   open the recommended matter or choose another from the header.
 3. Open the supervising-lawyer instructions and playbook before reviewing the
    contract. Opening a section is an action and spends one step.
 4. Work the matter using the controls described below. The budget indicator in the
@@ -38,11 +39,11 @@ to reproduce those products.
 | **Document** | The center workspace displays the current provision. Citations in submitted issues can reopen their source text. |
 | **Work** | The right pane contains the actions used to investigate the matter and create work product. |
 | **Issues** | The center **Review** tab collects submitted issues, their priority, analysis, citations, recommendation, and redline status. It is the closest view to a working issues list. |
-| **Activity** | The center **Activity** tab is the chronological audit trail: actions, client responses, search results, incremental rewards, errors, and the final score. |
+| **Activity** | The center **Activity** tab is the chronological audit trail: actions, client responses, search results, errors, and the final score. Intermediate rewards are deliberately withheld. |
 
-The progress checklist in the Work pane is orientation, not a guarantee of a good
-score. Legal correctness, grounding, prioritization, and drafting quality still
-matter.
+The progress checklist in Learn mode is orientation, not a guarantee of a good
+score. Benchmark mode hides this guidance. Legal correctness, grounding,
+prioritization, and drafting quality still matter.
 
 ## Actions
 
@@ -99,7 +100,7 @@ Use **finish** for a concise update to the supervising lawyer. Lead with materia
 risks, relevant learned facts, recommended positions, and anything that should
 block signature.
 
-The preflight dialog reports sections reviewed, questions asked, issues submitted,
+In Learn mode, the preflight dialog reports sections reviewed, questions asked, issues submitted,
 redline coverage, and steps remaining. It warns about obvious workflow gaps, such
 as a high-priority issue without draft language. It does **not** assess whether the
 legal judgment is correct. Choose **Keep reviewing** to return safely, or confirm
@@ -145,9 +146,11 @@ the service and are not included in the website bundle.
 The scoring service necessarily processes your actions during play. Choosing
 **download trace** does not send the completed trace to the separate training-data
 collector. After a completed matter, **contribute trace** offers that additional,
-optional upload and requires an explicit click. Its payload contains the action trace,
-score, and optional handle; contributed traces are replay-verified before training
-use. Do not enter real client or confidential information: these are synthetic exercises.
+optional upload and requires explicit, versioned training/evaluation consent. Its
+payload contains the action trace, score, Learn/Benchmark mode, application version,
+and optional professional-background category and handle. Contributions are
+replay-verified before export; identifying handles are excluded from training exports.
+Do not enter real client or confidential information: these are synthetic exercises.
 
 ## Common pitfalls
 

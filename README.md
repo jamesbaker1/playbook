@@ -96,16 +96,18 @@ which reconstructs the episode with the same `playbook_legal` package used by th
 The browser never receives rubrics, hidden facts, or scorer source, and does not
 reimplement the reward engine.
 
-Submitted issues become persistent work-product cards. From each card, a reviewer can
+Users choose Learn mode for workflow guidance or Benchmark mode for a sealed attempt
+without hints or pre-submit warnings. Submitted issues become persistent work-product cards. From each card, a reviewer can
 reopen cited evidence or start a linked redline. Before final submission, a preflight
 shows sections reviewed, questions used, issues submitted, draft coverage, and remaining
 steps. These are workflow warnings, not legal-quality judgments.
 
 Review actions are processed by the scoring service. Completed traces are uploaded to
 the separate training-data collector only if the user explicitly chooses
-**contribute trace**. Contributed traces contain actions, score data, and an optional handle; the ingestion
-pipeline replays every trace and rejects records that do not reproduce their claimed
-result. See [Using the web gym](docs/web-gym.md) and
+**contribute trace** and records explicit, versioned training consent. The ingestion
+pipeline preserves non-identifying provenance, replays every trace, and rejects
+records that are incomplete or do not reproduce their claimed result. Optional
+handles remain in raw storage and are excluded from training exports. See [Using the web gym](docs/web-gym.md) and
 [the Worker deployment notes](web/worker/README.md).
 
 ## Matters

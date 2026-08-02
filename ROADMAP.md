@@ -45,10 +45,10 @@ decide, and what you give away when someone pushes back.
       already required.
 - [x] Leakage and determinism sweeps extended to escalation guidance and counterparty
       configuration (`tests/test_escalation.py`, `tests/test_negotiation.py`).
-- [ ] `clean_msa_009` — the trap matter: a compliant renewal where the correct answer
+- [x] `clean_msa_009` — the trap matter: a compliant renewal where the correct answer
       is "no material issues", graded through `final_submission.required_concepts`.
       Tests false-positive discipline, which no issue-bearing matter can.
-- [ ] `nego_saas_010` — the negotiation matter: a scripted counterparty with a genuine
+- [x] `nego_saas_010` — the negotiation matter: a scripted counterparty with a genuine
       concession, a trap counter, and a client red line the agent must refuse to trade.
 - [ ] Baseline numbers for escalation recall and settled-issue quality across models;
       confirm the trap counter is actually trapping.
@@ -71,11 +71,20 @@ decide, and what you give away when someone pushes back.
 
 ## Phase 5 — Humans in the gym (in progress)
 
-- [x] Web UI over the environment: the web gym runs the real engine in-browser
-      (Pyodide) at jamesbaker1.github.io/playbook.
+- [x] Static web UI backed by the canonical Cloudflare Python Worker. Rubrics,
+      hidden facts, matter files, and scorer code are excluded from the Pages bundle;
+      there is no browser-local scoring fallback.
+- [x] Learn mode for guided practice and Benchmark mode for sealed attempts, with a
+      desktop three-pane workspace and mobile one-pane navigation.
 - [x] Opt-in trace contribution: Cloudflare Worker collection endpoint plus a
-      replay-verified export pipeline (`training/human_data.py`) — uploaded scores
-      are advisory; an episode counts only after the engine reproduces it.
+      replay-verified export pipeline (`training/human_data.py`). Consent is explicit
+      and versioned; source, app version, play mode, seed, and optional professional
+      background are retained as provenance; handles are excluded from exports.
+- [ ] Run a paid calibration pilot with 5–10 practicing lawyers. Measure completion
+      time, rubric/expert agreement, repeat consistency, and cost per reviewed trace.
+- [ ] Add blinded expert review: first material error, corrected next action, and
+      pairwise preference labels. Keep raw, validated, reviewed, curated, and sealed
+      evaluation data as separate tiers.
 - [ ] Human-lawyer baseline numbers for the benchmark.
 - [ ] Skill-gated pairwise preference collection on redlines (gold-matter
       calibration, vote weighting) feeding a drafting-quality reward model — crowd
