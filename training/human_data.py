@@ -148,8 +148,7 @@ def main() -> None:
         if not args.endpoint or not token:
             raise SystemExit("--endpoint and PLAYBOOK_TRACES_TOKEN are required to fetch")
         endpoint = args.endpoint.rstrip("/")
-        if endpoint.endswith("/api/traces"):
-            endpoint = endpoint[: -len("/api/traces")]
+        endpoint = endpoint.removesuffix("/api/traces")
         paths = fetch_records(endpoint, token, args.raw_dir)
         print(f"fetched {len(paths)} records into {args.raw_dir}")
 
