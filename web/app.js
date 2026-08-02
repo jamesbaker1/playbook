@@ -27,6 +27,7 @@
   let requestInFlight = false;
   let playMode = "learn";
   let nextStepAction = null;
+  let starterPayload = null;
   function setPlayMode(mode) {
     playMode = mode === "benchmark" ? "benchmark" : "learn";
     window.playbookMode = playMode;
@@ -46,10 +47,21 @@
   const mobileMedia = window.matchMedia("(max-width: 980px)");
 
   async function api(path, options = {}) {
-    const response = await fetch(API_BASE + path, {
-      ...options,
-      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    });
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30000);
+    let response;
+    try {
+      response = await fetch(API_BASE + path, {
+        ...options,
+        signal: options.signal || controller.signal,
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      });
+    } catch (error) {
+      if (error.name === "AbortError") throw new Error("The scoring service took too long to respond. Please retry.");
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
     let payload;
     try { payload = await response.json(); }
     catch (_) { throw new Error(`Scoring service returned ${response.status}.`); }
@@ -84,14 +96,24 @@
       if (!episode?.trace) throw new Error("The trace is available after the matter finishes.");
       return JSON.stringify(episode.trace, null, 2);
     },
+    activate(matterId, seed) {
+      episode = { matter_id: matterId, seed, actions: [], trace: null };
+    },
   };
+
+  // Warm the canonical starter while the matter list loads. A cold Python Worker
+  // can take several seconds; parallelizing these requests removes a second wait.
+  const starterWarmup = driver.start("ai_saas_001", 0)
+    .then((payload) => { starterPayload = payload; return payload; })
+    .catch(() => null);
 
   $("welcome-start").disabled = false;
   $("welcome-start").addEventListener("click", () => {
     if (matterSelect.disabled) {
       guidedStartPending = true;
-      $("welcome-start").textContent = "Opening when ready…";
-      $("boot-status").textContent = "Preparing the guided matter…";
+      $("welcome-start").disabled = true;
+      $("welcome-start").textContent = "Connecting to the matter service…";
+      $("boot-status").textContent = "Warming the scoring engine; this can take a few seconds…";
       return;
     }
     matterSelect.value = "ai_saas_001";
@@ -141,11 +163,12 @@
     boot("scoring service ready.");
     if (guidedStartPending) {
       matterSelect.value = "ai_saas_001";
-      startMatter();
+      await startMatter();
     }
   } catch (err) {
     $("boot-status").textContent = "Scoring service unavailable";
     $("welcome-start").textContent = "Retry connection";
+    $("welcome-start").disabled = false;
     boot("connection failed: " + err.message);
     $("welcome-start").onclick = () => window.location.reload();
   }
@@ -807,16 +830,29 @@
   async function startMatter() {
     const id = matterSelect.value;
     startBtn.disabled = true;
+    $("welcome-start").disabled = true;
+    $("welcome-start").textContent = "Opening matter…";
+    $("boot-status").textContent = "Opening the workspace…";
     let payload;
     try {
-      payload = await driver.start(id, 0);
+      if (id === "ai_saas_001") {
+        payload = starterPayload || await starterWarmup;
+        if (payload) driver.activate(id, 0);
+      }
+      if (!payload) payload = await driver.start(id, 0);
     } catch (error) {
       $("boot-status").textContent = "Could not open matter";
       boot("request failed: " + error.message);
+      $("welcome-start").textContent = "Retry opening matter";
+      $("welcome-start").disabled = false;
       return;
     } finally {
       startBtn.disabled = false;
     }
+    guidedStartPending = false;
+    starterPayload = null;
+    $("welcome-start").disabled = false;
+    $("welcome-start").textContent = "Open the guided matter";
     const obs = payload.observation;
     stepNo = 0;
     finished = false;
