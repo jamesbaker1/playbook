@@ -72,11 +72,25 @@ function calling can play the environment via the baseline runner.
 
 ## Matters
 
-Public development matters live in `matters/` (all synthetic; each carries a
-contamination canary string). Private held-out evaluation matters live in a separate
-private repository so published models can be scored on unseen work. Every matter
-ships a validated reference trajectory and adversarial bad trajectories in
-`examples/<matter_id>/`, enforced by CI.
+Eight public development matters (all synthetic; each carries a contamination canary
+string), varied by document architecture, role, leverage, and hidden-fact pivots:
+
+| Matter | Scenario | What it tests |
+| --- | --- | --- |
+| `ai_saas_001` | AI SaaS MSA + DPA, customer side | Model-training rights, incident notice, liability supercap |
+| `cloud_msa_002` | Enterprise cloud platform | Key terms hidden in a security exhibit; data residency |
+| `saas_renewal_003` | Renewal amendment | A buried SLA-credit deletion; cross-document reading |
+| `msa_provider_004` | Provider-side markup response | Accept/counter/escalate judgment under a concession playbook |
+| `ml_services_005` | Custom ML development | IP allocation, background-technology trap, acceptance gates |
+| `health_saas_006` | Wellness-benefits platform | A hidden biometric fact that changes severity calls |
+| `fintech_vendor_007` | Regulated fintech vendor | Regulatory framing, exam access, flow-down obligations |
+| `source_license_008` | Inbound SDK license | GPLv3/copyleft analysis without the classic overclaim |
+
+Private held-out evaluation matters live in a separate private repository so
+published models can be scored on unseen work. Every matter ships a validated
+reference trajectory and adversarial bad trajectories in `examples/<matter_id>/`,
+enforced by CI (reference ≥ 0.7 with no critical failure; fabricated-quote and
+reversed-redline trajectories must trip the critical gate).
 
 ## Repository map
 
