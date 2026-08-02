@@ -49,7 +49,7 @@ def run_episode(
 ) -> dict[str, Any]:
     """Run one full episode with a chat model driving the environment."""
     observation, _ = env.reset(seed=seed)
-    tools = tool_definitions()
+    tools = tool_definitions(env.action_schemas())
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {

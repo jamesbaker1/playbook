@@ -25,6 +25,7 @@ def test_observation_exposes_contract() -> None:
         "read_document",
         "search_matter",
         "ask_client",
+        "escalate",
         "submit_issue",
         "propose_redline",
         "submit_final",

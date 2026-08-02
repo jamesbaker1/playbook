@@ -21,7 +21,7 @@ Revision elements nest: text inserted by one lawyer and then deleted by another 
 exactly once, with the text that belongs to *it* — a nested deletion never leaks
 into the enclosing insertion's ``inserted_text``.
 
-Known limits, stated rather than hidden (see ``docs/matter-compiler.md`` §3.3):
+Known limits, stated rather than hidden (see ``docs/matter-compiler.md`` §2.3):
 
 - Clause numbers produced by ``numbering.xml`` (auto-numbered lists) do not appear
   in the paragraph text, so ``section_hint`` will be empty for those documents. It

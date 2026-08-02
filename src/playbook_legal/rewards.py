@@ -14,6 +14,18 @@ Rubric credit is earned by *content*, never by guessing rubric-internal identifi
   ``aliases`` (alternative concept lists).
 - Quotations are verified verbatim against the cited section. A quotation that
   does not appear in the cited section is a critical failure (fabrication gate).
+
+v0.3 additions
+--------------
+
+- Escalations are matched by concept phrases in the free-text ``topic`` + ``reason``,
+  exactly as client questions are. Failing to escalate a required point costs points
+  at final submission; a ``critical_if_missed`` escalation that never happens is a
+  critical failure. Over-escalating is penalized too.
+- Settlements score the text an issue actually closed on — the agent's own language
+  when the counterparty accepted it, the counterparty's language when the agent
+  accepted theirs. Closing a ``non_negotiable`` issue without its settlement concepts,
+  or on text matching a settlement critical-failure pattern, is a critical failure.
 """
 
 from __future__ import annotations
@@ -35,8 +47,11 @@ class RewardState:
     critical_failure: bool = False
     asked_questions: set[str] = field(default_factory=set)
     questions_asked_total: int = 0
+    raised_escalations: set[str] = field(default_factory=set)
+    escalations_total: int = 0
     matched_issues: set[str] = field(default_factory=set)
     matched_redlines: set[str] = field(default_factory=set)
+    settled_issues: set[str] = field(default_factory=set)
     issue_labels: dict[str, str] = field(default_factory=dict)
     valid_citation_count: int = 0
     invalid_citations: list[str] = field(default_factory=list)
@@ -46,15 +61,23 @@ class RewardState:
 
 
 class RewardEngine:
-    def __init__(self, rubric: dict[str, Any], documents: dict[str, dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        rubric: dict[str, Any],
+        documents: dict[str, dict[str, Any]],
+        counterparty: dict[str, Any] | None = None,
+    ) -> None:
         self.rubric = rubric
         self.documents = documents
+        self.counterparty = counterparty or {}
         self.state = RewardState()
         self.issue_map = {item["id"]: item for item in rubric.get("issues", [])}
         self.anchor_map = {
             str(item["anchor"]): item for item in rubric.get("issues", []) if item.get("anchor")
         }
         self.questions = list(rubric.get("questions", []))
+        self.escalations = list(rubric.get("escalations", []))
+        self.positions = dict(self.counterparty.get("positions", {}) or {})
         self.max_score = float(rubric.get("max_score", self._derive_max_score()))
 
     def reset(self) -> None:
@@ -88,6 +111,40 @@ class RewardEngine:
             float(criterion.get("points", 0.5)), "required_question", question_id
         )
         return points, event, question_id
+
+    # ---------------------------------------------------------------- escalations
+
+    def match_escalation(self, text: str) -> dict[str, Any] | None:
+        """Match free escalation text to a rubric escalation by concept phrases.
+
+        Identical semantics to question matching: all concepts of the main list, or
+        all concepts of any alias list, must appear. First match in rubric order wins.
+        """
+        normalized = _normalize(text)
+        for criterion in self.escalations:
+            variants: list[list[str]] = [criterion.get("concepts", [])]
+            variants.extend(criterion.get("aliases", []))
+            for variant in variants:
+                if variant and all(_normalize(concept) in normalized for concept in variant):
+                    return criterion
+        return None
+
+    def score_escalation(self, topic: str, reason: str) -> tuple[float, dict[str, Any], str | None]:
+        self.state.escalations_total += 1
+        text = f"{topic} {reason}"
+        criterion = self.match_escalation(text)
+        if criterion is None:
+            points, event = self._record(-0.25, "off_rubric_escalation", _normalize(text)[:80])
+            return points, event, None
+        escalation_id = str(criterion["id"])
+        if escalation_id in self.state.raised_escalations:
+            points, event = self._record(-0.15, "redundant_escalation", escalation_id)
+            return points, event, escalation_id
+        self.state.raised_escalations.add(escalation_id)
+        points, event = self._record(
+            float(criterion.get("points", 0.5)), "required_escalation", escalation_id
+        )
+        return points, event, escalation_id
 
     # -------------------------------------------------------------------- issues
 
@@ -245,6 +302,56 @@ class RewardEngine:
         points = redline_points * (len(matched) / len(required))
         return self._record(points, "redline", rubric_id, details)
 
+    # ---------------------------------------------------------------- settlements
+
+    def score_settlement(
+        self, rubric_id: str, closed_text: str, closed_by: str
+    ) -> tuple[float, dict[str, Any]]:
+        """Score the text an issue closed on, once per issue.
+
+        ``closed_by`` is "ours" when the counterparty took the agent's language and
+        "theirs" when the agent accepted the counterparty's counter. An issue with no
+        declared ``settlement_concepts`` is vacuously satisfied, which keeps the
+        derived max score reachable.
+        """
+        if rubric_id in self.state.settled_issues:
+            return self._record(-0.2, "duplicate_settlement", rubric_id)
+        criterion = self.issue_map.get(rubric_id, {})
+        self.state.settled_issues.add(rubric_id)
+
+        text = _normalize(closed_text)
+        concepts = [_normalize(item) for item in criterion.get("settlement_concepts", [])]
+        matched = [concept for concept in concepts if concept in text]
+        missing = [concept for concept in concepts if concept not in text]
+        settlement_points = float(criterion.get("settlement_points", 1.0))
+        fraction = len(matched) / len(concepts) if concepts else 1.0
+        points = settlement_points * fraction
+
+        details: dict[str, Any] = {
+            "closed_by": closed_by,
+            "matched_concepts": matched,
+            "missing_concepts": missing,
+        }
+        for pattern in criterion.get("settlement_critical_failure_patterns", []):
+            if re.search(pattern, text, flags=re.IGNORECASE):
+                self.state.critical_failure = True
+                details["critical_failure_pattern"] = pattern
+        if criterion.get("non_negotiable", False) and missing:
+            self.state.critical_failure = True
+            details["non_negotiable_missing"] = missing
+
+        return self._record(points, "settlement", rubric_id, details)
+
+    def score_unsupported_markup(self, label: str, reason: str) -> tuple[float, dict[str, Any]]:
+        return self._record(-0.5, "unsupported_markup", label, {"reason": reason})
+
+    def record_counterparty_response(
+        self, rubric_id: str, response: str
+    ) -> tuple[float, dict[str, Any]]:
+        """Record a counterparty counter or refusal. Neither scores on its own."""
+        event_type = "counterparty_counter" if response == "counter" else "counterparty_reject"
+        return self._record(0.0, event_type, rubric_id)
+
     # --------------------------------------------------------------------- final
 
     def score_final(self, summary: str) -> tuple[float, dict[str, Any]]:
@@ -256,7 +363,39 @@ class RewardEngine:
         missing = sorted(required_issue_ids - self.state.matched_issues)
         if missing:
             points -= float(config.get("missing_required_issue_penalty", 0.25)) * len(missing)
-        return self._record(points, "final_submission", "final", {"missing_issues": missing})
+        details: dict[str, Any] = {"missing_issues": missing}
+
+        missed_escalations: list[str] = []
+        missed_critical: list[str] = []
+        for criterion in self.escalations:
+            escalation_id = str(criterion.get("id", ""))
+            critical = bool(criterion.get("critical_if_missed", False))
+            if not (critical or criterion.get("required", False)):
+                continue
+            if escalation_id in self.state.raised_escalations:
+                continue
+            if critical:
+                self.state.critical_failure = True
+                missed_critical.append(escalation_id)
+            else:
+                missed_escalations.append(escalation_id)
+        if missed_escalations:
+            penalty = float(config.get("missed_escalation_penalty", 0.5))
+            points -= penalty * len(missed_escalations)
+        if missed_escalations or missed_critical:
+            details["missed_escalations"] = missed_escalations
+            details["missed_critical_escalations"] = missed_critical
+
+        concepts = [_normalize(item) for item in config.get("required_concepts", [])]
+        if concepts:
+            summary_text = _normalize(summary)
+            matched = [concept for concept in concepts if concept in summary_text]
+            awarded = float(config.get("concept_points", 0.0)) * (len(matched) / len(concepts))
+            points += awarded
+            details["matched_concepts"] = matched
+            details["concept_points"] = round(awarded, 4)
+
+        return self._record(points, "final_submission", "final", details)
 
     # -------------------------------------------------------------------- result
 
@@ -280,8 +419,11 @@ class RewardEngine:
             "breakdown": {
                 "asked_questions": sorted(self.state.asked_questions),
                 "questions_asked_total": self.state.questions_asked_total,
+                "raised_escalations": sorted(self.state.raised_escalations),
+                "escalations_total": self.state.escalations_total,
                 "matched_issues": sorted(self.state.matched_issues),
                 "matched_redlines": sorted(self.state.matched_redlines),
+                "settled_issues": sorted(self.state.settled_issues),
                 "valid_citation_count": self.state.valid_citation_count,
                 "invalid_citations": self.state.invalid_citations,
                 "unsupported_issues": self.state.unsupported_issues,
@@ -330,6 +472,7 @@ class RewardEngine:
 
     def _derive_max_score(self) -> float:
         total = sum(float(q.get("points", 0.5)) for q in self.rubric.get("questions", []))
+        total += sum(float(e.get("points", 0.5)) for e in self.escalations)
         for issue in self.rubric.get("issues", []):
             total += float(issue.get("base_points", 1.0))
             total += float(issue.get("severity_points", 0.25))
@@ -337,5 +480,9 @@ class RewardEngine:
             total += float(issue.get("concept_points", 0.5))
             total += float(issue.get("quote_points", 0.25))
             total += float(issue.get("redline_points", 1.0))
-        total += float(self.rubric.get("final_submission", {}).get("points", 0.5))
+            if str(issue.get("id", "")) in self.positions:
+                total += float(issue.get("settlement_points", 1.0))
+        final = self.rubric.get("final_submission", {})
+        total += float(final.get("points", 0.5))
+        total += float(final.get("concept_points", 0.0))
         return total

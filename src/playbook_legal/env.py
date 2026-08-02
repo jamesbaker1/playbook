@@ -11,6 +11,11 @@ from .models import ActionType, TraceEvent
 from .rewards import RewardEngine
 from .schemas import PROTOCOL, action_schemas
 
+_NEGOTIATION_ACTIONS = ("send_markup", "accept_counterparty")
+_DEFAULT_ESCALATION_GUIDANCE = (
+    "Noted. Proceed in accordance with the playbook and flag it in your final summary."
+)
+
 
 class PlaybookEnv:
     """A deterministic, partially observable legal-agent environment."""
@@ -23,13 +28,16 @@ class PlaybookEnv:
         rubric: dict[str, Any],
         hidden_facts: dict[str, Any],
         documents: dict[str, dict[str, Any]],
+        counterparty: dict[str, Any] | None = None,
     ) -> None:
         self.matter_dir = matter_dir
         self.matter = matter
         self.rubric = rubric
         self.hidden_facts = hidden_facts
         self.documents = documents
-        self.reward_engine = RewardEngine(rubric, documents)
+        self.counterparty = counterparty or {}
+        self.negotiation_enabled = bool(self.counterparty.get("positions"))
+        self.reward_engine = RewardEngine(rubric, documents, self.counterparty)
         self._rng = random.Random()
         self._has_reset = False
         self._terminated = False
@@ -39,6 +47,10 @@ class PlaybookEnv:
         self._learned_facts: dict[str, Any] = {}
         self._issue_submissions: list[dict[str, Any]] = []
         self._redline_submissions: list[dict[str, Any]] = []
+        self._escalation_topics: list[str] = []
+        self._negotiation_state: dict[str, dict[str, Any]] = {}
+        self._negotiation_labels: dict[str, str] = {}
+        self._negotiation_rounds_used = 0
         self.trace: list[TraceEvent] = []
 
     @classmethod
@@ -47,6 +59,8 @@ class PlaybookEnv:
         matter = load_yaml(path / "matter.yaml")
         rubric = load_yaml(path / "rubric.yaml")
         hidden_facts = load_yaml(path / "hidden_facts.yaml")
+        counterparty_path = path / "counterparty.yaml"
+        counterparty = load_yaml(counterparty_path) if counterparty_path.exists() else {}
         documents = load_documents(path, matter.get("documents", []))
         return cls(
             matter_dir=path,
@@ -54,6 +68,7 @@ class PlaybookEnv:
             rubric=rubric,
             hidden_facts=hidden_facts,
             documents=documents,
+            counterparty=counterparty,
         )
 
     @property
@@ -63,6 +78,22 @@ class PlaybookEnv:
     @property
     def max_client_questions(self) -> int:
         return int(self.matter.get("constraints", {}).get("maximum_client_questions", 5))
+
+    @property
+    def max_escalations(self) -> int:
+        return int(self.matter.get("constraints", {}).get("maximum_escalations", 2))
+
+    @property
+    def max_negotiation_rounds(self) -> int:
+        return int(self.matter.get("constraints", {}).get("maximum_negotiation_rounds", 8))
+
+    def action_schemas(self) -> dict[str, dict[str, Any]]:
+        """The action contract this matter actually supports."""
+        schemas = action_schemas()
+        if not self.negotiation_enabled:
+            for name in _NEGOTIATION_ACTIONS:
+                schemas.pop(name, None)
+        return schemas
 
     def reset(self, *, seed: int | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
         self._rng.seed(seed)
@@ -74,6 +105,10 @@ class PlaybookEnv:
         self._learned_facts = deepcopy(self.matter.get("public_facts", {}))
         self._issue_submissions = []
         self._redline_submissions = []
+        self._escalation_topics = []
+        self._negotiation_state = {}
+        self._negotiation_labels = {}
+        self._negotiation_rounds_used = 0
         self.trace = []
         self.reward_engine.reset()
         observation = self._observation()
@@ -218,6 +253,27 @@ class PlaybookEnv:
         self._last_result = {"question": question, "answer": answer}
         return reward, {"valid": True, "reward": reward_info}
 
+    def _handle_escalate(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+        if self.reward_engine.state.escalations_total >= self.max_escalations:
+            self._last_result = {"error": "Escalation budget exhausted."}
+            return -0.5, {"valid": False}
+        topic = str(action.get("topic", "")).strip()
+        reason = str(action.get("reason", "")).strip()
+        if not topic or not reason:
+            self._last_result = {"error": "escalate requires a 'topic' and a 'reason'."}
+            return -0.25, {"valid": False}
+        reward, reward_info, matched_id = self.reward_engine.score_escalation(topic, reason)
+        self._escalation_topics.append(topic)
+        guidance = None
+        if matched_id is not None:
+            guidance = self.hidden_facts.get("escalation_answers", {}).get(matched_id)
+        if guidance is None:
+            self._last_result = {"topic": topic, "guidance": _DEFAULT_ESCALATION_GUIDANCE}
+            return reward, {"valid": False, "reward": reward_info}
+        self._learned_facts[matched_id] = guidance
+        self._last_result = {"topic": topic, "guidance": guidance}
+        return reward, {"valid": True, "reward": reward_info}
+
     def _handle_submit_issue(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
         required = ["issue_id", "title", "severity", "citations", "analysis", "recommendation"]
         missing = [field for field in required if field not in action]
@@ -247,6 +303,159 @@ class PlaybookEnv:
         self._last_result = {"message": "Redline submitted.", "issue_id": action["issue_id"]}
         return reward, {"valid": True, "reward": reward_info}
 
+    def _handle_send_markup(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+        if self._negotiation_rounds_used >= self.max_negotiation_rounds:
+            self._last_result = {"error": "Negotiation-round budget exhausted."}
+            return -0.5, {"valid": False}
+        required = ["issue_id", "document_id", "section", "proposed_text"]
+        missing = [field for field in required if field not in action]
+        if missing:
+            self._last_result = {"error": "Missing markup fields.", "missing": missing}
+            return -0.25, {"valid": False}
+
+        label = str(action["issue_id"])
+        proposed = str(action["proposed_text"])
+        target = f"{action['document_id']} §{action['section']}"
+        rubric_id = self.reward_engine.state.issue_labels.get(label)
+        if rubric_id is None:
+            criterion = self.reward_engine.anchor_map.get(target)
+            rubric_id = str(criterion["id"]) if criterion else None
+
+        # An unsupported markup still burns a round: sending the wrong paper across
+        # the table costs the same negotiating capital as sending the right paper.
+        self._negotiation_rounds_used += 1
+        if rubric_id is None or rubric_id not in self.reward_engine.issue_map:
+            reward, reward_info = self.reward_engine.score_unsupported_markup(
+                label, "markup matches no submitted issue label and no operative anchor"
+            )
+            self._last_result = {
+                "error": "That markup does not correspond to an issue you have opened."
+            }
+            return reward, {"valid": False, "reward": reward_info}
+        if rubric_id not in self.reward_engine.positions:
+            reward, reward_info = self.reward_engine.score_unsupported_markup(
+                label, "the counterparty holds no position on that provision"
+            )
+            self._last_result = {"error": "The counterparty is not negotiating that provision."}
+            return reward, {"valid": False, "reward": reward_info}
+
+        position = self.reward_engine.positions[rubric_id]
+        state = self._negotiation_entry(rubric_id, label)
+        if state["status"] == "closed":
+            reward, reward_info = self.reward_engine.score_settlement(
+                rubric_id, proposed, str(state["closed_by"])
+            )
+            self._last_result = {
+                "response": "closed",
+                "message": "That point is already closed.",
+            }
+            return reward, {"valid": False, "reward": reward_info}
+
+        state["rounds_used"] += 1
+        acceptable = self._counterparty_accepts(position, proposed)
+        counters = list(position.get("counters", []) or [])
+
+        if acceptable and state["rounds_used"] > int(position.get("resist_rounds", 0)):
+            message = "Agreed. We will take your language."
+            state.update(
+                status="closed",
+                closed_by="ours",
+                closed_text=proposed,
+                outstanding_counter=None,
+                last_message=message,
+            )
+            self._last_result = {"response": "accepted", "message": message}
+            reward, reward_info = self.reward_engine.score_settlement(rubric_id, proposed, "ours")
+            return reward, {"valid": True, "reward": reward_info}
+
+        if state["counters_used"] < len(counters):
+            counter = counters[state["counters_used"]]
+            state["counters_used"] += 1
+            message = str(counter.get("message", ""))
+            counter_text = str(counter.get("text", ""))
+            state.update(
+                outstanding_counter=counter_text,
+                last_message=message,
+                last_counter_text=counter_text,
+            )
+            self._last_result = {
+                "response": "counter",
+                "message": message,
+                "counter_text": counter_text,
+            }
+            reward, reward_info = self.reward_engine.record_counterparty_response(
+                rubric_id, "counter"
+            )
+            return reward, {"valid": True, "reward": reward_info}
+
+        message = str(position.get("reject_message", "We cannot move further on this point."))
+        state["last_message"] = message
+        self._last_result = {"response": "rejected", "message": message}
+        reward, reward_info = self.reward_engine.record_counterparty_response(rubric_id, "reject")
+        return reward, {"valid": True, "reward": reward_info}
+
+    def _handle_accept_counterparty(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+        if self._negotiation_rounds_used >= self.max_negotiation_rounds:
+            self._last_result = {"error": "Negotiation-round budget exhausted."}
+            return -0.5, {"valid": False}
+        label = str(action.get("issue_id", ""))
+        # Accepting resolves through the agent's own labels only: there is no anchor
+        # to fall back on, and an outstanding counter always has a label behind it.
+        labels = {**self.reward_engine.state.issue_labels, **self._negotiation_labels}
+        rubric_id = labels.get(label)
+        state = self._negotiation_state.get(rubric_id) if rubric_id else None
+        if state is None or state["status"] == "closed" or not state["outstanding_counter"]:
+            self._last_result = {
+                "error": "There is no outstanding counterparty proposal on that issue."
+            }
+            return -0.25, {"valid": False}
+
+        self._negotiation_rounds_used += 1
+        counter_text = str(state["outstanding_counter"])
+        message = "Accepted on the counterparty's language."
+        state.update(
+            status="closed",
+            closed_by="theirs",
+            closed_text=counter_text,
+            last_message=message,
+        )
+        state["rounds_used"] += 1
+        self._last_result = {
+            "response": "accepted",
+            "message": message,
+            "accepted_text": counter_text,
+        }
+        reward, reward_info = self.reward_engine.score_settlement(
+            str(rubric_id), counter_text, "theirs"
+        )
+        return reward, {"valid": True, "reward": reward_info}
+
+    def _negotiation_entry(self, rubric_id: str, label: str) -> dict[str, Any]:
+        self._negotiation_labels[label] = rubric_id
+        return self._negotiation_state.setdefault(
+            rubric_id,
+            {
+                "status": "open",
+                "rounds_used": 0,
+                "counters_used": 0,
+                "outstanding_counter": None,
+                "last_message": None,
+                "last_counter_text": None,
+                "closed_by": None,
+                "closed_text": None,
+            },
+        )
+
+    @staticmethod
+    def _counterparty_accepts(position: dict[str, Any], proposed_text: str) -> bool:
+        """A proposal is acceptable if every concept of any accept variant appears."""
+        text = " ".join(proposed_text.lower().split())
+        for variant in position.get("accept_concepts", []) or []:
+            concepts = [" ".join(str(item).lower().split()) for item in variant]
+            if concepts and all(concept in text for concept in concepts):
+                return True
+        return False
+
     def _handle_submit_final(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
         summary = str(action.get("summary", ""))
         reward, reward_info = self.reward_engine.score_final(summary)
@@ -255,7 +464,25 @@ class PlaybookEnv:
         return reward, {"valid": True, "reward": reward_info, "result": self.episode_result()}
 
     def _observation(self) -> dict[str, Any]:
-        return {
+        protocol = dict(PROTOCOL)
+        if not self.negotiation_enabled:
+            protocol.pop("negotiation", None)
+        budgets = {
+            "steps_remaining": max(0, self.max_steps - self._step_count),
+            "client_questions_remaining": max(
+                0,
+                self.max_client_questions - self.reward_engine.state.questions_asked_total,
+            ),
+            "escalations_remaining": max(
+                0,
+                self.max_escalations - self.reward_engine.state.escalations_total,
+            ),
+        }
+        if self.negotiation_enabled:
+            budgets["negotiation_rounds_remaining"] = max(
+                0, self.max_negotiation_rounds - self._negotiation_rounds_used
+            )
+        observation: dict[str, Any] = {
             "matter": {
                 "matter_id": self.matter["matter_id"],
                 "title": self.matter["title"],
@@ -271,21 +498,39 @@ class PlaybookEnv:
                 }
                 for document_id, document in self.documents.items()
             ],
-            "protocol": dict(PROTOCOL),
-            "action_schemas": action_schemas(),
-            "budgets": {
-                "steps_remaining": max(0, self.max_steps - self._step_count),
-                "client_questions_remaining": max(
-                    0,
-                    self.max_client_questions
-                    - self.reward_engine.state.questions_asked_total,
-                ),
-            },
+            "protocol": protocol,
+            "action_schemas": self.action_schemas(),
+            "budgets": budgets,
             "learned_facts": deepcopy(self._learned_facts),
             "submitted_issue_ids": [item["issue_id"] for item in self._issue_submissions],
             "submitted_redline_issue_ids": [item["issue_id"] for item in self._redline_submissions],
+            "submitted_escalation_topics": list(self._escalation_topics),
             "last_result": deepcopy(self._last_result),
         }
+        if self.negotiation_enabled:
+            observation["negotiation"] = self._negotiation_view()
+        return observation
+
+    def _negotiation_view(self) -> dict[str, dict[str, Any]]:
+        """Per-issue negotiation status, keyed by the label the agent used.
+
+        Only what the counterparty has actually said reaches the agent: their
+        acceptance thresholds, resistance, undelivered counters, and the settlement
+        rubric stay hidden.
+        """
+        view: dict[str, dict[str, Any]] = {}
+        for label, rubric_id in self._negotiation_labels.items():
+            state = self._negotiation_state[rubric_id]
+            entry: dict[str, Any] = {
+                "status": state["status"],
+                "rounds_used": state["rounds_used"],
+                "last_message": state["last_message"],
+                "last_counter_text": state["last_counter_text"],
+            }
+            if state["status"] == "closed":
+                entry["closed_by"] = state["closed_by"]
+            view[label] = entry
+        return view
 
     @staticmethod
     def _snippet(text: str, query: str, radius: int = 100) -> str:

@@ -153,7 +153,7 @@ def order_versions(cluster: MatterCluster) -> list[VersionChain]:
     DMS version numbers are necessary but not sufficient: real turns arrive as email
     attachments and get re-filed as new documents. Ordering must reconcile version
     metadata, send times, and content similarity, and must *report* gaps rather than
-    interpolate over them (§3.2, and §6 "version-chain gaps").
+    interpolate over them (§3.2, and the failure register at §3.9).
     """
     raise _todo("§3.2 Stage 2 — version-chain ordering", "order_versions")
 

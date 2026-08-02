@@ -9,8 +9,11 @@ class ActionType(StrEnum):
     READ_DOCUMENT = "read_document"
     SEARCH_MATTER = "search_matter"
     ASK_CLIENT = "ask_client"
+    ESCALATE = "escalate"
     SUBMIT_ISSUE = "submit_issue"
     PROPOSE_REDLINE = "propose_redline"
+    SEND_MARKUP = "send_markup"
+    ACCEPT_COUNTERPARTY = "accept_counterparty"
     SUBMIT_FINAL = "submit_final"
 
 

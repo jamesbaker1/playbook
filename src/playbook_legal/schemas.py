@@ -53,6 +53,24 @@ _ACTIONS: dict[str, dict[str, Any]] = {
             "required": ["question"],
         },
     },
+    "escalate": {
+        "description": (
+            "Escalate one point to the supervising lawyer or the client's decision maker. "
+            "Every escalation consumes budget, so escalate only departures from a "
+            "non-negotiable position or requests that exceed your authority."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "topic": {"type": "string", "description": "Short label for the point escalated."},
+                "reason": {
+                    "type": "string",
+                    "description": "Why this exceeds your authority or departs from the playbook.",
+                },
+            },
+            "required": ["topic", "reason"],
+        },
+    },
     "submit_issue": {
         "description": (
             "Submit one material issue. Cite the single operative provision the issue targets "
@@ -111,6 +129,42 @@ _ACTIONS: dict[str, dict[str, Any]] = {
             "required": ["issue_id", "document_id", "section", "replacement_text", "rationale"],
         },
     },
+    "send_markup": {
+        "description": (
+            "Send proposed language for one section to the counterparty and receive their "
+            "response. The counterparty answers deterministically: they accept, counter with "
+            "their own language, or refuse. Each markup consumes a negotiation round."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "issue_id": {"type": "string", "description": "Label of your submitted issue."},
+                "document_id": {"type": "string"},
+                "section": {"type": "string"},
+                "proposed_text": {
+                    "type": "string",
+                    "description": "The language you are sending across the table.",
+                },
+            },
+            "required": ["issue_id", "document_id", "section", "proposed_text"],
+        },
+    },
+    "accept_counterparty": {
+        "description": (
+            "Accept the counterparty's outstanding counter-proposal for one issue and close "
+            "the point on their language. Accepting language you should not accept is scored."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "issue_id": {
+                    "type": "string",
+                    "description": "Your label for the issue whose counter you are accepting.",
+                }
+            },
+            "required": ["issue_id"],
+        },
+    },
     "submit_final": {
         "description": (
             "Submit the final summary for the supervising lawyer and end the episode. Submit "
@@ -142,6 +196,17 @@ PROTOCOL: dict[str, str] = {
         "issue_id is your own label. Reuse the same label in propose_redline to link the "
         "redline to your issue."
     ),
+    "escalation": (
+        "Escalations are budgeted. Escalate departures from non-negotiable positions and "
+        "requests beyond your authority. Both failing to escalate and over-escalating are "
+        "scored."
+    ),
+    "negotiation": (
+        "send_markup is answered deterministically by the counterparty: they accept, counter, "
+        "or refuse. Accepting counterparty language you should not accept is scored. Closing "
+        "every issue is not required — standing firm on a non-negotiable position and flagging "
+        "it in your final summary is correct."
+    ),
 }
 
 
@@ -150,8 +215,14 @@ def action_schemas() -> dict[str, dict[str, Any]]:
     return {name: dict(spec) for name, spec in _ACTIONS.items()}
 
 
-def tool_definitions() -> list[dict[str, Any]]:
-    """Return the action contract as OpenAI-compatible tool definitions."""
+def tool_definitions(actions: dict[str, dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+    """Return the action contract as OpenAI-compatible tool definitions.
+
+    ``actions`` restricts the contract to a subset — the environment filters out the
+    negotiation actions on matters without a counterparty, and the baseline runner
+    offers only what that matter actually supports.
+    """
+    specs = _ACTIONS if actions is None else actions
     return [
         {
             "type": "function",
@@ -161,5 +232,5 @@ def tool_definitions() -> list[dict[str, Any]]:
                 "parameters": spec["parameters"],
             },
         }
-        for name, spec in _ACTIONS.items()
+        for name, spec in specs.items()
     ]

@@ -106,6 +106,8 @@ def main() -> None:
     skipped: list[str] = []
     for matter_dir in matter_dirs:
         rubric = load_yaml(matter_dir / "rubric.yaml")
+        counterparty_path = matter_dir / "counterparty.yaml"
+        counterparty = load_yaml(counterparty_path) if counterparty_path.exists() else {}
         for seed in args.seeds:
             if args.runner == "replay":
                 result = run_replay(matter_dir, args.examples, seed)
@@ -114,7 +116,7 @@ def main() -> None:
                     break
             else:
                 result = run_baseline(matter_dir, seed, args)
-            metrics = compute_metrics(result, rubric)
+            metrics = compute_metrics(result, rubric, counterparty)
             metrics["seed"] = seed
             rows.append(metrics)
 
