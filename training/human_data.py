@@ -137,7 +137,9 @@ def main() -> None:
     parser.add_argument("--endpoint", required=False, help="Worker base URL")
     parser.add_argument("--matters", type=Path, default=Path("matters"))
     parser.add_argument("--raw-dir", type=Path, default=Path("artifacts/human_traces"))
-    parser.add_argument("--out", type=Path, default=Path("artifacts/human_sft.jsonl"))
+    parser.add_argument(
+        "--out", "--output", dest="out", type=Path, default=Path("artifacts/human_sft.jsonl")
+    )
     parser.add_argument("--skip-fetch", action="store_true", help="Verify/export raw-dir only")
     args = parser.parse_args()
 
@@ -145,7 +147,10 @@ def main() -> None:
         token = os.environ.get("PLAYBOOK_TRACES_TOKEN", "")
         if not args.endpoint or not token:
             raise SystemExit("--endpoint and PLAYBOOK_TRACES_TOKEN are required to fetch")
-        paths = fetch_records(args.endpoint.rstrip("/"), token, args.raw_dir)
+        endpoint = args.endpoint.rstrip("/")
+        if endpoint.endswith("/api/traces"):
+            endpoint = endpoint[: -len("/api/traces")]
+        paths = fetch_records(endpoint, token, args.raw_dir)
         print(f"fetched {len(paths)} records into {args.raw_dir}")
 
     records = [
