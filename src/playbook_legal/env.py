@@ -9,6 +9,7 @@ from typing import Any
 from .loaders import load_documents, load_yaml
 from .models import ActionType, TraceEvent
 from .rewards import RewardEngine
+from .schemas import PROTOCOL, action_schemas
 
 
 class PlaybookEnv:
@@ -41,7 +42,7 @@ class PlaybookEnv:
         self.trace: list[TraceEvent] = []
 
     @classmethod
-    def from_directory(cls, matter_dir: str | Path) -> "PlaybookEnv":
+    def from_directory(cls, matter_dir: str | Path) -> PlaybookEnv:
         path = Path(matter_dir)
         matter = load_yaml(path / "matter.yaml")
         rubric = load_yaml(path / "rubric.yaml")
@@ -194,20 +195,27 @@ class PlaybookEnv:
         return 0.0, {"valid": True, "hit_count": len(hits)}
 
     def _handle_ask_client(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
-        if len(self.reward_engine.state.asked_questions) >= self.max_client_questions:
+        if self.reward_engine.state.questions_asked_total >= self.max_client_questions:
             self._last_result = {"error": "Client-question budget exhausted."}
             return -0.5, {"valid": False}
-        question_id = str(action.get("question_id", ""))
-        fact = self.hidden_facts.get("client_answers", {}).get(question_id)
-        reward, reward_info = self.reward_engine.score_question(question_id)
-        if fact is None:
+        question = str(action.get("question", "")).strip()
+        if not question:
+            self._last_result = {"error": "ask_client requires a 'question'."}
+            return -0.25, {"valid": False}
+        reward, reward_info, matched_id = self.reward_engine.score_question(question)
+        answer = None
+        if matched_id is not None:
+            answer = self.hidden_facts.get("client_answers", {}).get(matched_id)
+        if answer is None:
             self._last_result = {
-                "question_id": question_id,
-                "answer": "The client does not have responsive information.",
+                "question": question,
+                "answer": (
+                    "The client has no responsive information beyond the matter file."
+                ),
             }
             return reward, {"valid": False, "reward": reward_info}
-        self._learned_facts[question_id] = fact
-        self._last_result = {"question_id": question_id, "answer": fact}
+        self._learned_facts[matched_id] = answer
+        self._last_result = {"question": question, "answer": answer}
         return reward, {"valid": True, "reward": reward_info}
 
     def _handle_submit_issue(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
@@ -218,11 +226,9 @@ class PlaybookEnv:
             return -0.25, {"valid": False}
         reward, reward_info = self.reward_engine.score_issue(action)
         self._issue_submissions.append(deepcopy(action))
-        self._last_result = {
-            "message": "Issue submitted.",
-            "issue_id": action["issue_id"],
-            "scoring": reward_info,
-        }
+        # Scoring detail stays harness-side (info/trace); the agent-visible
+        # observation only acknowledges receipt, so the rubric cannot be probed.
+        self._last_result = {"message": "Issue submitted.", "issue_id": action["issue_id"]}
         return reward, {"valid": True, "reward": reward_info}
 
     def _handle_propose_redline(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
@@ -238,21 +244,14 @@ class PlaybookEnv:
             return -0.75, {"valid": False}
         reward, reward_info = self.reward_engine.score_redline(action)
         self._redline_submissions.append(deepcopy(action))
-        self._last_result = {
-            "message": "Redline submitted.",
-            "issue_id": action["issue_id"],
-            "scoring": reward_info,
-        }
+        self._last_result = {"message": "Redline submitted.", "issue_id": action["issue_id"]}
         return reward, {"valid": True, "reward": reward_info}
 
     def _handle_submit_final(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
         summary = str(action.get("summary", ""))
         reward, reward_info = self.reward_engine.score_final(summary)
         self._terminated = True
-        self._last_result = {
-            "message": "Final work product submitted.",
-            "scoring": reward_info,
-        }
+        self._last_result = {"message": "Final work product submitted."}
         return reward, {"valid": True, "reward": reward_info, "result": self.episode_result()}
 
     def _observation(self) -> dict[str, Any]:
@@ -272,11 +271,14 @@ class PlaybookEnv:
                 }
                 for document_id, document in self.documents.items()
             ],
-            "available_actions": [action.value for action in ActionType],
+            "protocol": dict(PROTOCOL),
+            "action_schemas": action_schemas(),
             "budgets": {
                 "steps_remaining": max(0, self.max_steps - self._step_count),
                 "client_questions_remaining": max(
-                    0, self.max_client_questions - len(self.reward_engine.state.asked_questions)
+                    0,
+                    self.max_client_questions
+                    - self.reward_engine.state.questions_asked_total,
                 ),
             },
             "learned_facts": deepcopy(self._learned_facts),

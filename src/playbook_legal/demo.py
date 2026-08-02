@@ -7,26 +7,40 @@ from .env import PlaybookEnv
 
 
 def scripted_actions() -> list[dict]:
+    """A strong scripted trajectory written to the v0.2 contract.
+
+    The agent never sees rubric internals: issues are credited because their first
+    citation is the operative provision, questions because of their content, and
+    quotes because they reproduce section text verbatim.
+    """
     return [
         {"type": "read_document", "document_id": "instructions", "section": "1"},
         {"type": "read_document", "document_id": "msa", "section": "4.2"},
         {"type": "read_document", "document_id": "playbook", "section": "3"},
         {
             "type": "ask_client",
-            "question_id": "q_sensitive_data",
             "question": "Will the service process regulated or sensitive personal data?",
         },
         {
             "type": "ask_client",
-            "question_id": "q_launch_deadline",
             "question": "Is there a fixed launch deadline affecting negotiation leverage?",
         },
         {
             "type": "submit_issue",
-            "issue_id": "data_training",
+            "issue_id": "training-right",
             "title": "Provider model-training right exceeds client position",
             "severity": "high",
             "citations": ["msa §4.2", "playbook §3"],
+            "quotes": [
+                {
+                    "citation": "msa §4.2",
+                    "text": (
+                        "Acme may use Customer Data, prompts, inputs, Outputs, and usage "
+                        "information to operate, train, test, improve, and develop Acme's "
+                        "services and generalized machine-learning models."
+                    ),
+                }
+            ],
             "analysis": (
                 "The provider may use Customer Data and Outputs to train generalized models. "
                 "The client playbook permits only aggregated usage analytics and requires an "
@@ -36,7 +50,7 @@ def scripted_actions() -> list[dict]:
         },
         {
             "type": "propose_redline",
-            "issue_id": "data_training",
+            "issue_id": "training-right",
             "document_id": "msa",
             "section": "4.2",
             "replacement_text": (
@@ -50,10 +64,19 @@ def scripted_actions() -> list[dict]:
         {"type": "read_document", "document_id": "playbook", "section": "4"},
         {
             "type": "submit_issue",
-            "issue_id": "incident_notice",
+            "issue_id": "incident-timing",
             "title": "Security incident notice is too slow",
             "severity": "high",
             "citations": ["dpa §5.1", "playbook §4"],
+            "quotes": [
+                {
+                    "citation": "dpa §5.1",
+                    "text": (
+                        "in no event later than 72 hours after Acme confirms that the incident "
+                        "materially affects Customer Personal Data"
+                    ),
+                }
+            ],
             "analysis": (
                 "The DPA allows notice within 72 hours after confirmation, while the playbook "
                 "requires notice without undue delay and no later than 24 hours after discovery."
@@ -62,7 +85,7 @@ def scripted_actions() -> list[dict]:
         },
         {
             "type": "propose_redline",
-            "issue_id": "incident_notice",
+            "issue_id": "incident-timing",
             "document_id": "dpa",
             "section": "5.1",
             "replacement_text": (
@@ -75,10 +98,19 @@ def scripted_actions() -> list[dict]:
         {"type": "read_document", "document_id": "playbook", "section": "5"},
         {
             "type": "submit_issue",
-            "issue_id": "liability_cap",
+            "issue_id": "cap-carveouts",
             "title": "Single low cap applies to core data and IP risks",
             "severity": "high",
             "citations": ["msa §10.2", "playbook §5"],
+            "quotes": [
+                {
+                    "citation": "msa §10.2",
+                    "text": (
+                        "This cap applies to all claims, including confidentiality, "
+                        "data-security, and indemnification claims."
+                    ),
+                }
+            ],
             "analysis": (
                 "The fees-paid cap covers confidentiality, data-security, and IP indemnity claims. "
                 "The playbook requires a higher supercap for those exposures."
@@ -87,7 +119,7 @@ def scripted_actions() -> list[dict]:
         },
         {
             "type": "propose_redline",
-            "issue_id": "liability_cap",
+            "issue_id": "cap-carveouts",
             "document_id": "msa",
             "section": "10.2",
             "replacement_text": (
@@ -100,7 +132,7 @@ def scripted_actions() -> list[dict]:
         {"type": "read_document", "document_id": "dpa", "section": "9.2"},
         {
             "type": "submit_issue",
-            "issue_id": "dpa_precedence",
+            "issue_id": "precedence",
             "title": "DPA lacks effective precedence over conflicting MSA terms",
             "severity": "medium",
             "citations": ["dpa §9.2", "playbook §6"],
@@ -113,7 +145,7 @@ def scripted_actions() -> list[dict]:
         {"type": "read_document", "document_id": "msa", "section": "12.1"},
         {
             "type": "submit_issue",
-            "issue_id": "auto_renewal",
+            "issue_id": "renewal",
             "title": "Automatic renewal requires operational calendaring",
             "severity": "medium",
             "citations": ["msa §12.1", "playbook §7"],
@@ -144,7 +176,7 @@ def main() -> None:
     print(json.dumps(observation["matter"], indent=2))
 
     for action in scripted_actions():
-        _, reward, terminated, truncated, info = env.step(action)
+        _, reward, terminated, truncated, _ = env.step(action)
         print(f"step={len(env.trace):02d} action={action['type']:<18} reward={reward:>5.2f}")
         if terminated or truncated:
             break

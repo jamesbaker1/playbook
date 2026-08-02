@@ -2,6 +2,13 @@
 
 from .env import PlaybookEnv
 from .models import ActionType, EpisodeResult
+from .schemas import action_schemas, tool_definitions
 
-__all__ = ["ActionType", "EpisodeResult", "PlaybookEnv"]
-__version__ = "0.1.0"
+__all__ = [
+    "ActionType",
+    "EpisodeResult",
+    "PlaybookEnv",
+    "action_schemas",
+    "tool_definitions",
+]
+__version__ = "0.2.0"

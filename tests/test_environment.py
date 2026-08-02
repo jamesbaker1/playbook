@@ -1,13 +1,11 @@
 from pathlib import Path
 
 import pytest
+from conftest import MATTERS
 
 from playbook_legal import PlaybookEnv
-from playbook_legal.demo import scripted_actions
 
-
-ROOT = Path(__file__).resolve().parents[1]
-MATTER = ROOT / "matters" / "ai_saas_001"
+MATTER = MATTERS / "ai_saas_001"
 
 
 def test_reset_hides_client_answers() -> None:
@@ -19,55 +17,93 @@ def test_reset_hides_client_answers() -> None:
     assert info["matter_id"] == "ai_saas_001"
 
 
-def test_ask_client_reveals_only_requested_fact() -> None:
+def test_observation_exposes_contract() -> None:
     env = PlaybookEnv.from_directory(MATTER)
-    env.reset(seed=1)
-    observation, reward, *_ = env.step(
-        {
-            "type": "ask_client",
-            "question_id": "q_launch_deadline",
-            "question": "Is there a fixed deadline?",
-        }
+    observation, _ = env.reset(seed=1)
+    assert "protocol" in observation
+    assert set(observation["action_schemas"]) == {
+        "read_document",
+        "search_matter",
+        "ask_client",
+        "submit_issue",
+        "propose_redline",
+        "submit_final",
+    }
+
+
+def test_ask_client_free_text_reveals_only_requested_fact(ai_saas_env: PlaybookEnv) -> None:
+    observation, reward, *_ = ai_saas_env.step(
+        {"type": "ask_client", "question": "Is there a launch date the business has committed to?"}
     )
     assert reward > 0
     assert "September 15" in observation["last_result"]["answer"]
     assert "employee health-benefits" not in str(observation)
 
 
-def test_invalid_citation_is_penalized() -> None:
-    env = PlaybookEnv.from_directory(MATTER)
-    env.reset(seed=1)
-    _, reward, *_ = env.step(
+def test_off_rubric_question_consumes_budget(ai_saas_env: PlaybookEnv) -> None:
+    before = ai_saas_env._observation()["budgets"]["client_questions_remaining"]
+    observation, reward, *_ = ai_saas_env.step(
+        {"type": "ask_client", "question": "What is the provider's favorite color?"}
+    )
+    assert reward < 0
+    assert "no responsive information" in observation["last_result"]["answer"]
+    assert observation["budgets"]["client_questions_remaining"] == before - 1
+
+
+def test_question_budget_exhaustion(ai_saas_env: PlaybookEnv) -> None:
+    for index in range(ai_saas_env.max_client_questions):
+        ai_saas_env.step({"type": "ask_client", "question": f"Unrelated question {index}?"})
+    observation, reward, *_ = ai_saas_env.step(
+        {"type": "ask_client", "question": "One more question?"}
+    )
+    assert reward == -0.5
+    assert "budget" in observation["last_result"]["error"].lower()
+
+
+def test_invalid_citation_is_penalized(ai_saas_env: PlaybookEnv) -> None:
+    _, reward, *_ = ai_saas_env.step(
         {
             "type": "submit_issue",
-            "issue_id": "data_training",
+            "issue_id": "training",
             "title": "Training right",
             "severity": "high",
-            "citations": ["msa §99.9", "playbook §3"],
-            "analysis": "Customer Data and Outputs may be used to train models, not aggregated analytics.",
+            "citations": ["msa §4.2", "msa §99.9"],
+            "analysis": "Customer Data and Outputs may be used to train models.",
             "recommendation": "Delete it.",
         }
     )
     assert reward < 2.0
-    assert "msa §99.9" in env.episode_result()["breakdown"]["invalid_citations"]
+    assert "msa §99.9" in ai_saas_env.episode_result()["breakdown"]["invalid_citations"]
 
 
-def test_scripted_demo_completes_with_strong_score() -> None:
-    env = PlaybookEnv.from_directory(MATTER)
-    env.reset(seed=7)
-    for action in scripted_actions():
-        _, _, terminated, truncated, _ = env.step(action)
-        if terminated or truncated:
-            break
-    result = env.episode_result()
-    assert result["terminated"] is True
-    assert result["critical_failure"] is False
-    assert result["normalized_score"] >= 0.7
+def test_cannot_step_after_termination(ai_saas_env: PlaybookEnv) -> None:
+    ai_saas_env.step({"type": "submit_final", "summary": "x" * 200})
+    with pytest.raises(RuntimeError):
+        ai_saas_env.step({"type": "search_matter", "query": "data"})
 
 
-def test_cannot_step_after_termination() -> None:
+def test_unknown_action_penalized(ai_saas_env: PlaybookEnv) -> None:
+    observation, reward, terminated, truncated, _ = ai_saas_env.step({"type": "sue_everyone"})
+    assert reward == -0.5
+    assert not terminated and not truncated
+    assert "Unknown action" in observation["last_result"]["error"]
+
+
+def test_step_budget_truncates() -> None:
     env = PlaybookEnv.from_directory(MATTER)
     env.reset(seed=1)
-    env.step({"type": "submit_final", "summary": "x" * 200})
-    with pytest.raises(RuntimeError):
-        env.step({"type": "search_matter", "query": "data"})
+    truncated = False
+    for _ in range(env.max_steps + 1):
+        try:
+            _, _, _, truncated, _ = env.step({"type": "search_matter", "query": "data"})
+        except RuntimeError:
+            break
+    assert truncated
+    assert env.episode_result()["truncated"] is True
+
+
+def test_save_trace_writes_file(tmp_path: Path) -> None:
+    env = PlaybookEnv.from_directory(MATTER)
+    env.reset(seed=3)
+    destination = env.save_trace(tmp_path / "trace.json")
+    assert destination.exists()

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "playbook-legal"
-version = "0.1.0"
+version = "0.2.0"
 description = "An open environment for evaluating and training AI agents on realistic legal work."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -22,12 +22,18 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]
+baselines = ["openai>=1.40"]
 gym = ["gymnasium>=1.0"]
 train = ["datasets>=3", "transformers>=4.50", "trl>=0.17", "peft>=0.14", "accelerate>=1.2"]
 
 [project.scripts]
 playbook-demo = "playbook_legal.demo:main"
 playbook-eval = "playbook_legal.cli:main"
+playbook-lint = "playbook_legal.lint:main"
+playbook-export = "playbook_legal.export:main"
+playbook-render = "playbook_legal.render:main"
+playbook-baseline = "playbook_legal.baseline:main"
+playbook-bench = "playbook_legal.bench:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -38,3 +44,6 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint.per-file-ignores]
+"training/*" = ["E402"]
