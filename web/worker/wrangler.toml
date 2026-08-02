@@ -1,0 +1,7 @@
+name = "playbook-traces"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+
+kv_namespaces = [
+  { binding = "TRACES", id = "2edc6959b77347dc9b95e406a6a2b83b" }
+]

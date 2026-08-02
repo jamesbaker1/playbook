@@ -16,7 +16,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 WEB = REPO / "web"
 
-ASSETS = ["index.html", "style.css", "app.js", "driver.py"]
+ASSETS = ["index.html", "style.css", "app.js", "contribute.js", "driver.py"]
 
 
 def build(out_dir: Path) -> None:

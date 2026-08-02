@@ -18,6 +18,11 @@
   let readSections = new Set();
   let submittedLabels = new Set();
 
+  function markProgress(name) {
+    const item = document.querySelector(`[data-progress="${name}"]`);
+    if (item) item.classList.add("done");
+  }
+
   console.log(
     "%cplaybook",
     "font-weight:bold",
@@ -66,6 +71,9 @@
     }
     matterSelect.disabled = false;
     startBtn.disabled = false;
+    $("welcome-start").disabled = false;
+    $("help-start").disabled = false;
+    $("boot-status").textContent = `${matters.length} matters ready — choose one or try the guided matter`;
     $("engine-line").textContent =
       `pyodide ${pyodide.version} · playbook_legal 0.2.0 · ${matters.length} matters mounted`;
     boot("pick a matter above and open it.");
@@ -87,6 +95,15 @@
     const cls = reward > 0 ? "pos" : reward < 0 ? "neg" : "zero";
     const sign = reward > 0 ? "+" : "";
     return el("span", "rew " + cls, sign + reward.toFixed(2));
+  }
+
+  function showWorkspace(view) {
+    const documentMode = view === "document";
+    $("document-view").hidden = !documentMode;
+    transcript.hidden = documentMode;
+    document.querySelectorAll("#workspace-tabs button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.view === view);
+    });
   }
 
   function addEntry(kind, reward, bodyNodes) {
@@ -171,6 +188,10 @@
       readSections.add(docId + "§" + sec);
       if (link) link.classList.add("read");
       body.push(el("pre", "body doc-text", lr.content));
+      $("document-view").replaceChildren(el("pre", "", lr.content));
+      $("current-document").textContent = `${docId} §${sec}`;
+      showWorkspace("document");
+      markProgress("read");
     }
     addEntry(`read ${docId} §${sec}`, resp.reward, body);
     maybeScore(resp);
@@ -182,8 +203,12 @@
     const lr = resp.observation.last_result;
     const body = [el("div", "body", "q: " + question)];
     if (lr.error) body.push(el("div", "body error", lr.error));
-    else body.push(el("div", "body answer", lr.answer));
+    else {
+      body.push(el("div", "body answer", lr.answer));
+      markProgress("question");
+    }
     addEntry("ask_client", resp.reward, body);
+    showWorkspace("activity");
     maybeScore(resp);
   }
 
@@ -202,41 +227,52 @@
       body.push(list);
     }
     addEntry(`search "${query}"`, resp.reward, body);
+    showWorkspace("activity");
     maybeScore(resp);
   }
 
   function submitIssue(payload) {
     const resp = doStep({ type: "submit_issue", ...payload });
-    if (!resp) return;
+    if (!resp) return false;
     const lr = resp.observation.last_result;
     const body = [];
     if (lr.error) body.push(el("div", "body error", lr.error + " " + (lr.missing || "")));
     else {
       submittedLabels.add(payload.issue_id);
+      markProgress("issue");
       refreshLabels();
       body.push(el("div", "body", `${payload.severity} — ${payload.title}`));
       body.push(el("div", "body", "cites: " + payload.citations.join(", ")));
     }
     addEntry(`submit_issue [${payload.issue_id}]`, resp.reward, body);
+    showWorkspace("activity");
     maybeScore(resp);
+    return !lr.error;
   }
 
   function proposeRedline(payload) {
     const resp = doStep({ type: "propose_redline", ...payload });
-    if (!resp) return;
+    if (!resp) return false;
     const lr = resp.observation.last_result;
     const body = [];
     if (lr.error) body.push(el("div", "body error", lr.error + " " + (lr.missing || "")));
-    else body.push(el("pre", "body doc-text", payload.replacement_text));
+    else {
+      body.push(el("pre", "body doc-text", payload.replacement_text));
+      markProgress("redline");
+    }
     addEntry(`propose_redline [${payload.issue_id}] ${payload.document_id} §${payload.section}`,
       resp.reward, body);
+    showWorkspace("activity");
     maybeScore(resp);
+    return !lr.error;
   }
 
   function submitFinal(summary) {
     const resp = doStep({ type: "submit_final", summary });
     if (!resp) return;
     addEntry("submit_final", resp.reward, [el("div", "body", summary)]);
+    showWorkspace("activity");
+    markProgress("finish");
     maybeScore(resp);
   }
 
@@ -245,7 +281,7 @@
     const r = resp.result;
     const block = el("div", "score");
     const big = el("div", "big" + (r.critical_failure ? " capped" : ""),
-      r.normalized_score.toFixed(3));
+      Math.round(r.normalized_score * 100) + " / 100");
     block.appendChild(big);
     block.appendChild(el("div", "sub",
       `raw ${r.raw_score} / ${r.max_score}` +
@@ -274,11 +310,17 @@
       a.click();
       URL.revokeObjectURL(a.href);
     });
-    const again = el("button", "", "open another matter");
-    again.addEventListener("click", () => startMatter());
+    const again = el("button", "", "choose another matter");
+    again.addEventListener("click", () => {
+      $("main").hidden = true;
+      $("boot").hidden = false;
+      budgetsEl.hidden = true;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
     actions.appendChild(dl);
     actions.appendChild(again);
     block.appendChild(actions);
+    if (window.playbookContribute) window.playbookContribute(r, actions, () => driver.trace());
     transcript.appendChild(block);
     block.scrollIntoView({ block: "end", behavior: "smooth" });
   }
@@ -286,18 +328,22 @@
   /* ------------------------------------------------------------- composer */
 
   function disableComposer() {
-    document.querySelectorAll("#composer input, #composer textarea, #composer button")
+    document.querySelectorAll("#composer input, #composer textarea, #composer select, #composer button")
       .forEach((n) => (n.disabled = true));
   }
 
   function enableComposer() {
-    document.querySelectorAll("#composer input, #composer textarea, #composer button")
+    document.querySelectorAll("#composer input, #composer textarea, #composer select, #composer button")
       .forEach((n) => (n.disabled = false));
   }
 
   function refreshLabels() {
-    const dl = $("issue-labels");
+    const dl = $("redline-label");
     dl.replaceChildren();
+    const prompt = document.createElement("option");
+    prompt.value = "";
+    prompt.textContent = submittedLabels.size ? "Choose a submitted issue" : "Submit an issue first";
+    dl.appendChild(prompt);
     for (const label of submittedLabels) {
       const opt = document.createElement("option");
       opt.value = label;
@@ -312,6 +358,10 @@
       btn.classList.add("active");
       $("form-" + btn.dataset.tab).classList.add("active");
     });
+  });
+
+  document.querySelectorAll("#workspace-tabs button").forEach((btn) => {
+    btn.addEventListener("click", () => showWorkspace(btn.dataset.view));
   });
 
   $("add-quote").addEventListener("click", () => {
@@ -359,27 +409,32 @@
       recommendation: $("issue-recommendation").value.trim(),
     };
     if (quotes.length) payload.quotes = quotes;
-    submitIssue(payload);
-    e.target.reset();
-    $("quotes").replaceChildren();
+    if (submitIssue(payload)) {
+      e.target.reset();
+      $("quotes").replaceChildren();
+    }
   });
 
   $("form-redline").addEventListener("submit", (e) => {
     e.preventDefault();
-    proposeRedline({
+    const accepted = proposeRedline({
       issue_id: $("redline-label").value.trim(),
       document_id: $("redline-doc").value,
       section: $("redline-section").value.trim().replace(/^§\s*/, ""),
       replacement_text: $("redline-text").value.trim(),
       rationale: $("redline-rationale").value.trim(),
     });
-    e.target.reset();
+    if (accepted) e.target.reset();
   });
 
   $("form-finish").addEventListener("submit", (e) => {
     e.preventDefault();
     const s = $("final-summary").value.trim();
-    if (s) submitFinal(s);
+    if (!s) return;
+    const warning = submittedLabels.size === 0
+      ? "You have not submitted any issues. Submit this final work product anyway?"
+      : "Submitting ends this matter and calculates your score. Continue?";
+    if (window.confirm(warning)) submitFinal(s);
   });
 
   /* ---------------------------------------------------------------- start */
@@ -394,6 +449,10 @@
     submittedLabels = new Set();
     refreshLabels();
     transcript.replaceChildren();
+    $("current-document").textContent = "No section open";
+    $("document-view").innerHTML = `<div class="empty-document"><p class="eyebrow">${obs.matter.matter_id}</p><h2>${obs.matter.title}</h2><p><strong>You are:</strong> ${obs.matter.role}</p><p>${obs.matter.assignment}</p><p class="start-hint">Start by opening the supervising-lawyer instructions and playbook from the matter file.</p></div>`;
+    showWorkspace("document");
+    document.querySelectorAll("#progress li").forEach((item) => item.classList.remove("done"));
     enableComposer();
     renderDocs(obs);
     updateBudgets(obs);
@@ -414,4 +473,15 @@
   }
 
   startBtn.addEventListener("click", startMatter);
+  $("welcome-start").addEventListener("click", () => {
+    matterSelect.value = "ai_saas_001";
+    startMatter();
+  });
+  $("help-start").addEventListener("click", () => {
+    $("help-dialog").close();
+    matterSelect.value = "ai_saas_001";
+    startMatter();
+  });
+  $("help-btn").addEventListener("click", () => $("help-dialog").showModal());
+  $("close-help").addEventListener("click", () => $("help-dialog").close());
 })();

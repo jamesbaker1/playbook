@@ -3,102 +3,166 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>playbook — the legal agent gym</title>
-<meta name="description" content="play a synthetic legal matter against the same deterministic scoring engine used to train and benchmark AI legal agents. runs entirely in your browser.">
+<title>Playbook — the legal agent gym</title>
+<meta name="description" content="Work a synthetic legal matter and see how the same transparent engine used to benchmark AI legal agents scores your decisions.">
 <link rel="stylesheet" href="style.css">
-<!-- the scoring engine below is the real playbook_legal python package,
-     compiled to webassembly. nothing is reimplemented for the demo.
-     read the trace you download at the end — every point is accounted for. -->
 </head>
 <body>
 <header>
-  <span class="mark">playbook</span>
+  <a class="brand" href="./" aria-label="Playbook home"><span class="mark">playbook</span></a>
   <span class="tag">the legal agent gym</span>
   <span class="spacer"></span>
+  <a class="header-link" href="https://github.com/jamesbaker1/playbook#readme">about</a>
+  <button id="help-btn" class="header-link" type="button">how to play</button>
   <label class="pick">matter
     <select id="matter-select" disabled><option>booting…</option></select>
   </label>
-  <button id="start-btn" disabled>open matter</button>
+  <button id="start-btn" class="primary" disabled>start matter</button>
   <span id="budgets" class="budgets" hidden></span>
 </header>
 
 <div id="boot" class="boot">
-  <pre id="boot-log">fetching python runtime…</pre>
+  <section class="welcome">
+    <p class="eyebrow">OPEN, AUDITABLE LEGAL-AGENT BENCHMARK</p>
+    <h1>Can you review a deal<br>like a careful lawyer?</h1>
+    <p class="lede">Work through a synthetic legal matter, make judgment calls, and get a transparent score from the same deterministic engine used to evaluate AI agents.</p>
+    <div class="welcome-actions">
+      <button id="welcome-start" class="primary" disabled>try the guided matter</button>
+      <a href="https://github.com/jamesbaker1/playbook">view the research project →</a>
+    </div>
+    <div class="steps" aria-label="How Playbook works">
+      <div><b>01</b><strong>Read the record</strong><span>Inspect only the provisions that matter. Every action spends a step.</span></div>
+      <div><b>02</b><strong>Make the calls</strong><span>Ask targeted questions, identify risks, and draft operative redlines.</span></div>
+      <div><b>03</b><strong>See the evidence</strong><span>Get a criterion-level score and download the complete audit trace.</span></div>
+    </div>
+    <div class="trust-row">
+      <span>8 synthetic matters</span><span>runs locally in your browser</span><span>no legal data uploaded</span><span>open source</span>
+    </div>
+    <details class="boot-details">
+      <summary><span id="boot-status">Starting local scoring engine…</span></summary>
+      <pre id="boot-log">fetching python runtime…</pre>
+    </details>
+  </section>
 </div>
 
 <main id="main" hidden>
   <aside id="docs">
-    <p class="pane-label">record</p>
+    <p class="pane-label">1 · READ THE RECORD</p>
     <div id="doc-list"></div>
-    <p class="hint">reading a section is an action. it costs a step.</p>
+    <p class="hint">Select a section to open it. Reading and searching each cost one step.</p>
   </aside>
 
-  <section id="file">
-    <div id="transcript"></div>
+  <section id="file" aria-label="Document workspace">
+    <div class="workspace-bar">
+      <nav id="workspace-tabs" aria-label="Workspace view">
+        <button type="button" data-view="document" class="active">Document</button>
+        <button type="button" data-view="activity">Activity</button>
+      </nav>
+      <span id="current-document">No section open</span>
+    </div>
+    <article id="document-view">
+      <div class="empty-document">
+        <p class="eyebrow">MATTER WORKSPACE</p>
+        <h2>Start with the instructions.</h2>
+        <p>Choose a section from the matter file on the left. The document opens here; questions and work product stay organized in the review pane.</p>
+      </div>
+    </article>
+    <div id="transcript" aria-live="polite" hidden></div>
   </section>
 
   <aside id="composer">
-    <p class="pane-label">actions</p>
-    <nav id="tabs">
-      <button data-tab="ask" class="active">ask</button>
+    <p class="pane-label">2 · BUILD YOUR REVIEW</p>
+    <ol id="progress" class="progress" aria-label="Matter progress">
+      <li data-progress="read">read a provision</li>
+      <li data-progress="question">learn a client fact</li>
+      <li data-progress="issue">submit an issue</li>
+      <li data-progress="redline">draft a redline</li>
+      <li data-progress="finish">finish the review</li>
+    </ol>
+    <nav id="tabs" aria-label="Available actions">
+      <button data-tab="ask" class="active">ask client</button>
       <button data-tab="search">search</button>
-      <button data-tab="issue">issue</button>
+      <button data-tab="issue">add issue</button>
       <button data-tab="redline">redline</button>
       <button data-tab="finish">finish</button>
     </nav>
 
     <form id="form-ask" class="tabform active">
-      <textarea id="ask-question" rows="3" placeholder="one factual question for the client. budget is small — ask only what could change the position." required></textarea>
+      <p class="form-help">Ask only facts that could change your advice or negotiating position.</p>
+      <label for="ask-question">Question for the client</label>
+      <textarea id="ask-question" rows="3" placeholder="Will the service process regulated or sensitive data?" required></textarea>
       <button type="submit">ask the client</button>
     </form>
 
     <form id="form-search" class="tabform">
-      <input id="search-query" placeholder="substring search across every section" required>
+      <p class="form-help">Find a term across the record without opening every section.</p>
+      <label for="search-query">Search term</label>
+      <input id="search-query" placeholder="e.g. training, liability, renewal" required>
       <button type="submit">search the record</button>
     </form>
 
     <form id="form-issue" class="tabform">
-      <input id="issue-label" placeholder="your label, e.g. training-right" required>
-      <input id="issue-title" placeholder="issue title" required>
-      <select id="issue-severity">
-        <option value="low">low</option>
-        <option value="medium">medium</option>
-        <option value="high" selected>high</option>
-        <option value="critical">critical</option>
-      </select>
-      <textarea id="issue-citations" rows="2" placeholder="citations, one per line. operative provision first, e.g. msa §4.2" required></textarea>
-      <textarea id="issue-analysis" rows="4" placeholder="analysis" required></textarea>
-      <textarea id="issue-recommendation" rows="2" placeholder="recommendation" required></textarea>
+      <p class="form-help">Ground the issue in the contract and playbook. Put the operative provision first.</p>
+      <label for="issue-label">Short internal label</label>
+      <input id="issue-label" placeholder="e.g. training-right" required>
+      <label for="issue-title">Issue title</label>
+      <input id="issue-title" placeholder="Provider training right exceeds client position" required>
+      <label for="issue-severity">Priority</label>
+      <select id="issue-severity"><option value="low">low</option><option value="medium">medium</option><option value="high" selected>high</option><option value="critical">critical</option></select>
+      <label for="issue-citations">Citations — one per line</label>
+      <textarea id="issue-citations" rows="2" placeholder="msa §4.2&#10;playbook §3" required></textarea>
+      <label for="issue-analysis">Why it matters</label>
+      <textarea id="issue-analysis" rows="4" placeholder="Explain the conflict, consequence, and relevant client fact." required></textarea>
+      <label for="issue-recommendation">Recommended position</label>
+      <textarea id="issue-recommendation" rows="2" placeholder="State the preferred position and acceptable fallback." required></textarea>
       <div id="quotes"></div>
-      <button type="button" id="add-quote" class="ghost">+ quote (verbatim only — a wrong quote ends badly)</button>
+      <button type="button" id="add-quote" class="ghost">+ add a verbatim quote (optional)</button>
       <button type="submit">submit issue</button>
     </form>
 
     <form id="form-redline" class="tabform">
-      <input id="redline-label" list="issue-labels" placeholder="label of your issue" required>
-      <datalist id="issue-labels"></datalist>
-      <div class="row">
-        <select id="redline-doc"></select>
-        <input id="redline-section" placeholder="§" required>
-      </div>
-      <textarea id="redline-text" rows="5" placeholder="replacement language" required></textarea>
-      <textarea id="redline-rationale" rows="2" placeholder="rationale" required></textarea>
+      <p class="form-help">Write replacement language that actually fixes a submitted issue.</p>
+      <label for="redline-label">Issue this redline fixes</label>
+      <select id="redline-label" required><option value="">Submit an issue first</option></select>
+      <label>Provision to replace</label>
+      <div class="row"><select id="redline-doc"></select><input id="redline-section" placeholder="section" required></div>
+      <label for="redline-text">Replacement language</label>
+      <textarea id="redline-text" rows="5" placeholder="Draft the complete operative provision." required></textarea>
+      <label for="redline-rationale">Rationale</label>
+      <textarea id="redline-rationale" rows="2" placeholder="Explain how this language implements the client position." required></textarea>
       <button type="submit">propose redline</button>
     </form>
 
     <form id="form-finish" class="tabform">
-      <textarea id="final-summary" rows="6" placeholder="closing summary for the supervising lawyer. name the issues that matter." required></textarea>
+      <p class="form-help">Summarize priorities, client facts, and the positions that should block signature.</p>
+      <label for="final-summary">Update for the supervising lawyer</label>
+      <textarea id="final-summary" rows="7" placeholder="Lead with the highest-risk issues and recommended next steps." required></textarea>
       <button type="submit" class="danger">submit final work product</button>
     </form>
   </aside>
 </main>
 
+<dialog id="help-dialog">
+  <button id="close-help" class="dialog-close" aria-label="Close help">×</button>
+  <p class="eyebrow">HOW TO PLAY</p>
+  <h2>Work the matter, not the rubric.</h2>
+  <p>You are counsel on a synthetic deal. Read the instructions and playbook, inspect the operative contract provisions, and use the action panel to produce your review.</p>
+  <div class="help-grid">
+    <div><b>Start with context</b><p>Open the supervising-lawyer instructions and negotiation playbook before chasing contract issues.</p></div>
+    <div><b>Cite carefully</b><p>Use <code>document §section</code>. Any quotation must be copied exactly from the cited section.</p></div>
+    <div><b>Use judgment</b><p>Questions and steps are limited. Prioritize facts and risks that could change the outcome.</p></div>
+    <div><b>Close the loop</b><p>Submit issues before linking redlines to them, then finish with a concise lawyer update.</p></div>
+  </div>
+  <button id="help-start" class="primary" disabled>start the guided matter</button>
+</dialog>
+
 <footer>
-  <span>scoring locally — the real <a href="https://github.com/jamesbaker1/playbook">playbook_legal</a> engine in webassembly. zero network calls after boot.</span>
+  <span>Scoring locally with the real <a href="https://github.com/jamesbaker1/playbook">playbook_legal</a> engine. No matter data leaves this page.</span>
   <span id="engine-line"></span>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <script src="app.js"></script>
+<script src="contribute.js"></script>
 </body>
 </html>
