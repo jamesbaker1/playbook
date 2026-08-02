@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Playbook — the legal agent gym</title>
-<meta name="description" content="Work a synthetic legal matter and see how the same transparent engine used to benchmark AI legal agents scores your decisions.">
+<title>playbook — the legal agent gym</title>
+<meta name="description" content="Play a synthetic legal matter against the deterministic engine that benchmarks AI legal agents. Every verified episode can become open training data.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,35 +24,36 @@
 
 <div id="boot" class="boot">
   <section class="welcome">
-    <p class="section-label">PLAYBOOK LEGAL GYM</p>
-    <h1>Practice a legal contract review.</h1>
-    <p class="lede">Open a realistic synthetic matter, review the documents, record issues, and draft redlines. At the end, Playbook shows exactly how the work was scored.</p>
-    <fieldset class="mode-picker" aria-label="Choose an experience">
-      <legend>Choose how you want to work</legend>
+    <p class="eyebrow">OPEN, AUDITABLE LEGAL-AGENT GYM</p>
+    <h1>Can you review a deal<br>like a careful lawyer?</h1>
+    <p class="lede">Work a synthetic matter, make the judgment calls, and get a criterion-level score from the same deterministic engine that benchmarks AI legal agents. Every episode produces a complete audit trace — contribute yours, and it becomes verified, open training data.</p>
+    <fieldset class="mode-picker" aria-label="Choose a mode">
+      <legend>mode</legend>
       <label class="mode-option selected">
         <input type="radio" name="play-mode" value="learn" checked>
-        <span><strong>Learn</strong><small>Guided workflow, practical prompts, and a final explanation.</small></span>
+        <span><strong>learn</strong><small>guided, with a final explanation</small></span>
       </label>
       <label class="mode-option">
         <input type="radio" name="play-mode" value="benchmark">
-        <span><strong>Benchmark</strong><small>A sealed attempt: no guidance or workflow checks until you submit.</small></span>
+        <span><strong>benchmark</strong><small>sealed — no hints until you submit</small></span>
       </label>
     </fieldset>
     <div class="welcome-actions">
-      <button id="welcome-start" class="primary">Open the guided matter</button>
-      <span class="time-note">Starter matter · about 15–20 minutes</span>
-      <a href="https://github.com/jamesbaker1/playbook">About the project</a>
+      <button id="welcome-start" class="primary">try the guided matter</button>
+      <span class="time-note">about 15–20 minutes</span>
+      <a href="https://github.com/jamesbaker1/playbook">view the research project →</a>
     </div>
     <div class="steps" aria-label="How Playbook works">
-      <div><strong>Read the matter</strong><span>Open the instructions, playbook, and agreement provisions.</span></div>
-      <div><strong>Prepare the review</strong><span>Ask focused questions, record issues, and draft changes.</span></div>
-      <div><strong>Finish and check</strong><span>Receive a transparent score and downloadable audit trace.</span></div>
+      <div><b>01</b><strong>Read the record</strong><span>Inspect only the provisions that matter. Every action spends a step.</span></div>
+      <div><b>02</b><strong>Make the calls</strong><span>Ask targeted questions, flag risks, and draft operative redlines.</span></div>
+      <div><b>03</b><strong>See the evidence</strong><span>A criterion-level score and the complete audit trace, every point accounted for.</span></div>
+      <div><b>04</b><strong>Leave a trace</strong><span>Opt in, and your verified episode joins an open training set for legal agents.</span></div>
     </div>
     <div class="trust-row">
-      <span>Synthetic matters</span><span>Canonical scoring</span><span>No client documents</span><span>Open source</span>
+      <span>10 synthetic matters</span><span>canonical scoring engine</span><span>no client documents</span><span>open source</span>
     </div>
     <details class="boot-details">
-      <summary><span id="boot-status">Connecting to scoring service…</span></summary>
+      <summary><span id="boot-status">connecting to the scoring service…</span></summary>
       <pre id="boot-log">checking service availability…</pre>
     </details>
   </section>

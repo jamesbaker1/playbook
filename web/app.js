@@ -36,8 +36,8 @@
       input.checked = input.value === playMode;
       input.closest(".mode-option").classList.toggle("selected", input.checked);
     });
-    $("welcome-start").textContent = playMode === "benchmark" ? "Start sealed benchmark" : "Open the guided matter";
-    $("mode-badge").textContent = playMode === "benchmark" ? "Benchmark mode" : "Learn mode";
+    $("welcome-start").textContent = playMode === "benchmark" ? "start a sealed benchmark" : "try the guided matter";
+    $("mode-badge").textContent = playMode === "benchmark" ? "benchmark mode" : "learn mode";
   }
   document.querySelectorAll('input[name="play-mode"]').forEach((input) => {
     input.addEventListener("change", () => setPlayMode(input.value));
@@ -112,8 +112,8 @@
     if (matterSelect.disabled) {
       guidedStartPending = true;
       $("welcome-start").disabled = true;
-      $("welcome-start").textContent = "Connecting to the matter service…";
-      $("boot-status").textContent = "Warming the scoring engine; this can take a few seconds…";
+      $("welcome-start").textContent = "connecting…";
+      $("boot-status").textContent = "warming the scoring engine — a few seconds…";
       return;
     }
     matterSelect.value = "ai_saas_001";
@@ -166,8 +166,8 @@
       await startMatter();
     }
   } catch (err) {
-    $("boot-status").textContent = "Scoring service unavailable";
-    $("welcome-start").textContent = "Retry connection";
+    $("boot-status").textContent = "scoring service unavailable";
+    $("welcome-start").textContent = "retry connection";
     $("welcome-start").disabled = false;
     boot("connection failed: " + err.message);
     $("welcome-start").onclick = () => window.location.reload();
@@ -831,8 +831,8 @@
     const id = matterSelect.value;
     startBtn.disabled = true;
     $("welcome-start").disabled = true;
-    $("welcome-start").textContent = "Opening matter…";
-    $("boot-status").textContent = "Opening the workspace…";
+    $("welcome-start").textContent = "opening matter…";
+    $("boot-status").textContent = "opening the workspace…";
     let payload;
     try {
       if (id === "ai_saas_001") {
@@ -841,9 +841,9 @@
       }
       if (!payload) payload = await driver.start(id, 0);
     } catch (error) {
-      $("boot-status").textContent = "Could not open matter";
+      $("boot-status").textContent = "could not open matter";
       boot("request failed: " + error.message);
-      $("welcome-start").textContent = "Retry opening matter";
+      $("welcome-start").textContent = "retry opening matter";
       $("welcome-start").disabled = false;
       return;
     } finally {
@@ -852,7 +852,7 @@
     guidedStartPending = false;
     starterPayload = null;
     $("welcome-start").disabled = false;
-    $("welcome-start").textContent = "Open the guided matter";
+    $("welcome-start").textContent = "try the guided matter";
     const obs = payload.observation;
     stepNo = 0;
     finished = false;
