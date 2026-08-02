@@ -2,103 +2,104 @@
 
 **Train legal agents on the work, not just the law.**
 
-Playbook is an open environment for evaluating and training AI agents on realistic,
-multi-step legal work. An agent receives a matter file, client facts, documents,
-professional instructions, and a negotiation playbook. It must inspect the record,
-ask limited questions, identify material issues, propose work product, and submit a
-final answer. The environment scores the agent's actions against deterministic checks
-and expert-authored rubrics.
+[![CI](https://github.com/jamesbaker1/playbook/actions/workflows/ci.yml/badge.svg)](https://github.com/jamesbaker1/playbook/actions/workflows/ci.yml)
 
-This repository is a runnable **v0.1 vertical slice**. It includes one synthetic
-customer-side AI SaaS contract-review matter, a stateful environment, a deterministic
-reward engine, trajectory logging, tests, and export utilities for supervised fine-tuning.
+Playbook is a gym for legal agents: partially observable, rubric-scored environments
+for evaluating and training AI on realistic, multi-step legal work. An agent receives
+a matter file, documents, professional instructions, and a client negotiation
+playbook. It must inspect the record, ask a limited number of client questions,
+identify material issues, propose redlines, and submit a final summary. Every action
+is scored by deterministic verifiers against expert-authored rubrics, and every
+episode produces a complete audit trace usable as training data.
 
-## Why the package is called `playbook-legal`
+Existing legal benchmarks test static, single-turn tasks. Playbook tests the
+*process* of legal work: fact gathering under budget, playbook compliance, escalation
+judgment, citation-grounded analysis, and drafting — the same design pattern that
+made policy-constrained agent benchmarks work in other domains.
 
-The public project name is **Playbook**. The `playbook` and `playbooks` package names are
-already occupied on PyPI, so this starter uses the distribution name `playbook-legal`
-and the Python import namespace `playbook_legal`.
+## The v0.2 scoring contract
+
+Credit is earned by **content**, never by guessing rubric internals:
+
+- **Issues** are credited by the operative provision they cite (each rubric issue has
+  a unique *anchor* citation; your first citation decides the match).
+- **Client questions** are free text, matched by concepts; every question consumes
+  budget whether or not it lands.
+- **Quotations** are verified verbatim against the cited section. A fabricated quote
+  is a **critical failure** that caps the episode score — polish cannot rescue
+  fabrication.
+- Scoring detail never appears in agent-visible observations, so the rubric cannot
+  be probed mid-episode.
+- Given the same matter, seed, and actions, everything is deterministic.
 
 ## Quick start
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest
-python -m playbook_legal.demo
+pytest                      # environment, scoring, adversarial, and example tests
+python -m playbook_legal.demo   # scripted episode with full score breakdown
 ```
-
-The demo runs a transparent scripted agent through the included matter and writes a
-complete episode trace to `artifacts/demo_trajectory.json`.
 
 ## Core API
 
 ```python
-from pathlib import Path
 from playbook_legal import PlaybookEnv
 
-matter_dir = Path("matters/ai_saas_001")
-env = PlaybookEnv.from_directory(matter_dir)
+env = PlaybookEnv.from_directory("matters/ai_saas_001")
 observation, info = env.reset(seed=7)
-
 observation, reward, terminated, truncated, info = env.step({
-    "type": "read_document",
-    "document_id": "msa",
-    "section": "4.2"
+    "type": "ask_client",
+    "question": "Is there a fixed launch deadline affecting negotiation leverage?",
 })
 ```
 
-`step()` follows the modern Gymnasium shape:
+`step()` follows the Gymnasium shape. Actions are also exposed as OpenAI-compatible
+tool definitions (`playbook_legal.tool_definitions()`), so any chat model with
+function calling can play the environment via the baseline runner.
 
-```text
-observation, reward, terminated, truncated, info
-```
+## Command-line tools
 
-The core package does not require Gymnasium. A thin adapter can be added after the
-language-agent interface stabilizes.
+| Command | Purpose |
+| --- | --- |
+| `playbook-demo` | Run the scripted reference episode |
+| `playbook-eval <matter> <actions.jsonl>` | Replay an action file and print the score |
+| `playbook-lint --all matters` | Validate matter packages (anchors, citations, canary) |
+| `playbook-baseline <matter> --model <m>` | Let an OpenAI-compatible model play a matter |
+| `playbook-bench --runner replay\|baseline` | Score a runner across all matters → scorecard |
+| `playbook-render <trace> <out.html>` | Render a trace as an HTML audit report |
+| `playbook-export <trace> <out.jsonl>` | Convert a trace to chat-format SFT data |
 
-## Included matter
+## Matters
 
-`ai_saas_001` asks the agent to review an AI-enabled SaaS agreement and DPA for a
-customer using a client negotiation playbook. The matter tests:
-
-- provider use of customer data and outputs for model training;
-- security-incident notification timing;
-- limitation-of-liability treatment of confidentiality, data, and IP risks;
-- DPA precedence over conflicting agreement terms;
-- renewal and termination-management risk;
-- targeted client fact gathering;
-- citation-grounded issue submission;
-- and operative redline drafting.
-
-All matter content is synthetic and intentionally simplified. It is not legal advice.
+Public development matters live in `matters/` (all synthetic; each carries a
+contamination canary string). Private held-out evaluation matters live in a separate
+private repository so published models can be scored on unseen work. Every matter
+ships a validated reference trajectory and adversarial bad trajectories in
+`examples/<matter_id>/`, enforced by CI.
 
 ## Repository map
 
 ```text
-src/playbook_legal/       Environment, schemas, scoring, trace logging, CLI
-matters/ai_saas_001/      First complete synthetic legal matter
-examples/                 Agent examples
-training/                 SFT export and training-plan scaffolding
-tests/                    Unit and end-to-end tests
-SPEC.md                    v0.1 technical specification
-AUTHORING.md               How to create the next matter
-ROADMAP.md                 Four-week build plan
+src/playbook_legal/       Environment, scoring, schemas, linter, baseline, bench
+matters/                  Public synthetic matters (dev split)
+examples/<matter_id>/     Reference + adversarial trajectories per matter
+training/                 Modal-ready SFT / DPO / GRPO scaffolds (never auto-run)
+tests/                    Environment, scoring, adversarial, lint, baseline tests
+SPEC.md                   Technical specification (v0.2 contract)
+AUTHORING.md              How to author and validate a matter
+ROADMAP.md                Build plan and status
 ```
 
 ## Design principles
 
 1. **Score actions, not prose similarity.**
 2. **Separate hidden state from agent observations.**
-3. **Use deterministic verifiers wherever possible.**
+3. **Use deterministic verifiers first; add judges only where verifiers cannot reach.**
 4. **Treat critical legal failures as gates, not small average penalties.**
-5. **Log every action for auditability and training-data generation.**
-6. **Keep public evaluation matters separate from private held-out matters.**
-7. **Use only synthetic, licensed, or clearly public source materials.**
+5. **Make the reward un-gameable before making it bigger** (anti-gaming tests in CI).
+6. **Log every action for auditability and training-data generation.**
+7. **Keep public evaluation matters separate from private held-out matters.**
+8. **Use only synthetic, licensed, or clearly public source materials.**
 
-## Next milestone
-
-The next release should add nine more technology-transactions matters, a model client
-simulator constrained by structured hidden state, a baseline runner for local/API models,
-and a calibrated human-review workflow for drafting-quality scores.
+All matter content is synthetic and intentionally simplified. It is not legal advice.

@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use Playbook in your research, please cite it as below."
+title: "Playbook: environments for realistic legal-agent work"
+authors:
+  - family-names: Baker
+    given-names: James
+repository-code: "https://github.com/jamesbaker1/playbook"
+license: Apache-2.0
+version: 0.2.0
+date-released: 2026-08-02
+keywords:
+  - legal-ai
+  - reinforcement-learning
+  - agents
+  - evaluation
+  - contracts
