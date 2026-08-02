@@ -69,11 +69,16 @@ format feeds everything downstream:
 ## Browser gym
 
 GitHub Pages is a static delivery layer, not a second implementation of Playbook.
-`web/build_site.py` bundles the public matters, the Python package, a small JSON
-driver, and the interface assets. At runtime Pyodide mounts those files and imports
-`playbook_legal` in the browser. JavaScript sends JSON actions to `web/driver.py`;
-the driver calls `PlaybookEnv.step()` and returns JSON observations and terminal
-results.
+`web/build_site.py` emits only HTML, CSS, and JavaScript assets. The client sends a
+matter ID, seed, and action history to a dedicated Cloudflare Python Worker. The Worker
+creates a fresh `PlaybookEnv`, deterministically replays the history, and returns the
+current safe observation or terminal result.
+
+Stateless replay means the service needs no session database and trusts no
+browser-provided observation, score, trace, or step number. Rubrics, hidden facts,
+counterparty positions, matter files, and scorer source are bundled only with the
+Worker. Nonterminal responses omit harness-side reward details that could expose
+rubric internals.
 
 The interface maintains presentation-only state such as the selected document,
 review cards, drafts, mobile pane, and final preflight. None of that state awards

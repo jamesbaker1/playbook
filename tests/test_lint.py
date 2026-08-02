@@ -134,3 +134,47 @@ def test_invalid_regex_fails(tmp_path: Path) -> None:
     )
     report = lint_matter(matter_dir)
     assert any("invalid regex" in error for error in report.errors)
+
+
+def test_dead_non_negotiable_gate_fails(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].update({"settlement_points": 1.0, "non_negotiable": True}),
+    )
+    (matter_dir / "counterparty.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "positions": {
+                    "issue_one": {
+                        "accept_concepts": [["service"]],
+                        "reject_message": "No.",
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    report = lint_matter(matter_dir)
+    assert any("can never fire" in error for error in report.errors)
+
+
+def test_missing_settlement_concepts_warns(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(matter_dir, lambda r: r["issues"][0].update({"settlement_points": 1.0}))
+    (matter_dir / "counterparty.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "positions": {
+                    "issue_one": {
+                        "accept_concepts": [["service"]],
+                        "reject_message": "No.",
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    report = lint_matter(matter_dir)
+    assert report.ok
+    assert any("any closing" in warning for warning in report.warnings)

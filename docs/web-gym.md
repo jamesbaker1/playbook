@@ -11,10 +11,9 @@ are synthetic.
 
 ## First-time use
 
-1. Open the web gym and wait for **matters ready**. The first visit downloads the
-   Python/WebAssembly runtime, scoring engine, and synthetic matter files. Expand
-   the startup-status row only if you want to see those details.
-2. Choose **try the guided matter** for the recommended introduction, or select a
+1. Open the web gym and wait briefly for **matters ready** while the page checks the
+   scoring service. No Python runtime or matter internals are downloaded.
+2. Choose **Open the guided matter** for the recommended introduction, or select a
    matter in the header and choose **start matter**.
 3. Open the supervising-lawyer instructions and playbook before reviewing the
    contract. Opening a section is an action and spends one step.
@@ -135,20 +134,20 @@ awkward on a phone, so prepare long replacement language elsewhere if needed, th
 paste and verify it before submission. Do not rely on the browser Back button to
 move between workspace panes; use the bottom navigation.
 
-## Privacy and local execution
+## Privacy and service processing
 
-Matter actions and scoring run locally in the browser using the repository's real
-Python engine through WebAssembly. There is no account and no scoring API. Loading
-the page still downloads ordinary website assets and the Python runtime from their
-hosts, as any web application does.
+The website sends the selected synthetic matter ID and your action history to the
+Playbook scoring service. The service runs the canonical Python environment and
+returns safe observations, client answers earned through actions, and terminal
+results. Rubrics, hidden facts, counterparty positions, and scorer source remain on
+the service and are not included in the website bundle.
 
-No trace is uploaded during play or when you choose **download trace**. After a
-completed matter, the gym separately offers **contribute trace**. Contribution is
-optional and requires an explicit click. The uploaded payload contains the action
-trace and score plus an optional handle; contributed traces are replay-verified
-before they are accepted for training use. Review a downloaded trace before
-contributing if you want to see exactly what it contains. Do not enter real client
-information: these are synthetic exercises.
+The scoring service necessarily processes your actions during play. Choosing
+**download trace** does not send the completed trace to the separate training-data
+collector. After a completed matter, **contribute trace** offers that additional,
+optional upload and requires an explicit click. Its payload contains the action trace,
+score, and optional handle; contributed traces are replay-verified before training
+use. Do not enter real client or confidential information: these are synthetic exercises.
 
 ## Common pitfalls
 

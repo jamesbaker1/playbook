@@ -28,6 +28,33 @@
     handle.maxLength = 40;
     handle.style.marginBottom = "6px";
 
+    const background = document.createElement("select");
+    background.setAttribute("aria-label", "Professional background (optional)");
+    background.style.marginBottom = "6px";
+    for (const [value, label] of [
+      ["", "background (optional)"],
+      ["lawyer", "lawyer"],
+      ["legal_professional", "other legal professional"],
+      ["law_student", "law student"],
+      ["other", "other"],
+    ]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      background.appendChild(option);
+    }
+
+    const consentLabel = document.createElement("label");
+    consentLabel.style.display = "flex";
+    consentLabel.style.gap = "8px";
+    consentLabel.style.margin = "4px 0 8px";
+    const consent = document.createElement("input");
+    consent.type = "checkbox";
+    consent.style.width = "auto";
+    consentLabel.append(consent, document.createTextNode(
+      "I agree that this trace may be used to train and evaluate AI models."
+    ));
+
     const btn = document.createElement("button");
     btn.type = "button";
     btn.textContent = "contribute trace";
@@ -37,12 +64,24 @@
     status.style.color = "var(--muted)";
 
     btn.addEventListener("click", async () => {
+      if (!consent.checked) {
+        status.textContent = "confirm training-data consent first";
+        consent.focus();
+        return;
+      }
       btn.disabled = true;
       status.textContent = "uploading…";
       try {
         const payload = {
           app: "web-gym",
+          app_version: "0.3",
+          mode: window.playbookMode === "benchmark" ? "benchmark" : "learn",
           handle: handle.value.trim() || null,
+          background: background.value || null,
+          consent: {
+            version: "2026-08-01",
+            training_and_evaluation: true,
+          },
           trace: JSON.parse(getTraceJson()),
         };
         const response = await fetch(TRACE_ENDPOINT, {
@@ -54,6 +93,8 @@
         if (response.ok && body.ok) {
           status.textContent = "received — thank you. it counts once it replays clean.";
           handle.disabled = true;
+          background.disabled = true;
+          consent.disabled = true;
         } else {
           btn.disabled = false;
           status.textContent = "rejected: " + (body.error || response.status);
@@ -67,6 +108,8 @@
     wrap.appendChild(note);
     wrap.appendChild(handle);
     wrap.appendChild(document.createElement("br"));
+    wrap.appendChild(background);
+    wrap.appendChild(consentLabel);
     wrap.appendChild(btn);
     wrap.appendChild(status);
     actionsRow.parentNode.insertBefore(wrap, actionsRow.nextSibling);

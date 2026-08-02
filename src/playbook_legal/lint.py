@@ -258,6 +258,7 @@ def _lint_counterparty(
     settlement_points = {
         str(issue.get("id", "")): float(issue.get("settlement_points", 1.0)) for issue in issues
     }
+    issue_by_id = {str(issue.get("id", "")): issue for issue in issues}
     for rubric_id, position in positions.items():
         key = str(rubric_id)
         if key not in issue_ids:
@@ -278,6 +279,22 @@ def _lint_counterparty(
 
         if settlement_points.get(key, 0.0) <= 0:
             report.warn(f"negotiated issue '{key}' has no settlement_points > 0")
+
+        # An issue without settlement_concepts earns full settlement_points on ANY
+        # closing text (vacuous credit), and non_negotiable cannot gate without
+        # concepts to miss — a dead gate is an authoring error, not scaffolding.
+        issue = issue_by_id.get(key, {})
+        if not issue.get("settlement_concepts"):
+            if issue.get("non_negotiable"):
+                report.error(
+                    f"non_negotiable issue '{key}' has no settlement_concepts — "
+                    "the concession gate can never fire"
+                )
+            else:
+                report.warn(
+                    f"negotiated issue '{key}' has no settlement_concepts — any closing "
+                    "text earns full settlement_points"
+                )
 
 
 def discover_matter_dirs(root: str | Path) -> list[Path]:

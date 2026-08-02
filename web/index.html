@@ -14,6 +14,7 @@
   <span class="spacer"></span>
   <a class="header-link" href="https://github.com/jamesbaker1/playbook#readme">about</a>
   <button id="help-btn" class="header-link" type="button">how to play</button>
+  <span id="mode-badge" class="mode-badge" hidden>Learn mode</span>
   <label class="pick">matter
     <select id="matter-select" disabled><option>booting…</option></select>
   </label>
@@ -26,6 +27,17 @@
     <p class="section-label">PLAYBOOK LEGAL GYM</p>
     <h1>Practice a legal contract review.</h1>
     <p class="lede">Open a realistic synthetic matter, review the documents, record issues, and draft redlines. At the end, Playbook shows exactly how the work was scored.</p>
+    <fieldset class="mode-picker" aria-label="Choose an experience">
+      <legend>Choose how you want to work</legend>
+      <label class="mode-option selected">
+        <input type="radio" name="play-mode" value="learn" checked>
+        <span><strong>Learn</strong><small>Guided workflow, practical prompts, and a final explanation.</small></span>
+      </label>
+      <label class="mode-option">
+        <input type="radio" name="play-mode" value="benchmark">
+        <span><strong>Benchmark</strong><small>A sealed attempt: no guidance or workflow checks until you submit.</small></span>
+      </label>
+    </fieldset>
     <div class="welcome-actions">
       <button id="welcome-start" class="primary">Open the guided matter</button>
       <a href="https://github.com/jamesbaker1/playbook">About the project</a>
@@ -36,11 +48,11 @@
       <div><strong>Finish and check</strong><span>Receive a transparent score and downloadable audit trace.</span></div>
     </div>
     <div class="trust-row">
-      <span>8 synthetic matters</span><span>Runs in your browser</span><span>No documents uploaded</span><span>Open source</span>
+      <span>Synthetic matters</span><span>Canonical scoring</span><span>No client documents</span><span>Open source</span>
     </div>
     <details class="boot-details">
-      <summary><span id="boot-status">Starting local scoring engine…</span></summary>
-      <pre id="boot-log">fetching python runtime…</pre>
+      <summary><span id="boot-status">Connecting to scoring service…</span></summary>
+      <pre id="boot-log">checking service availability…</pre>
     </details>
   </section>
 </div>
@@ -49,7 +61,7 @@
   <aside id="docs">
     <p class="pane-label">1 · READ THE RECORD</p>
     <div id="doc-list"></div>
-    <p class="hint">Select a section to open it. Reading and searching each cost one step.</p>
+    <p class="hint learn-only">Select a section to open it. Reading and searching each cost one step.</p>
   </aside>
 
   <section id="file" aria-label="Document workspace">
@@ -82,7 +94,7 @@
 
   <aside id="composer">
     <p class="pane-label">2 · BUILD YOUR REVIEW</p>
-    <ol id="progress" class="progress" aria-label="Matter progress">
+    <ol id="progress" class="progress learn-only" aria-label="Matter progress">
       <li data-progress="read">read a provision</li>
       <li data-progress="question">learn a client fact</li>
       <li data-progress="issue">submit an issue</li>
@@ -186,12 +198,11 @@
 </dialog>
 
 <footer>
-  <span>Scoring locally with the real <a href="https://github.com/jamesbaker1/playbook">playbook_legal</a> engine. No matter data leaves this page.</span>
+  <span>Scored by the canonical <a href="https://github.com/jamesbaker1/playbook">playbook_legal</a> service. Your review actions are sent to the service for evaluation.</span>
   <span><a href="https://github.com/jamesbaker1/playbook/blob/main/LICENSE">AGPL-3.0</a> · <a href="mailto:jamesbaker2019@gmail.com">commercial licensing</a></span>
   <span id="engine-line"></span>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <script src="app.js"></script>
 <script src="contribute.js"></script>
 </body>

@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,9 @@ from playbook_legal.env import PlaybookEnv
 from playbook_legal.export import convert
 
 SCORE_TOLERANCE = 1e-6
+CONSENT_VERSION = "2026-08-01"
+ALLOWED_BACKGROUNDS = {"lawyer", "legal_professional", "law_student", "other"}
+ALLOWED_MODES = {"learn", "benchmark"}
 
 
 def _get(url: str, token: str) -> Any:
@@ -62,6 +66,24 @@ def verify_record(
     record: dict[str, Any], matters_root: Path
 ) -> tuple[bool, str, dict[str, Any] | None]:
     """Replay the record's actions; return (ok, reason, replayed_trace_payload)."""
+    consent = record.get("consent") or {}
+    if (
+        consent.get("version") != CONSENT_VERSION
+        or consent.get("training_and_evaluation") is not True
+    ):
+        return False, "missing or outdated training-and-evaluation consent", None
+    app_version = record.get("app_version")
+    if not isinstance(app_version, str) or not re.fullmatch(r"[0-9A-Za-z._-]{1,32}", app_version):
+        return False, "missing or invalid app version", None
+    if record.get("app", "web-gym") != "web-gym":
+        return False, "invalid contribution source", None
+    background = record.get("background")
+    if background is not None and background not in ALLOWED_BACKGROUNDS:
+        return False, "invalid contributor background", None
+    mode = record.get("mode")
+    if mode is not None and mode not in ALLOWED_MODES:
+        return False, "invalid play mode", None
+
     trace = record.get("trace") or {}
     matter_id = str(trace.get("matter", ""))
     matter_dir = matters_root / matter_id
@@ -69,10 +91,20 @@ def verify_record(
         return False, f"unknown matter: {matter_id}", None
     events = trace.get("events") or []
     claimed = trace.get("result") or {}
+    if not isinstance(events, list) or not events or len(events) > 200:
+        return False, "malformed events", None
+    if not isinstance(claimed, dict):
+        return False, "malformed claimed result", None
 
     env = PlaybookEnv.from_directory(matter_dir)
-    env.reset(seed=0)
-    for event in events:
+    seed = trace.get("seed", 0)
+    if isinstance(seed, bool) or not isinstance(seed, int) or not -(2**31) <= seed < 2**31:
+        return False, "invalid replay seed", None
+    env.reset(seed=seed)
+    ended_at: int | None = None
+    for index, event in enumerate(events):
+        if not isinstance(event, dict):
+            return False, "malformed event", None
         action = event.get("action")
         if not isinstance(action, dict):
             return False, "malformed event", None
@@ -81,10 +113,19 @@ def verify_record(
         except RuntimeError:
             return False, "actions continue past episode end", None
         if terminated or truncated:
+            ended_at = index
             break
 
+    if ended_at is None:
+        return False, "incomplete episode", None
+    if ended_at != len(events) - 1:
+        return False, "actions continue past episode end", None
+
     replayed = env.episode_result()
-    if abs(replayed["normalized_score"] - float(claimed.get("normalized_score", -1))) > SCORE_TOLERANCE:
+    claimed_score = claimed.get("normalized_score")
+    if isinstance(claimed_score, bool) or not isinstance(claimed_score, (int, float)):
+        return False, "malformed claimed score", None
+    if abs(replayed["normalized_score"] - float(claimed_score)) > SCORE_TOLERANCE:
         return False, (
             f"score mismatch: claimed {claimed.get('normalized_score')} "
             f"replayed {replayed['normalized_score']}"
@@ -94,6 +135,7 @@ def verify_record(
 
     payload = {
         "matter": matter_id,
+        "seed": seed,
         "events": [
             {
                 "step": event.step,
@@ -125,8 +167,15 @@ def export_verified(
                 rejected += 1
                 reasons.append(reason)
                 continue
-            tag = "human" + (f":{record['handle']}" if record.get("handle") else "")
-            chat = convert(payload, agent=tag)
+            chat = convert(payload, agent="human")
+            chat["provenance"] = {
+                "source": "human_contribution",
+                "app": record.get("app", "web-gym"),
+                "app_version": record["app_version"],
+                "mode": record.get("mode"),
+                "consent_version": record["consent"]["version"],
+                "contributor_background": record.get("background"),
+            }
             handle.write(json.dumps(chat, ensure_ascii=False) + "\n")
             kept += 1
     return kept, rejected, reasons

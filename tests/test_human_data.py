@@ -25,8 +25,14 @@ def build_genuine_record() -> dict:
     return {
         "agent": "human",
         "handle": "test-player",
+        "app": "web-gym",
+        "app_version": "0.3",
+        "mode": "benchmark",
+        "background": "lawyer",
+        "consent": {"version": "2026-08-01", "training_and_evaluation": True},
         "trace": {
             "matter": "ai_saas_001",
+            "seed": 0,
             "events": [
                 {"step": event.step, "action": event.action} for event in env.trace
             ],
@@ -67,6 +73,50 @@ def test_unknown_matter_is_rejected() -> None:
     assert "unknown matter" in reason
 
 
+def test_missing_or_outdated_consent_is_rejected() -> None:
+    record = build_genuine_record()
+    del record["consent"]
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert not ok
+    assert "consent" in reason
+
+    record = build_genuine_record()
+    record["consent"]["version"] = "2025-01-01"
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert not ok
+    assert "consent" in reason
+
+
+def test_incomplete_episode_is_rejected() -> None:
+    record = build_genuine_record()
+    record["trace"]["events"] = record["trace"]["events"][:1]
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert not ok
+    assert "incomplete" in reason
+
+
+def test_events_after_terminal_are_rejected() -> None:
+    record = build_genuine_record()
+    record["trace"]["events"].append(record["trace"]["events"][-1])
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert not ok
+    assert "past episode end" in reason
+
+
+def test_malformed_untrusted_fields_are_rejected_without_crashing() -> None:
+    record = build_genuine_record()
+    record["trace"]["result"]["normalized_score"] = "excellent"
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert not ok
+    assert "claimed score" in reason
+
+    record = build_genuine_record()
+    record["app_version"] = "<script>"
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert not ok
+    assert "app version" in reason
+
+
 def test_export_tags_human_agent(tmp_path: Path) -> None:
     good = build_genuine_record()
     forged = build_genuine_record()
@@ -75,6 +125,15 @@ def test_export_tags_human_agent(tmp_path: Path) -> None:
     kept, rejected, _reasons = export_verified([good, forged], MATTERS, out)
     assert (kept, rejected) == (1, 1)
     line = json.loads(out.read_text(encoding="utf-8").splitlines()[0])
-    assert line["agent"] == "human:test-player"
+    assert line["agent"] == "human"
     assert line["matter_id"] == "ai_saas_001"
     assert line["messages"][0]["role"] == "system"
+    assert line["provenance"] == {
+        "source": "human_contribution",
+        "app": "web-gym",
+        "app_version": "0.3",
+        "mode": "benchmark",
+        "consent_version": "2026-08-01",
+        "contributor_background": "lawyer",
+    }
+    assert "test-player" not in json.dumps(line)

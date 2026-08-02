@@ -24,3 +24,13 @@ def test_site_build_produces_declared_assets(tmp_path: Path) -> None:
     )
     for name in ("index.html", "style.css", "app.js", "contribute.js", ".nojekyll"):
         assert (out / name).exists(), f"missing built asset: {name}"
+
+    # Hidden facts, rubrics, and Python runtime code belong only in the engine Worker.
+    forbidden = ["manifest.json", "driver.py", "pkg", "matters"]
+    for name in forbidden:
+        assert not (out / name).exists(), f"private engine asset leaked into site: {name}"
+    index = (out / "index.html").read_text(encoding="utf-8").lower()
+    app = (out / "app.js").read_text(encoding="utf-8").lower()
+    assert "pyodide" not in index
+    assert "loadpyodide" not in app
+    assert "hidden_facts" not in app

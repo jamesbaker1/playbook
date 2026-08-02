@@ -45,12 +45,13 @@ advice and should not read like any identifiable firm's form.
 
 ## Working on the web gym
 
-The site under `web/` is deliberately dependency-light: static HTML, CSS, and
-JavaScript around the real Python environment running in Pyodide. Preserve these
-boundaries:
+The site under `web/` is deliberately dependency-light static HTML, CSS, and
+JavaScript. The canonical environment runs in `engine-worker/`. Preserve these boundaries:
 
 - Do not duplicate scoring or matter logic in JavaScript. Browser actions must go
-  through `web/driver.py` and `PlaybookEnv`.
+  through the versioned Worker API and `PlaybookEnv`.
+- Never add Python package source, matters, rubrics, hidden facts, or a Pyodide
+  runtime to the Pages build. `tests/test_web_bundle.py` enforces this boundary.
 - Preserve drafts when users change tabs or mobile panes. Starting a new matter is
   the point at which forms and local workspace state reset.
 - Desktop uses a matter/document/work-product layout. At widths up to 980px, only
@@ -66,6 +67,7 @@ Build and validate the exact GitHub Pages bundle with:
 ```bash
 python web/build_site.py dist
 python -m pytest -q tests/test_web_bundle.py
+python -m pytest -q tests/test_engine_worker.py
 node --check web/app.js
 node --check web/contribute.js
 ```
@@ -73,6 +75,11 @@ node --check web/contribute.js
 Manual browser checks should include 320×568, 390×844, and 768×1024 viewports,
 keyboard-only use, switching every mobile pane with partially completed forms, an
 invalid issue/redline submission, and final-preflight cancellation.
+
+Prepare the Worker bundle with `python engine-worker/vendor.py`. Deploy the Worker
+before deploying a frontend that requires a new API contract. Run the direct-engine
+parity tests before every Worker deployment; the Pages client and Worker deploy
+independently and must report compatible engine versions.
 
 ## Human trace contributions
 

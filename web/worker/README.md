@@ -2,16 +2,18 @@
 
 Collects episode traces contributed from the web gym into Cloudflare KV.
 
-- `POST /api/traces` — public, CORS-limited to the gym's origin. Validates shape
-  and size (≤ 2 MB, ≤ 200 events) and stores the record.
+- `POST /api/traces` — public, CORS-limited to the gym's origin. Validates shape,
+  size (≤ 2 MB, ≤ 200 events), app version, optional background category, and
+  explicit versioned training/evaluation consent before storing the record.
 - `GET /api/traces` / `GET /api/traces/<key>` — require `Authorization: Bearer
   <READ_TOKEN>` (a Worker secret).
 
 **Trust model:** uploads are anonymous and client-scored, so nothing here is
 trusted. `training/human_data.py` downloads the records, replays every action
 sequence through the real environment, recomputes the score deterministically,
-and drops any record whose claimed result does not reproduce. Only verified
-episodes are exported for training, tagged `agent: human`.
+and drops incomplete, non-reproducible, or unconsented records. Only verified
+episodes are exported for training, tagged `agent: human`; the optional display
+handle remains in raw storage and is not copied into the training dataset.
 
 Deploy / manage (from this directory):
 

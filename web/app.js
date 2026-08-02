@@ -1,5 +1,4 @@
-/* playbook web gym — boots the real playbook_legal python package in
-   webassembly and plays full episodes against it. no backend, no api. */
+/* playbook web gym — static client for the canonical scoring service. */
 
 (async function () {
   "use strict";
@@ -11,6 +10,7 @@
   const budgetsEl = $("budgets");
   const transcript = $("transcript");
   const docList = $("doc-list");
+  const API_BASE = "https://playbook-engine.james-baker1628.workers.dev";
 
   let driver = null;
   let stepNo = 0;
@@ -24,11 +24,70 @@
   let stepsRemaining = 0;
   let mobileView = "files";
   let guidedStartPending = false;
+  let requestInFlight = false;
+  let playMode = "learn";
+  function setPlayMode(mode) {
+    playMode = mode === "benchmark" ? "benchmark" : "learn";
+    window.playbookMode = playMode;
+    document.body.classList.toggle("mode-benchmark", playMode === "benchmark");
+    document.querySelectorAll('input[name="play-mode"]').forEach((input) => {
+      input.checked = input.value === playMode;
+      input.closest(".mode-option").classList.toggle("selected", input.checked);
+    });
+    $("welcome-start").textContent = playMode === "benchmark" ? "Start sealed benchmark" : "Open the guided matter";
+    $("mode-badge").textContent = playMode === "benchmark" ? "Benchmark mode" : "Learn mode";
+  }
+  document.querySelectorAll('input[name="play-mode"]').forEach((input) => {
+    input.addEventListener("change", () => setPlayMode(input.value));
+  });
+  setPlayMode("learn");
+  let episode = null;
   const mobileMedia = window.matchMedia("(max-width: 980px)");
+
+  async function api(path, options = {}) {
+    const response = await fetch(API_BASE + path, {
+      ...options,
+      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    });
+    let payload;
+    try { payload = await response.json(); }
+    catch (_) { throw new Error(`Scoring service returned ${response.status}.`); }
+    if (!response.ok) {
+      const detail = typeof payload.error === "object" ? payload.error.message : payload.error;
+      throw new Error(detail || `Scoring service returned ${response.status}.`);
+    }
+    return payload;
+  }
+
+  driver = {
+    async listMatters() { return api("/api/matters"); },
+    async start(matterId, seed) {
+      episode = { matter_id: matterId, seed, actions: [], trace: null };
+      return api("/api/start", { method: "POST", body: JSON.stringify(episode) });
+    },
+    async step(action) {
+      episode.actions.push(action);
+      try {
+        const response = await api("/api/step", {
+          method: "POST",
+          body: JSON.stringify({ matter_id: episode.matter_id, seed: episode.seed, actions: episode.actions }),
+        });
+        if (response.trace) episode.trace = response.trace;
+        return response;
+      } catch (error) {
+        episode.actions.pop();
+        throw error;
+      }
+    },
+    trace() {
+      if (!episode?.trace) throw new Error("The trace is available after the matter finishes.");
+      return JSON.stringify(episode.trace, null, 2);
+    },
+  };
 
   $("welcome-start").disabled = false;
   $("welcome-start").addEventListener("click", () => {
-    if (!driver) {
+    if (matterSelect.disabled) {
       guidedStartPending = true;
       $("welcome-start").textContent = "Opening when ready…";
       $("boot-status").textContent = "Preparing the guided matter…";
@@ -47,7 +106,7 @@
     "%cplaybook",
     "font-weight:bold",
     "— the scoring engine you are playing against is the same python package " +
-      "the RL trainer and the benchmark use. no api, no reimplementation. " +
+      "the RL trainer and benchmark use, served through the canonical API. " +
       "download the trace at the end: every point is accounted for. " +
       "engine source: https://github.com/jamesbaker1/playbook"
   );
@@ -59,28 +118,10 @@
 
   /* ------------------------------------------------------------- bootstrap */
 
-  let pyodide;
   try {
-    pyodide = await loadPyodide();
-    boot("python runtime ready");
-    boot("loading pyyaml…");
-    await pyodide.loadPackage("pyyaml", { messageCallback: () => {} });
-    boot("fetching engine + matters…");
-
-    const manifest = await (await fetch("manifest.json")).json();
-    const files = manifest.files;
-    for (const path of files) {
-      const dir = "/site/" + path.split("/").slice(0, -1).join("/");
-      pyodide.FS.mkdirTree(dir);
-      const text = await (await fetch(path)).text();
-      pyodide.FS.writeFile("/site/" + path, text);
-    }
-    boot(`mounted ${files.length} files`);
-
-    pyodide.runPython("import sys; sys.path.insert(0, '/site'); sys.path.insert(0, '/site/pkg')");
-    driver = pyodide.pyimport("driver");
-    const matters = JSON.parse(driver.list_matters());
-    boot(`playbook_legal imported — ${matters.length} matters, scoring engine live`);
+    boot("connecting to scoring service…");
+    const response = await driver.listMatters();
+    const matters = response.matters;
 
     matterSelect.replaceChildren();
     for (const m of matters) {
@@ -95,15 +136,17 @@
     $("help-start").disabled = false;
     $("boot-status").textContent = `${matters.length} matters ready — choose one or try the guided matter`;
     $("engine-line").textContent =
-      `pyodide ${pyodide.version} · playbook_legal 0.2.0 · ${matters.length} matters mounted`;
-    boot("pick a matter above and open it.");
+      `engine ${response.engine_version} · ${matters.length} matters available`;
+    boot("scoring service ready.");
     if (guidedStartPending) {
       matterSelect.value = "ai_saas_001";
       startMatter();
     }
   } catch (err) {
-    boot("boot failed: " + err);
-    throw err;
+    $("boot-status").textContent = "Scoring service unavailable";
+    $("welcome-start").textContent = "Retry connection";
+    boot("connection failed: " + err.message);
+    $("welcome-start").onclick = () => window.location.reload();
   }
 
   /* ------------------------------------------------------------ rendering */
@@ -309,14 +352,19 @@
 
   /* ------------------------------------------------------------- episode */
 
-  function doStep(action) {
-    if (finished) return null;
+  async function doStep(action) {
+    if (finished || requestInFlight) return null;
+    requestInFlight = true;
+    $("composer").setAttribute("aria-busy", "true");
     let resp;
     try {
-      resp = JSON.parse(driver.step(JSON.stringify(action)));
+      resp = await driver.step(action);
     } catch (err) {
       addEntry("engine error", null, [el("div", "body error", String(err))]);
       return null;
+    } finally {
+      requestInFlight = false;
+      $("composer").removeAttribute("aria-busy");
     }
     stepNo += 1;
     updateBudgets(resp.observation);
@@ -327,8 +375,8 @@
     return resp;
   }
 
-  function readSection(docId, sec, link) {
-    const resp = doStep({ type: "read_document", document_id: docId, section: sec });
+  async function readSection(docId, sec, link) {
+    const resp = await doStep({ type: "read_document", document_id: docId, section: sec });
     if (!resp) return;
     const lr = resp.observation.last_result;
     const body = [];
@@ -347,8 +395,8 @@
     maybeScore(resp);
   }
 
-  function ask(question) {
-    const resp = doStep({ type: "ask_client", question });
+  async function ask(question) {
+    const resp = await doStep({ type: "ask_client", question });
     if (!resp) return;
     const lr = resp.observation.last_result;
     const body = [el("div", "body", "q: " + question)];
@@ -361,10 +409,11 @@
     addEntry("ask_client", resp.reward, body);
     showWorkspace("activity");
     maybeScore(resp);
+    return !lr.error;
   }
 
-  function search(query) {
-    const resp = doStep({ type: "search_matter", query });
+  async function search(query) {
+    const resp = await doStep({ type: "search_matter", query });
     if (!resp) return;
     const lr = resp.observation.last_result;
     const body = [];
@@ -380,10 +429,11 @@
     addEntry(`search "${query}"`, resp.reward, body);
     showWorkspace("activity");
     maybeScore(resp);
+    return !lr.error;
   }
 
-  function submitIssue(payload) {
-    const resp = doStep({ type: "submit_issue", ...payload });
+  async function submitIssue(payload) {
+    const resp = await doStep({ type: "submit_issue", ...payload });
     if (!resp) return false;
     const lr = resp.observation.last_result;
     const body = [];
@@ -403,8 +453,8 @@
     return !lr.error;
   }
 
-  function proposeRedline(payload) {
-    const resp = doStep({ type: "propose_redline", ...payload });
+  async function proposeRedline(payload) {
+    const resp = await doStep({ type: "propose_redline", ...payload });
     if (!resp) return false;
     const lr = resp.observation.last_result;
     const body = [];
@@ -422,8 +472,8 @@
     return !lr.error;
   }
 
-  function submitFinal(summary) {
-    const resp = doStep({ type: "submit_final", summary });
+  async function submitFinal(summary) {
+    const resp = await doStep({ type: "submit_final", summary });
     if (!resp) return;
     addEntry("submit_final", resp.reward, [el("div", "body", summary)]);
     showWorkspace("activity");
@@ -471,7 +521,8 @@
       $("main").hidden = true;
       $("boot").hidden = false;
       budgetsEl.hidden = true;
-      $("welcome-start").textContent = "Open the guided matter";
+      $("mode-badge").hidden = true;
+      setPlayMode(playMode);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
     actions.appendChild(dl);
@@ -534,19 +585,19 @@
     $("quotes").appendChild(row);
   });
 
-  $("form-ask").addEventListener("submit", (e) => {
+  $("form-ask").addEventListener("submit", async (e) => {
     e.preventDefault();
     const q = $("ask-question").value.trim();
-    if (q) { ask(q); $("ask-question").value = ""; }
+    if (q && await ask(q)) $("ask-question").value = "";
   });
 
-  $("form-search").addEventListener("submit", (e) => {
+  $("form-search").addEventListener("submit", async (e) => {
     e.preventDefault();
     const q = $("search-query").value.trim();
-    if (q) { search(q); $("search-query").value = ""; }
+    if (q && await search(q)) $("search-query").value = "";
   });
 
-  $("form-issue").addEventListener("submit", (e) => {
+  $("form-issue").addEventListener("submit", async (e) => {
     e.preventDefault();
     const quotes = [];
     document.querySelectorAll(".quote-row").forEach((row) => {
@@ -563,15 +614,15 @@
       recommendation: $("issue-recommendation").value.trim(),
     };
     if (quotes.length) payload.quotes = quotes;
-    if (submitIssue(payload)) {
+    if (await submitIssue(payload)) {
       e.target.reset();
       $("quotes").replaceChildren();
     }
   });
 
-  $("form-redline").addEventListener("submit", (e) => {
+  $("form-redline").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const accepted = proposeRedline({
+    const accepted = await proposeRedline({
       issue_id: $("redline-label").value.trim(),
       document_id: $("redline-doc").value,
       section: $("redline-section").value.trim().replace(/^§\s*/, ""),
@@ -590,6 +641,9 @@
   });
 
   function renderFinishPreflight() {
+    const sealed = playMode === "benchmark";
+    $("finish-title").textContent = sealed ? "Submit this sealed attempt?" : "Ready to finish this review?";
+    $("finish-confirm").textContent = sealed ? "Submit benchmark" : "Submit and see score";
     const rows = [
       ["Sections reviewed", readSections.size],
       ["Client questions asked", questionsAsked],
@@ -598,6 +652,7 @@
       ["Steps remaining", stepsRemaining],
     ];
     const checklist = $("finish-checklist");
+    checklist.hidden = sealed;
     checklist.replaceChildren();
     rows.forEach(([label, value]) => {
       const row = el("div", "finish-row");
@@ -612,15 +667,16 @@
     if (highWithoutDraft.length) warnings.push(`${highWithoutDraft.length} high-priority issue(s) have no draft language. Confirm that is intentional.`);
     if (stepsRemaining <= 3) warnings.push(`Only ${stepsRemaining} steps remain.`);
     if (!warnings.length) warnings.push("No obvious workflow gaps found. This check does not assess legal correctness.");
+    $("finish-warnings").hidden = sealed;
     $("finish-warnings").replaceChildren(...warnings.map((message) => el("p", "", message)));
   }
 
   $("finish-back").addEventListener("click", () => $("finish-dialog").close());
-  $("finish-confirm").addEventListener("click", () => {
+  $("finish-confirm").addEventListener("click", async () => {
     const summary = $("final-summary").value.trim();
     if (!summary) return;
     $("finish-dialog").close();
-    submitFinal(summary);
+    await submitFinal(summary);
   });
 
   document.querySelectorAll("#mobile-nav button").forEach((button) => {
@@ -630,9 +686,19 @@
 
   /* ---------------------------------------------------------------- start */
 
-  function startMatter() {
+  async function startMatter() {
     const id = matterSelect.value;
-    const payload = JSON.parse(driver.start(id, 0));
+    startBtn.disabled = true;
+    let payload;
+    try {
+      payload = await driver.start(id, 0);
+    } catch (error) {
+      $("boot-status").textContent = "Could not open matter";
+      boot("request failed: " + error.message);
+      return;
+    } finally {
+      startBtn.disabled = false;
+    }
     const obs = payload.observation;
     stepNo = 0;
     finished = false;
@@ -648,7 +714,13 @@
     renderReview();
     transcript.replaceChildren();
     $("current-document").textContent = "No section open";
-    $("document-view").innerHTML = `<div class="empty-document"><p class="eyebrow">${obs.matter.matter_id}</p><h2>${obs.matter.title}</h2><p><strong>You are:</strong> ${obs.matter.role}</p><p>${obs.matter.assignment}</p><p class="start-hint">Start by opening the supervising-lawyer instructions and playbook from the matter file.</p></div>`;
+    const empty = el("div", "empty-document");
+    empty.append(el("p", "eyebrow", obs.matter.matter_id), el("h2", "", obs.matter.title));
+    const role = el("p");
+    role.append(el("strong", "", "You are: "), document.createTextNode(obs.matter.role));
+    empty.append(role, el("p", "", obs.matter.assignment));
+    if (playMode === "learn") empty.append(el("p", "start-hint", "Start by opening the supervising-lawyer instructions and playbook from the matter file."));
+    $("document-view").replaceChildren(empty);
     showWorkspace("document");
     document.querySelectorAll("#progress li").forEach((item) => item.classList.remove("done"));
     enableComposer();
@@ -658,6 +730,7 @@
     $("boot").hidden = true;
     $("main").hidden = false;
     document.body.classList.add("matter-active");
+    $("mode-badge").hidden = false;
     window.scrollTo(0, 0);
     setMobileView("files");
 
@@ -666,16 +739,17 @@
       el("div", "body", m.title),
       el("div", "body", "you are: " + m.role),
       el("div", "body", "assignment: " + m.assignment),
-      el("div", "body answer",
+      ...(playMode === "learn" ? [el("div", "body answer",
         "house rules: cite provisions as 'doc §section', operative provision first. " +
         "quotes must be verbatim — a fabricated quote is a critical failure. " +
-        "every client question spends budget. finish before the steps run out."),
+        "every client question spends budget. finish before the steps run out.")] : []),
     ]);
   }
 
   startBtn.addEventListener("click", startMatter);
   $("help-start").addEventListener("click", () => {
     $("help-dialog").close();
+    setPlayMode("learn");
     matterSelect.value = "ai_saas_001";
     startMatter();
   });

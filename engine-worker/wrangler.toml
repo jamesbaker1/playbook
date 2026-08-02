@@ -1,0 +1,28 @@
+name = "playbook-engine"
+main = "src/entry.py"
+compatibility_date = "2026-08-02"
+compatibility_flags = ["python_workers"]
+
+# Matter packs are data, not code — bundle their YAML/Markdown into the Worker
+# so core.py can read them from the module filesystem.
+[[rules]]
+globs = ["**/*.yaml", "**/*.md"]
+type = "Data"
+fallthrough = true
+find_additional_modules = true
+base_dir = "./src"
+
+[[rules]]
+type = "Data"
+globs = ["matters/**/*.yaml"]
+fallthrough = true
+
+[[rules]]
+type = "Text"
+globs = ["matters/**/*.md"]
+fallthrough = true
+
+[vars]
+ALLOWED_ORIGIN = "https://jamesbaker1.github.io"
+MAX_REQUEST_BYTES = "262144"
+MAX_ACTIONS = "50"

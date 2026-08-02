@@ -80,6 +80,7 @@ button.primary:hover:not(:disabled) { background: var(--red); border-color: var(
 
 .budgets { font-variant-numeric: tabular-nums; }
 .budgets b { color: var(--red); font-weight: 700; }
+.mode-badge { padding: 2px 7px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; white-space: nowrap; }
 
 /* ------------------------------------------------------------------ boot */
 
@@ -95,6 +96,15 @@ button.primary:hover:not(:disabled) { background: var(--red); border-color: var(
 .section-label { color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .08em; }
 .welcome h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(38px, 5vw, 58px); font-weight: 400; line-height: 1.08; letter-spacing: -.02em; margin: 16px 0 18px; }
 .lede { max-width: 680px; font-size: clamp(16px, 2vw, 19px); line-height: 1.55; color: #514c47; }
+.mode-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 760px; margin-top: 28px; padding: 0; border: 0; }
+.mode-picker legend { width: 100%; margin-bottom: 9px; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.mode-option { display: flex; align-items: flex-start; gap: 10px; min-height: 76px; padding: 13px 14px; border: 1px solid var(--line); cursor: pointer; }
+.mode-option:hover { border-color: var(--ink); }
+.mode-option.selected { border-color: var(--ink); box-shadow: inset 0 -2px var(--red); background: #fff; }
+.mode-option input { width: auto; margin-top: 4px; accent-color: var(--red); }
+.mode-option span { display: grid; gap: 2px; }
+.mode-option strong { font-family: Georgia, "Times New Roman", serif; font-size: 18px; font-weight: 400; }
+.mode-option small { color: var(--muted); font-size: 12px; line-height: 1.45; }
 .welcome-actions { display: flex; align-items: center; gap: 22px; margin: 26px 0 42px; }
 .welcome-actions button { padding: 10px 15px; }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--line); }
@@ -282,6 +292,10 @@ code { background: var(--paper-2); padding: 1px 4px; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
 #mobile-nav { display: none; }
 
+body.mode-benchmark .learn-only { display: none !important; }
+body.mode-benchmark .form-help { display: none; }
+body.mode-benchmark.matter-active #help-btn { display: none; }
+
 /* ---------------------------------------------------------------- mobile */
 
 @media (max-width: 980px) {
@@ -293,6 +307,7 @@ code { background: var(--paper-2); padding: 1px 4px; }
   .steps { grid-template-columns: 1fr; }
   .steps > div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
   .welcome-actions { align-items: flex-start; flex-direction: column; margin-bottom: 36px; }
+  .mode-picker { grid-template-columns: 1fr; }
   main { display: block; padding-bottom: 72px; }
   #docs { border-right: none; border-bottom: 1px solid var(--line); }
   #composer { border-left: none; border-top: 1px solid var(--line); }
@@ -315,6 +330,7 @@ code { background: var(--paper-2); padding: 1px 4px; }
 
 @media (max-width: 600px) {
   .welcome h1 { font-size: 38px; }
+  .mode-option { min-height: 68px; }
   .pick { width: 100%; min-width: 0; display: flex; gap: 8px; align-items: center; order: 3; }
   .pick select { flex: 1; min-width: 0; max-width: 100%; }
   #start-btn { order: 3; }
