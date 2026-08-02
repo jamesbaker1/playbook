@@ -1,0 +1,5 @@
+{"type":"ask_client","question_id":"q_sensitive_data","question":"Will the service process regulated or sensitive personal data?"}
+{"type":"read_document","document_id":"msa","section":"4.2"}
+{"type":"read_document","document_id":"playbook","section":"3"}
+{"type":"submit_issue","issue_id":"data_training","title":"Provider model-training right exceeds client position","severity":"high","citations":["msa §4.2","playbook §3"],"analysis":"The provider may use Customer Data and Outputs to train generalized models, while the playbook permits only aggregated analytics.","recommendation":"Delete the training right and retain aggregated, de-identified analytics only."}
+{"type":"submit_final","summary":"The provider's use of Customer Data and Outputs for generalized model training is inconsistent with the client playbook and should be treated as a signature condition. Additional review should focus on incident notice, liability allocation, DPA precedence, and renewal management."}
