@@ -10,9 +10,9 @@ from conftest import EXAMPLES, MATTERS, ROOT
 
 sys.path.insert(0, str(ROOT / "training"))
 
-from human_data import export_verified, verify_record  # noqa: E402
+from human_data import export_verified, verify_record
 
-from playbook_legal import PlaybookEnv  # noqa: E402
+from playbook_legal import PlaybookEnv
 
 
 def build_genuine_record() -> dict:
@@ -55,7 +55,7 @@ def test_forged_score_is_rejected() -> None:
 def test_forged_critical_flag_is_rejected() -> None:
     record = build_genuine_record()
     record["trace"]["result"]["critical_failure"] = True
-    ok, reason, _ = verify_record(record, MATTERS)
+    ok, _reason, _ = verify_record(record, MATTERS)
     assert not ok
 
 
@@ -72,7 +72,7 @@ def test_export_tags_human_agent(tmp_path: Path) -> None:
     forged = build_genuine_record()
     forged["trace"]["result"]["normalized_score"] = 1.0
     out = tmp_path / "human.jsonl"
-    kept, rejected, reasons = export_verified([good, forged], MATTERS, out)
+    kept, rejected, _reasons = export_verified([good, forged], MATTERS, out)
     assert (kept, rejected) == (1, 1)
     line = json.loads(out.read_text(encoding="utf-8").splitlines()[0])
     assert line["agent"] == "human:test-player"

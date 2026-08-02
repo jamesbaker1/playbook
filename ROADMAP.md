@@ -38,10 +38,13 @@
 - [ ] Adversarial reward re-testing on real rollouts before any online RL.
 - [ ] Small GRPO experiment; publish methods, baselines, limitations, and a demo.
 
-## Phase 5 — Humans in the gym (design)
+## Phase 5 — Humans in the gym (in progress)
 
-- [ ] Web UI over the environment (it is already a turn-based JSON API): people play
-      the same episodes models play, scored by the same rubrics.
+- [x] Web UI over the environment: the web gym runs the real engine in-browser
+      (Pyodide) at jamesbaker1.github.io/playbook.
+- [x] Opt-in trace contribution: Cloudflare Worker collection endpoint plus a
+      replay-verified export pipeline (`training/human_data.py`) — uploaded scores
+      are advisory; an episode counts only after the engine reproduces it.
 - [ ] Human-lawyer baseline numbers for the benchmark.
 - [ ] Skill-gated pairwise preference collection on redlines (gold-matter
       calibration, vote weighting) feeding a drafting-quality reward model — crowd

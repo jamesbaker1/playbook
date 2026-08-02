@@ -27,7 +27,14 @@ SCORE_TOLERANCE = 1e-6
 
 
 def _get(url: str, token: str) -> Any:
-    request = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
+    request = urllib.request.Request(
+        url,
+        headers={
+            "Authorization": f"Bearer {token}",
+            # Cloudflare's edge rejects the bare urllib user agent.
+            "User-Agent": "playbook-human-data/0.2",
+        },
+    )
     with urllib.request.urlopen(request, timeout=60) as response:
         return json.loads(response.read().decode("utf-8"))
 
