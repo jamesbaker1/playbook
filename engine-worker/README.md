@@ -15,13 +15,13 @@ uv sync
 uv run pywrangler dev
 ```
 
-`vendor.py` copies the canonical package and matter directories into ignored deployment folders.
-Run it again whenever engine code or matters change. Deploy with `uv run pywrangler deploy` only after
-tests and an authenticated staging check pass.
+`vendor.py` copies the canonical package and matter directories into tracked deployment folders.
+Run it whenever engine code or matters change and commit the resulting bundle. Deploy with
+`uv run pywrangler deploy` only after tests and an authenticated staging check pass.
 
-Run `python engine-worker/vendor.py --check` to fail if either ignored deployment copy is
-missing, stale, or contains extra files. CI rebuilds the bundle and performs this parity check before
-tests; deployment workflows should do the same immediately before publishing.
+Run `python engine-worker/vendor.py --check` to fail if either tracked deployment copy is
+missing, stale, or contains extra files. CI performs this parity check without regenerating the
+bundle, so a stale commit fails rather than being silently repaired.
 
 Configure `ALLOWED_ORIGIN` in `wrangler.toml` for the GitHub Pages origin. Production secrets or
 environment-specific values should be configured in Cloudflare rather than committed.

@@ -1,5 +1,3 @@
-src/playbook_legal/
-src/matters/
 .venv/
 .venv-workers/
 .wrangler/
