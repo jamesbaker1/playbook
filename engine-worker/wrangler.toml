@@ -12,16 +12,6 @@ fallthrough = true
 find_additional_modules = true
 base_dir = "./src"
 
-[[rules]]
-type = "Data"
-globs = ["matters/**/*.yaml"]
-fallthrough = true
-
-[[rules]]
-type = "Text"
-globs = ["matters/**/*.md"]
-fallthrough = true
-
 [vars]
 ALLOWED_ORIGIN = "https://jamesbaker1.github.io"
 MAX_REQUEST_BYTES = "262144"
