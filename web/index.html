@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>playbook — the legal agent gym</title>
+<meta name="description" content="play a synthetic legal matter against the same deterministic scoring engine used to train and benchmark AI legal agents. runs entirely in your browser.">
+<link rel="stylesheet" href="style.css">
+<!-- the scoring engine below is the real playbook_legal python package,
+     compiled to webassembly. nothing is reimplemented for the demo.
+     read the trace you download at the end — every point is accounted for. -->
+</head>
+<body>
+<header>
+  <span class="mark">playbook</span>
+  <span class="tag">the legal agent gym</span>
+  <span class="spacer"></span>
+  <label class="pick">matter
+    <select id="matter-select" disabled><option>booting…</option></select>
+  </label>
+  <button id="start-btn" disabled>open matter</button>
+  <span id="budgets" class="budgets" hidden></span>
+</header>
+
+<div id="boot" class="boot">
+  <pre id="boot-log">fetching python runtime…</pre>
+</div>
+
+<main id="main" hidden>
+  <aside id="docs">
+    <p class="pane-label">record</p>
+    <div id="doc-list"></div>
+    <p class="hint">reading a section is an action. it costs a step.</p>
+  </aside>
+
+  <section id="file">
+    <div id="transcript"></div>
+  </section>
+
+  <aside id="composer">
+    <p class="pane-label">actions</p>
+    <nav id="tabs">
+      <button data-tab="ask" class="active">ask</button>
+      <button data-tab="search">search</button>
+      <button data-tab="issue">issue</button>
+      <button data-tab="redline">redline</button>
+      <button data-tab="finish">finish</button>
+    </nav>
+
+    <form id="form-ask" class="tabform active">
+      <textarea id="ask-question" rows="3" placeholder="one factual question for the client. budget is small — ask only what could change the position." required></textarea>
+      <button type="submit">ask the client</button>
+    </form>
+
+    <form id="form-search" class="tabform">
+      <input id="search-query" placeholder="substring search across every section" required>
+      <button type="submit">search the record</button>
+    </form>
+
+    <form id="form-issue" class="tabform">
+      <input id="issue-label" placeholder="your label, e.g. training-right" required>
+      <input id="issue-title" placeholder="issue title" required>
+      <select id="issue-severity">
+        <option value="low">low</option>
+        <option value="medium">medium</option>
+        <option value="high" selected>high</option>
+        <option value="critical">critical</option>
+      </select>
+      <textarea id="issue-citations" rows="2" placeholder="citations, one per line. operative provision first, e.g. msa §4.2" required></textarea>
+      <textarea id="issue-analysis" rows="4" placeholder="analysis" required></textarea>
+      <textarea id="issue-recommendation" rows="2" placeholder="recommendation" required></textarea>
+      <div id="quotes"></div>
+      <button type="button" id="add-quote" class="ghost">+ quote (verbatim only — a wrong quote ends badly)</button>
+      <button type="submit">submit issue</button>
+    </form>
+
+    <form id="form-redline" class="tabform">
+      <input id="redline-label" list="issue-labels" placeholder="label of your issue" required>
+      <datalist id="issue-labels"></datalist>
+      <div class="row">
+        <select id="redline-doc"></select>
+        <input id="redline-section" placeholder="§" required>
+      </div>
+      <textarea id="redline-text" rows="5" placeholder="replacement language" required></textarea>
+      <textarea id="redline-rationale" rows="2" placeholder="rationale" required></textarea>
+      <button type="submit">propose redline</button>
+    </form>
+
+    <form id="form-finish" class="tabform">
+      <textarea id="final-summary" rows="6" placeholder="closing summary for the supervising lawyer. name the issues that matter." required></textarea>
+      <button type="submit" class="danger">submit final work product</button>
+    </form>
+  </aside>
+</main>
+
+<footer>
+  <span>scoring locally — the real <a href="https://github.com/jamesbaker1/playbook">playbook_legal</a> engine in webassembly. zero network calls after boot.</span>
+  <span id="engine-line"></span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

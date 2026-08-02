@@ -17,6 +17,10 @@ Existing legal benchmarks test static, single-turn tasks. Playbook tests the
 judgment, citation-grounded analysis, and drafting — the same design pattern that
 made policy-constrained agent benchmarks work in other domains.
 
+**Play it yourself:** [jamesbaker1.github.io/playbook](https://jamesbaker1.github.io/playbook/)
+— the web gym runs the real scoring engine in your browser (WebAssembly, no
+backend) under the same budgets and gates the models face.
+
 ## The v0.2 scoring contract
 
 Credit is earned by **content**, never by guessing rubric internals:
@@ -98,12 +102,18 @@ reversed-redline trajectories must trip the critical gate).
 src/playbook_legal/       Environment, scoring, schemas, linter, baseline, bench
 matters/                  Public synthetic matters (dev split)
 examples/<matter_id>/     Reference + adversarial trajectories per matter
+web/                      The web gym — the real engine via Pyodide, no backend
 training/                 Modal-ready SFT / DPO / GRPO scaffolds (never auto-run)
 tests/                    Environment, scoring, adversarial, lint, baseline tests
+docs/                     Architecture, environment API, scoring, evaluation, report
 SPEC.md                   Technical specification (v0.2 contract)
 AUTHORING.md              How to author and validate a matter
 ROADMAP.md                Build plan and status
 ```
+
+Deeper reading: [architecture](docs/architecture.md) ·
+[environment API](docs/environment.md) · [scoring in depth](docs/scoring.md) ·
+[evaluation](docs/evaluation.md) · [contributing](CONTRIBUTING.md)
 
 ## Design principles
 
