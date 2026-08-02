@@ -19,7 +19,11 @@ made policy-constrained agent benchmarks work in other domains.
 
 **Play it yourself:** [jamesbaker1.github.io/playbook](https://jamesbaker1.github.io/playbook/)
 — the web gym runs the real scoring engine in your browser (WebAssembly, no
-backend) under the same budgets and gates the models face.
+backend) under the same budgets and gates the models face. The interface uses a
+familiar legal-workspace model: matter file on the left, document in the center,
+and structured review actions on the right. On mobile, a bottom bar switches among
+Matter, Document, Work, Issues, and Activity without losing drafts. See the
+[web-gym guide](docs/web-gym.md).
 
 ## The v0.2 scoring contract
 
@@ -74,6 +78,25 @@ function calling can play the environment via the baseline runner.
 | `playbook-render <trace> <out.html>` | Render a trace as an HTML audit report |
 | `playbook-export <trace> <out.jsonl>` | Convert a trace to chat-format SFT data |
 
+## Web gym
+
+The hosted gym is both a demonstration and a human-data interface. It bundles the
+same `playbook_legal` Python package and public matters used by the CLI, mounts them
+inside Pyodide, and executes actions locally. Reading, searching, questions, issue
+submission, redlining, scoring, and trace export therefore use the canonical engine;
+the browser does not reimplement the rubric.
+
+Submitted issues become persistent work-product cards. From each card, a reviewer can
+reopen cited evidence or start a linked redline. Before final submission, a preflight
+shows sections reviewed, questions used, issues submitted, draft coverage, and remaining
+steps. These are workflow warnings, not legal-quality judgments.
+
+Completed traces remain local unless the user explicitly chooses **contribute trace**.
+Contributed traces contain actions, score data, and an optional handle; the ingestion
+pipeline replays every trace and rejects records that do not reproduce their claimed
+result. See [Using the web gym](docs/web-gym.md) and
+[the Worker deployment notes](web/worker/README.md).
+
 ## Matters
 
 Eight public development matters (all synthetic; each carries a contamination canary
@@ -111,7 +134,7 @@ AUTHORING.md              How to author and validate a matter
 ROADMAP.md                Build plan and status
 ```
 
-Deeper reading: [architecture](docs/architecture.md) ·
+Deeper reading: [web gym](docs/web-gym.md) · [architecture](docs/architecture.md) ·
 [environment API](docs/environment.md) · [scoring in depth](docs/scoring.md) ·
 [evaluation](docs/evaluation.md) · [contributing](CONTRIBUTING.md)
 

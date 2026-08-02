@@ -17,6 +17,13 @@
   let finished = false;
   let readSections = new Set();
   let submittedLabels = new Set();
+  let submittedIssues = new Map();
+  let redlinedLabels = new Set();
+  let sectionCache = new Map();
+  let questionsAsked = 0;
+  let stepsRemaining = 0;
+  let mobileView = "files";
+  const mobileMedia = window.matchMedia("(max-width: 980px)");
 
   function markProgress(name) {
     const item = document.querySelector(`[data-progress="${name}"]`);
@@ -99,11 +106,134 @@
 
   function showWorkspace(view) {
     const documentMode = view === "document";
+    const reviewMode = view === "review";
     $("document-view").hidden = !documentMode;
-    transcript.hidden = documentMode;
+    $("review-view").hidden = !reviewMode;
+    transcript.hidden = documentMode || reviewMode;
     document.querySelectorAll("#workspace-tabs button").forEach((button) => {
       button.classList.toggle("active", button.dataset.view === view);
     });
+    if (mobileMedia.matches) setMobileView(view, false);
+  }
+
+  function setMobileView(view, chooseWorkspace = true) {
+    mobileView = view;
+    if (!mobileMedia.matches || $("main").hidden) {
+      $("docs").hidden = false;
+      $("file").hidden = false;
+      $("composer").hidden = false;
+      return;
+    }
+    $("docs").hidden = view !== "files";
+    $("file").hidden = !["document", "review", "activity"].includes(view);
+    $("composer").hidden = view !== "work";
+    if (chooseWorkspace && ["document", "review", "activity"].includes(view)) {
+      showWorkspace(view);
+    }
+    document.querySelectorAll("#mobile-nav button").forEach((button) => {
+      if (button.dataset.mobileView === view) button.setAttribute("aria-current", "page");
+      else button.removeAttribute("aria-current");
+    });
+  }
+
+  function parseCitation(citation) {
+    const match = citation.match(/^\s*(.+?)\s+\u00a7\s*(.+?)\s*$/);
+    return match ? { documentId: match[1], section: match[2] } : null;
+  }
+
+  function openCitation(citation) {
+    const parsed = parseCitation(citation);
+    if (!parsed) return;
+    const cached = sectionCache.get(`${parsed.documentId}§${parsed.section}`);
+    if (cached) {
+      $("document-view").replaceChildren(el("pre", "", cached));
+      $("current-document").textContent = `${parsed.documentId} §${parsed.section}`;
+      showWorkspace("document");
+      return;
+    }
+    if (finished) return;
+    readSection(parsed.documentId, parsed.section, null);
+  }
+
+  function selectComposerTab(name) {
+    document.querySelectorAll("#tabs button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.tab === name);
+    });
+    document.querySelectorAll(".tabform").forEach((form) => {
+      form.classList.toggle("active", form.id === "form-" + name);
+    });
+    if (mobileMedia.matches) setMobileView("work");
+  }
+
+  function draftRedline(issue) {
+    const redlineDirty = ["redline-section", "redline-text", "redline-rationale"]
+      .some((id) => $(id).value.trim());
+    const switchingIssue = $("redline-label").value && $("redline-label").value !== issue.issue_id;
+    if (redlineDirty && switchingIssue && !window.confirm("Discard the current redline draft and switch issues?")) return;
+    if (redlineDirty && switchingIssue) $("form-redline").reset();
+    selectComposerTab("redline");
+    $("redline-label").value = issue.issue_id;
+    const operative = issue.citations.map(parseCitation).find(Boolean);
+    if (operative) {
+      const docOption = Array.from($("redline-doc").options)
+        .find((option) => option.value === operative.documentId);
+      if (docOption && !$("redline-section").value.trim()) {
+        $("redline-doc").value = operative.documentId;
+        $("redline-section").value = operative.section;
+      }
+    }
+    if (!$("redline-rationale").value.trim()) {
+      $("redline-rationale").value = issue.recommendation;
+    }
+    $("redline-text").focus();
+    $("composer").scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  function renderReview() {
+    const list = $("review-list");
+    list.replaceChildren();
+    $("review-count").textContent = submittedIssues.size;
+    if (!submittedIssues.size) {
+      const empty = el("div", "empty-review");
+      empty.append(el("strong", "", "No issues submitted yet."),
+        el("span", "", "Add an issue from the review pane and it will appear here."));
+      list.appendChild(empty);
+      return;
+    }
+    for (const issue of submittedIssues.values()) {
+      const card = el("article", "issue-card severity-" + issue.severity);
+      const head = el("div", "issue-card-head");
+      const heading = el("div");
+      heading.append(el("span", "issue-meta", issue.severity + " priority \u00b7 " + issue.issue_id),
+        el("h3", "", issue.title));
+      const status = el("span", "issue-status " + (redlinedLabels.has(issue.issue_id) ? "complete" : ""),
+        redlinedLabels.has(issue.issue_id) ? "redline drafted" : "issue submitted");
+      head.append(heading, status);
+      card.appendChild(head);
+      card.append(el("p", "issue-analysis", issue.analysis));
+      const recommendation = el("div", "issue-recommendation");
+      recommendation.append(el("strong", "", "Recommended position"), el("p", "", issue.recommendation));
+      card.appendChild(recommendation);
+      const footer = el("div", "issue-card-actions");
+      const cites = el("div", "citation-list");
+      issue.citations.forEach((citation) => {
+        const parsed = parseCitation(citation);
+        const cite = el("button", "citation-link", citation);
+        cite.type = "button";
+        const cached = parsed && sectionCache.has(`${parsed.documentId}§${parsed.section}`);
+        cite.disabled = !parsed || (finished && !cached);
+        cite.title = parsed ? (cached ? "Open reviewed section" : "Open cited section — costs one step") : "Citation cannot be opened automatically";
+        if (parsed) cite.addEventListener("click", () => openCitation(citation));
+        cites.appendChild(cite);
+      });
+      const draft = el("button", "draft-redline", redlinedLabels.has(issue.issue_id) ? "Draft another redline" : "Draft redline");
+      draft.type = "button";
+      draft.disabled = finished;
+      draft.addEventListener("click", () => draftRedline(issue));
+      footer.append(cites, draft);
+      card.appendChild(footer);
+      list.appendChild(card);
+    }
   }
 
   function addEntry(kind, reward, bodyNodes) {
@@ -122,6 +252,8 @@
   function updateBudgets(obs) {
     const b = obs.budgets;
     const s = b.steps_remaining, q = b.client_questions_remaining;
+    stepsRemaining = s;
+    budgetsEl.setAttribute("aria-label", `${s} steps remaining; ${q} client questions remaining`);
     budgetsEl.replaceChildren(
       document.createTextNode("steps "),
       s <= 5 ? el("b", "", String(s)) : document.createTextNode(String(s)),
@@ -189,6 +321,7 @@
       if (link) link.classList.add("read");
       body.push(el("pre", "body doc-text", lr.content));
       $("document-view").replaceChildren(el("pre", "", lr.content));
+      sectionCache.set(`${docId}§${sec}`, lr.content);
       $("current-document").textContent = `${docId} §${sec}`;
       showWorkspace("document");
       markProgress("read");
@@ -205,6 +338,7 @@
     if (lr.error) body.push(el("div", "body error", lr.error));
     else {
       body.push(el("div", "body answer", lr.answer));
+      questionsAsked += 1;
       markProgress("question");
     }
     addEntry("ask_client", resp.reward, body);
@@ -239,8 +373,10 @@
     if (lr.error) body.push(el("div", "body error", lr.error + " " + (lr.missing || "")));
     else {
       submittedLabels.add(payload.issue_id);
+      submittedIssues.set(payload.issue_id, payload);
       markProgress("issue");
       refreshLabels();
+      renderReview();
       body.push(el("div", "body", `${payload.severity} — ${payload.title}`));
       body.push(el("div", "body", "cites: " + payload.citations.join(", ")));
     }
@@ -259,6 +395,8 @@
     else {
       body.push(el("pre", "body doc-text", payload.replacement_text));
       markProgress("redline");
+      redlinedLabels.add(payload.issue_id);
+      renderReview();
     }
     addEntry(`propose_redline [${payload.issue_id}] ${payload.document_id} §${payload.section}`,
       resp.reward, body);
@@ -353,10 +491,7 @@
 
   document.querySelectorAll("#tabs button").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll("#tabs button").forEach((b) => b.classList.remove("active"));
-      document.querySelectorAll(".tabform").forEach((f) => f.classList.remove("active"));
-      btn.classList.add("active");
-      $("form-" + btn.dataset.tab).classList.add("active");
+      selectComposerTab(btn.dataset.tab);
     });
   });
 
@@ -431,11 +566,48 @@
     e.preventDefault();
     const s = $("final-summary").value.trim();
     if (!s) return;
-    const warning = submittedLabels.size === 0
-      ? "You have not submitted any issues. Submit this final work product anyway?"
-      : "Submitting ends this matter and calculates your score. Continue?";
-    if (window.confirm(warning)) submitFinal(s);
+    renderFinishPreflight();
+    $("finish-dialog").showModal();
   });
+
+  function renderFinishPreflight() {
+    const rows = [
+      ["Sections reviewed", readSections.size],
+      ["Client questions asked", questionsAsked],
+      ["Issues submitted", submittedIssues.size],
+      ["Issues with draft language", `${redlinedLabels.size} of ${submittedIssues.size}`],
+      ["Steps remaining", stepsRemaining],
+    ];
+    const checklist = $("finish-checklist");
+    checklist.replaceChildren();
+    rows.forEach(([label, value]) => {
+      const row = el("div", "finish-row");
+      row.append(el("span", "", label), el("strong", "", String(value)));
+      checklist.appendChild(row);
+    });
+    const warnings = [];
+    if (!readSections.size) warnings.push("You have not reviewed any provisions.");
+    if (!submittedIssues.size) warnings.push("You have not submitted any issues. Your score may be very low.");
+    const highWithoutDraft = Array.from(submittedIssues.values())
+      .filter((issue) => ["high", "critical"].includes(issue.severity) && !redlinedLabels.has(issue.issue_id));
+    if (highWithoutDraft.length) warnings.push(`${highWithoutDraft.length} high-priority issue(s) have no draft language. Confirm that is intentional.`);
+    if (stepsRemaining <= 3) warnings.push(`Only ${stepsRemaining} steps remain.`);
+    if (!warnings.length) warnings.push("No obvious workflow gaps found. This check does not assess legal correctness.");
+    $("finish-warnings").replaceChildren(...warnings.map((message) => el("p", "", message)));
+  }
+
+  $("finish-back").addEventListener("click", () => $("finish-dialog").close());
+  $("finish-confirm").addEventListener("click", () => {
+    const summary = $("final-summary").value.trim();
+    if (!summary) return;
+    $("finish-dialog").close();
+    submitFinal(summary);
+  });
+
+  document.querySelectorAll("#mobile-nav button").forEach((button) => {
+    button.addEventListener("click", () => setMobileView(button.dataset.mobileView));
+  });
+  mobileMedia.addEventListener("change", () => setMobileView(mobileView));
 
   /* ---------------------------------------------------------------- start */
 
@@ -447,7 +619,14 @@
     finished = false;
     readSections = new Set();
     submittedLabels = new Set();
+    submittedIssues = new Map();
+    redlinedLabels = new Set();
+    sectionCache = new Map();
+    questionsAsked = 0;
+    document.querySelectorAll(".tabform").forEach((form) => form.reset());
+    $("quotes").replaceChildren();
     refreshLabels();
+    renderReview();
     transcript.replaceChildren();
     $("current-document").textContent = "No section open";
     $("document-view").innerHTML = `<div class="empty-document"><p class="eyebrow">${obs.matter.matter_id}</p><h2>${obs.matter.title}</h2><p><strong>You are:</strong> ${obs.matter.role}</p><p>${obs.matter.assignment}</p><p class="start-hint">Start by opening the supervising-lawyer instructions and playbook from the matter file.</p></div>`;
@@ -459,6 +638,7 @@
     budgetsEl.hidden = false;
     $("boot").hidden = true;
     $("main").hidden = false;
+    setMobileView("files");
 
     const m = obs.matter;
     addEntry("matter opened — " + m.matter_id, null, [

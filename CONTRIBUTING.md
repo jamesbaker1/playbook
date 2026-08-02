@@ -43,6 +43,48 @@ advice and should not read like any identifiable firm's form.
 - Determinism is non-negotiable in the environment and reward engine (no clocks,
   no RNG outside the seeded generator).
 
+## Working on the web gym
+
+The site under `web/` is deliberately dependency-light: static HTML, CSS, and
+JavaScript around the real Python environment running in Pyodide. Preserve these
+boundaries:
+
+- Do not duplicate scoring or matter logic in JavaScript. Browser actions must go
+  through `web/driver.py` and `PlaybookEnv`.
+- Preserve drafts when users change tabs or mobile panes. Starting a new matter is
+  the point at which forms and local workspace state reset.
+- Desktop uses a matter/document/work-product layout. At widths up to 980px, only
+  one workspace surface should be exposed at a time through the mobile navigation.
+- New controls need keyboard operation, visible focus, plain-language labels, and
+  effective touch targets of at least 44 CSS pixels.
+- Final submission is irreversible and must continue to use the in-page preflight.
+- Keep technical boot output collapsed by default; runtime transparency should not
+  displace the task interface.
+
+Build and validate the exact GitHub Pages bundle with:
+
+```bash
+python web/build_site.py dist
+python -m pytest -q tests/test_web_bundle.py
+node --check web/app.js
+node --check web/contribute.js
+```
+
+Manual browser checks should include 320×568, 390×844, and 768×1024 viewports,
+keyboard-only use, switching every mobile pane with partially completed forms, an
+invalid issue/redline submission, and final-preflight cancellation.
+
+## Human trace contributions
+
+Trace upload is opt-in and implemented separately in `web/contribute.js`. The public
+POST endpoint accepts anonymous traces plus an optional handle. Administrative reads
+require the Worker's `READ_TOKEN`; never put that secret or `.wrangler/` state in Git.
+
+Download, replay, and export candidate traces with `training/human_data.py`. Uploaded
+scores are untrusted: the verifier reconstructs the matter episode, replays every
+action, and retains only traces whose score and critical-failure status reproduce.
+See [web/worker/README.md](web/worker/README.md) for deployment and secret setup.
+
 ## License
 
 Apache-2.0. By contributing you agree your contribution is licensed under the

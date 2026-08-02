@@ -56,6 +56,7 @@
     <div class="workspace-bar">
       <nav id="workspace-tabs" aria-label="Workspace view">
         <button type="button" data-view="document" class="active">Document</button>
+        <button type="button" data-view="review">Review <span id="review-count" class="tab-count">0</span></button>
         <button type="button" data-view="activity">Activity</button>
       </nav>
       <span id="current-document">No section open</span>
@@ -67,6 +68,15 @@
         <p>Choose a section from the matter file on the left. The document opens here; questions and work product stay organized in the review pane.</p>
       </div>
     </article>
+    <section id="review-view" hidden aria-label="Submitted work product">
+      <div class="review-heading">
+        <div><p class="eyebrow">WORK PRODUCT</p><h2>Your review</h2></div>
+        <p>Submitted issues stay here as you work. Draft each proposed fix directly from its issue.</p>
+      </div>
+      <div id="review-list" class="review-list">
+        <div class="empty-review"><strong>No issues submitted yet.</strong><span>Add an issue from the review pane and it will appear here.</span></div>
+      </div>
+    </section>
     <div id="transcript" aria-live="polite" hidden></div>
   </section>
 
@@ -140,6 +150,13 @@
       <button type="submit" class="danger">submit final work product</button>
     </form>
   </aside>
+  <nav id="mobile-nav" aria-label="Matter workspace">
+    <button type="button" data-mobile-view="files">Matter</button>
+    <button type="button" data-mobile-view="document">Document</button>
+    <button type="button" data-mobile-view="work">Work</button>
+    <button type="button" data-mobile-view="review">Issues</button>
+    <button type="button" data-mobile-view="activity">Activity</button>
+  </nav>
 </main>
 
 <dialog id="help-dialog">
@@ -154,6 +171,18 @@
     <div><b>Close the loop</b><p>Submit issues before linking redlines to them, then finish with a concise lawyer update.</p></div>
   </div>
   <button id="help-start" class="primary" disabled>start the guided matter</button>
+</dialog>
+
+<dialog id="finish-dialog" aria-labelledby="finish-title">
+  <p class="eyebrow">FINAL CHECK</p>
+  <h2 id="finish-title">Ready to finish this review?</h2>
+  <p>Submitting ends the matter and calculates your score. You will not be able to edit this review afterward.</p>
+  <div id="finish-checklist" class="finish-checklist"></div>
+  <div id="finish-warnings" class="finish-warnings" role="status"></div>
+  <div class="dialog-actions">
+    <button id="finish-back" type="button">Keep reviewing</button>
+    <button id="finish-confirm" type="button" class="primary">Submit and see score</button>
+  </div>
 </dialog>
 
 <footer>

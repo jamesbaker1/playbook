@@ -65,3 +65,23 @@ format feeds everything downstream:
   scripted, `model:<name>`, or human);
 - `training/build_pairs.py` → DPO preference pairs;
 - `training/grpo_env_reward.py` → the environment itself as the RL reward.
+
+## Browser gym
+
+GitHub Pages is a static delivery layer, not a second implementation of Playbook.
+`web/build_site.py` bundles the public matters, the Python package, a small JSON
+driver, and the interface assets. At runtime Pyodide mounts those files and imports
+`playbook_legal` in the browser. JavaScript sends JSON actions to `web/driver.py`;
+the driver calls `PlaybookEnv.step()` and returns JSON observations and terminal
+results.
+
+The interface maintains presentation-only state such as the selected document,
+review cards, drafts, mobile pane, and final preflight. None of that state awards
+points. The environment remains authoritative for budgets, transitions, reward,
+termination, and the audit trace.
+
+Optional trace contribution is isolated in `web/contribute.js`. The browser posts
+the trace only after affirmative user action. A Cloudflare Worker applies origin,
+shape, event-count, and payload-size checks before storing it in KV. Because client
+input remains untrusted, `training/human_data.py` reconstructs and deterministically
+replays every candidate before export.
