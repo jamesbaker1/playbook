@@ -11,7 +11,7 @@
       (keyword stuffing must lose), fabrication and reversal gates.
 - [x] HTML trace report and SFT export as package CLIs.
 
-## Phase 2 — Matter factory and benchmark ✅ (this release)
+## Phase 2 — Matter factory and benchmark ✅
 
 - [x] 7 additional technology-transactions matters, varied per AUTHORING.md
       (document architecture, role flips, regulatory overlays, factual pivots).
@@ -21,6 +21,37 @@
 - [x] Baseline runner: OpenAI-compatible tool-calling loop (any endpoint via
       base_url), protocol-failure recovery.
 - [x] `playbook-bench` scorecard implementing the SPEC §10 evaluation protocol.
+
+## Phase 2.5 — Judgment mechanics ✅ (v0.3, this release)
+
+Issue-spotting is the easy half of the job. Phase 2.5 scores the two things a
+supervising partner actually watches for: whether you know what is not yours to
+decide, and what you give away when someone pushes back.
+
+- [x] **Escalation contract** (SPEC §7): budgeted `escalate(topic, reason)`,
+      concept-matched like client questions, answered from hidden supervisor guidance.
+      Required escalations are settled up at `submit_final`; `critical_if_missed` is a
+      gate. Over-escalation and redundant escalation are penalized.
+- [x] **Deterministic negotiation contract** (SPEC §8): `counterparty.yaml` as hidden
+      state; `send_markup` / `accept_counterparty` published only where a counterparty
+      exists; accept/counter/refuse decided by `accept_concepts` + `resist_rounds`.
+      Settlements score the text an issue actually *closes on*; `non_negotiable` and
+      `settlement_critical_failure_patterns` are gates.
+- [x] New budgets and observation surface: `maximum_escalations` (2),
+      `maximum_negotiation_rounds` (8), `escalations_remaining`,
+      `submitted_escalation_topics`, the per-label `negotiation` map.
+- [x] Metrics extended: escalation recall, over-escalation count, settled-issue ratio.
+- [x] `msa_provider_004` retrofitted with the CEO-sign-off escalation its own playbook
+      already required.
+- [x] Leakage and determinism sweeps extended to escalation guidance and counterparty
+      configuration (`tests/test_escalation.py`, `tests/test_negotiation.py`).
+- [ ] `clean_msa_009` — the trap matter: a compliant renewal where the correct answer
+      is "no material issues", graded through `final_submission.required_concepts`.
+      Tests false-positive discipline, which no issue-bearing matter can.
+- [ ] `nego_saas_010` — the negotiation matter: a scripted counterparty with a genuine
+      concession, a trap counter, and a client red line the agent must refuse to trade.
+- [ ] Baseline numbers for escalation recall and settled-issue quality across models;
+      confirm the trap counter is actually trapping.
 
 ## Phase 3 — Trajectories and SFT (scaffolded, not yet run)
 

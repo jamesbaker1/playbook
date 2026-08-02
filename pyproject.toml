@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "playbook-legal"
-version = "0.2.0"
+version = "0.3.0"
 description = "An open environment for evaluating and training AI agents on realistic legal work."
 readme = "README.md"
 requires-python = ">=3.11"

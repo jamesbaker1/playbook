@@ -6,7 +6,7 @@ authors:
     given-names: James
 repository-code: "https://github.com/jamesbaker1/playbook"
 license: AGPL-3.0-only
-version: 0.2.0
+version: 0.3.0
 date-released: 2026-08-02
 keywords:
   - legal-ai
