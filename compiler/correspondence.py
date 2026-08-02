@@ -33,8 +33,9 @@ Two invariants matter and are enforced here:
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any
 
 _HEADING_RE = re.compile(r"^(#{1,6})(\s|$)")
 
@@ -211,7 +212,7 @@ def _squeeze(text: str) -> str:
 
 def _first_value(payload: Mapping[str, Any], keys: Sequence[str]) -> Any:
     for key in keys:
-        if key in payload and payload[key]:
+        if payload.get(key):
             return payload[key]
     return None
 

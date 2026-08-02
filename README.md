@@ -150,3 +150,21 @@ Deeper reading: [web gym](docs/web-gym.md) · [architecture](docs/architecture.m
 8. **Use only synthetic, licensed, or clearly public source materials.**
 
 All matter content is synthetic and intentionally simplified. It is not legal advice.
+
+## License
+
+Copyright © 2026 James Baker.
+
+Playbook is open-source software under the
+[GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). If you modify
+Playbook and make that modified version available to users over a network, the AGPL
+generally requires you to offer those users the corresponding source under the same
+license.
+
+Organizations that need proprietary integration, private modifications, redistribution
+under different terms, warranty terms, or other exceptions may obtain a separate
+commercial license. See [Commercial licensing](COMMERCIAL-LICENSING.md) or contact
+[jamesbaker2019@gmail.com](mailto:jamesbaker2019@gmail.com).
+
+Versions previously released under Apache-2.0 remain available under the license that
+applied to those versions.

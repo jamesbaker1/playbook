@@ -5,7 +5,7 @@ authors:
   - family-names: Baker
     given-names: James
 repository-code: "https://github.com/jamesbaker1/playbook"
-license: Apache-2.0
+license: AGPL-3.0-only
 version: 0.2.0
 date-released: 2026-08-02
 keywords:

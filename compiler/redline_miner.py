@@ -42,9 +42,10 @@ import argparse
 import json
 import re
 import zipfile
+from collections.abc import Iterator, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import IO, Iterator, Sequence
+from typing import IO
 from xml.etree import ElementTree as ET
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -63,7 +64,9 @@ _REVISION_KINDS = {
     "moveFrom": "move_from",
 }
 
-_SECTION_RE = re.compile(r"^(?:section|article|clause)?\s*(\d+(?:\.\d+)*)[.):]?\s+(\S+)", re.I)
+_SECTION_RE = re.compile(
+    r"^(?:section|article|clause)?\s*(\d+(?:\.\d+)*)[.):]?\s+(\S+)", re.IGNORECASE
+)
 
 
 @dataclass(frozen=True)

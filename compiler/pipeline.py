@@ -26,9 +26,10 @@ Stage order::
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 DESIGN_DOC = "docs/matter-compiler.md"
 

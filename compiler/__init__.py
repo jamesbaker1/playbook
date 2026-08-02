@@ -11,6 +11,7 @@ Working today: :mod:`compiler.redline_miner` (Word tracked changes) and
 
 from __future__ import annotations
 
-from . import correspondence, pipeline, redline_miner
-
 __all__ = ["correspondence", "pipeline", "redline_miner"]
+
+# Submodules are imported on demand (``from compiler import redline_miner``) so that
+# ``python -m compiler.redline_miner`` runs the CLI without a double-import warning.

@@ -87,5 +87,7 @@ See [web/worker/README.md](web/worker/README.md) for deployment and secret setup
 
 ## License
 
-Apache-2.0. By contributing you agree your contribution is licensed under the
-project license.
+AGPL-3.0-only. By contributing you agree your contribution is licensed under the
+project license and that the project owner may also offer the contribution as part
+of Playbook under separate commercial terms. Do not contribute code you do not have
+the authority to license on that basis.
