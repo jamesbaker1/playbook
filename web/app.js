@@ -23,7 +23,20 @@
   let questionsAsked = 0;
   let stepsRemaining = 0;
   let mobileView = "files";
+  let guidedStartPending = false;
   const mobileMedia = window.matchMedia("(max-width: 980px)");
+
+  $("welcome-start").disabled = false;
+  $("welcome-start").addEventListener("click", () => {
+    if (!driver) {
+      guidedStartPending = true;
+      $("welcome-start").textContent = "Opening when ready…";
+      $("boot-status").textContent = "Preparing the guided matter…";
+      return;
+    }
+    matterSelect.value = "ai_saas_001";
+    startMatter();
+  });
 
   function markProgress(name) {
     const item = document.querySelector(`[data-progress="${name}"]`);
@@ -84,6 +97,10 @@
     $("engine-line").textContent =
       `pyodide ${pyodide.version} · playbook_legal 0.2.0 · ${matters.length} matters mounted`;
     boot("pick a matter above and open it.");
+    if (guidedStartPending) {
+      matterSelect.value = "ai_saas_001";
+      startMatter();
+    }
   } catch (err) {
     boot("boot failed: " + err);
     throw err;
@@ -450,9 +467,11 @@
     });
     const again = el("button", "", "choose another matter");
     again.addEventListener("click", () => {
+      document.body.classList.remove("matter-active");
       $("main").hidden = true;
       $("boot").hidden = false;
       budgetsEl.hidden = true;
+      $("welcome-start").textContent = "Open the guided matter";
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
     actions.appendChild(dl);
@@ -638,6 +657,8 @@
     budgetsEl.hidden = false;
     $("boot").hidden = true;
     $("main").hidden = false;
+    document.body.classList.add("matter-active");
+    window.scrollTo(0, 0);
     setMobileView("files");
 
     const m = obs.matter;
@@ -653,10 +674,6 @@
   }
 
   startBtn.addEventListener("click", startMatter);
-  $("welcome-start").addEventListener("click", () => {
-    matterSelect.value = "ai_saas_001";
-    startMatter();
-  });
   $("help-start").addEventListener("click", () => {
     $("help-dialog").close();
     matterSelect.value = "ai_saas_001";
