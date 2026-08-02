@@ -127,7 +127,7 @@
     for (const m of matters) {
       const opt = document.createElement("option");
       opt.value = m.id;
-      opt.textContent = `${m.id} — ${m.title.toLowerCase()}`;
+      opt.textContent = `${m.id === "ai_saas_001" ? "starter · " : ""}${m.title.toLowerCase()}`;
       matterSelect.appendChild(opt);
     }
     matterSelect.disabled = false;
@@ -485,13 +485,65 @@
     if (!resp.result) return;
     const r = resp.result;
     const block = el("div", "score");
+    const percent = Math.round(r.normalized_score * 100);
+    const band = percent >= 85 ? "Strong review" : percent >= 70 ? "Sound foundation" :
+      percent >= 50 ? "Developing review" : "Needs another pass";
+    block.appendChild(el("p", "eyebrow", "PERFORMANCE BRIEF"));
+    block.appendChild(el("h2", "score-title", band));
     const big = el("div", "big" + (r.critical_failure ? " capped" : ""),
-      Math.round(r.normalized_score * 100) + " / 100");
+      percent + " / 100");
     block.appendChild(big);
     block.appendChild(el("div", "sub",
       `raw ${r.raw_score} / ${r.max_score}` +
       (r.critical_failure ? " — CRITICAL FAILURE: score capped" : "") +
       (r.truncated ? " — out of steps" : "")));
+
+    const breakdown = r.breakdown;
+    const issueCount = breakdown.matched_issues.length;
+    const redlineCount = breakdown.matched_redlines.length;
+    const submittedCount = submittedIssues.size;
+    const citationTotal = breakdown.valid_citation_count + breakdown.invalid_citations.length;
+    const citationRate = citationTotal ? Math.round(100 * breakdown.valid_citation_count / citationTotal) : 0;
+    const metrics = el("div", "score-metrics");
+    for (const [value, label] of [
+      [`${issueCount}/${submittedCount || 0}`, "supported issues"],
+      [`${redlineCount}/${issueCount || 0}`, "issues redlined"],
+      [`${citationRate}%`, "valid citations"],
+      [String(r.steps), "steps used"],
+    ]) {
+      const card = el("div", "score-metric");
+      card.append(el("strong", "", value), el("span", "", label));
+      metrics.appendChild(card);
+    }
+    block.appendChild(metrics);
+
+    const feedback = el("div", "score-feedback");
+    const strengths = [];
+    const focus = [];
+    if (issueCount) strengths.push(`${issueCount} material issue${issueCount === 1 ? "" : "s"} grounded in the rubric.`);
+    if (citationRate === 100 && citationTotal) strengths.push("Every submitted citation was valid.");
+    if (redlineCount === issueCount && issueCount) strengths.push("Every credited issue was carried through to drafting.");
+    if (breakdown.fabricated_quotes.length === 0) strengths.push("No quotation-integrity problems.");
+    if (breakdown.unsupported_issues.length) focus.push(`${breakdown.unsupported_issues.length} submitted issue${breakdown.unsupported_issues.length === 1 ? " was" : "s were"} not sufficiently supported.`);
+    if (breakdown.invalid_citations.length) focus.push(`Correct ${breakdown.invalid_citations.length} invalid citation${breakdown.invalid_citations.length === 1 ? "" : "s"}.`);
+    if (redlineCount < issueCount) focus.push(`Draft operative language for ${issueCount - redlineCount} credited issue${issueCount - redlineCount === 1 ? "" : "s"}.`);
+    const finalEvent = [...breakdown.reward_events].reverse().find((event) => event.type === "final_submission");
+    if (finalEvent?.missing_issues?.length) focus.push(`The final update omitted ${finalEvent.missing_issues.length} material issue${finalEvent.missing_issues.length === 1 ? "" : "s"}.`);
+    if (r.critical_failure) focus.unshift("Address the critical error before refining lower-priority work.");
+    if (!focus.length) focus.push(percent >= 85 ? "Try a sealed benchmark next." : "Tighten analysis and drafting language to capture the remaining points.");
+    for (const [title, items] of [["What worked", strengths.slice(0, 3)], ["Next focus", focus.slice(0, 3)]]) {
+      const panel = el("section", "feedback-panel");
+      panel.appendChild(el("h3", "", title));
+      const list = el("ul");
+      for (const item of items.length ? items : ["Complete another matter to establish a pattern."]) list.appendChild(el("li", "", item));
+      panel.appendChild(list);
+      feedback.appendChild(panel);
+    }
+    block.appendChild(feedback);
+
+    block.appendChild(el("details", "score-detail"));
+    const detail = block.lastChild;
+    detail.appendChild(el("summary", "", "See the complete scoring audit"));
 
     const table = el("table");
     for (const ev of r.breakdown.reward_events) {
@@ -503,7 +555,7 @@
       row.appendChild(pts);
       table.appendChild(row);
     }
-    block.appendChild(table);
+    detail.appendChild(table);
 
     const actions = el("div", "actions-row");
     const dl = el("button", "", "download trace");
@@ -719,6 +771,7 @@
     const role = el("p");
     role.append(el("strong", "", "You are: "), document.createTextNode(obs.matter.role));
     empty.append(role, el("p", "", obs.matter.assignment));
+    if (id === "ai_saas_001") empty.append(el("p", "matter-time", "Starter matter · about 15–20 minutes · 30-step limit"));
     if (playMode === "learn") empty.append(el("p", "start-hint", "Start by opening the supervising-lawyer instructions and playbook from the matter file."));
     $("document-view").replaceChildren(empty);
     showWorkspace("document");
