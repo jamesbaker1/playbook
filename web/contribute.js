@@ -9,6 +9,48 @@
   "use strict";
 
   const TRACE_ENDPOINT = "https://playbook-traces.james-baker1628.workers.dev/api/traces";
+  const UPLOAD_TIMEOUT_MS = 20000;
+  const MAX_TRANSIENT_RETRIES = 2;
+  const TRANSIENT_STATUSES = new Set([429, 502, 503, 504]);
+
+  function delay(ms) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
+  }
+
+  async function postTrace(body, onRetry) {
+    for (let attempt = 0; ; attempt += 1) {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS);
+      let response;
+      try {
+        response = await fetch(TRACE_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+          signal: controller.signal,
+        });
+      } finally {
+        window.clearTimeout(timer);
+      }
+
+      // Retry only when the server explicitly reports a transient failure. A
+      // network error or timeout is ambiguous: the Worker may have stored the
+      // trace before the response was lost, and its API has no idempotency key.
+      if (!TRANSIENT_STATUSES.has(response.status) || attempt >= MAX_TRANSIENT_RETRIES) {
+        return response;
+      }
+      onRetry(attempt + 1);
+      await delay(500 * (2 ** attempt));
+    }
+  }
+
+  async function responseBody(response) {
+    try {
+      return await response.json();
+    } catch {
+      return {};
+    }
+  }
 
   window.playbookContribute = function (result, actionsRow, getTraceJson) {
     if (!TRACE_ENDPOINT) return;
@@ -60,17 +102,24 @@
     btn.textContent = "contribute trace";
 
     const status = document.createElement("span");
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
     status.style.marginLeft = "10px";
     status.style.color = "var(--muted)";
 
+    let submitted = false;
+    let uploading = false;
+
     btn.addEventListener("click", async () => {
+      if (submitted || uploading) return;
       if (!consent.checked) {
         status.textContent = "confirm training-data consent first";
         consent.focus();
         return;
       }
+      uploading = true;
       btn.disabled = true;
-      status.textContent = "uploading…";
+      status.textContent = "Uploading your trace…";
       try {
         const payload = {
           app: "web-gym",
@@ -84,24 +133,35 @@
           },
           trace: JSON.parse(getTraceJson()),
         };
-        const response = await fetch(TRACE_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+        // Serialize once so every safe retry sends exactly the same trace.
+        const response = await postTrace(JSON.stringify(payload), (attempt) => {
+          status.textContent = `The service is busy. Retrying (${attempt}/${MAX_TRANSIENT_RETRIES})…`;
         });
-        const body = await response.json();
+        const body = await responseBody(response);
         if (response.ok && body.ok) {
-          status.textContent = "received — thank you. it counts once it replays clean.";
+          submitted = true;
+          status.textContent = "Received — thank you. It counts once it replays clean.";
           handle.disabled = true;
           background.disabled = true;
           consent.disabled = true;
         } else {
           btn.disabled = false;
-          status.textContent = "rejected: " + (body.error || response.status);
+          const reason = body.error || `server error ${response.status}`;
+          status.textContent = response.status >= 500 || response.status === 429
+            ? `The service is temporarily unavailable (${reason}). Please try again.`
+            : `This trace was not accepted: ${reason}.`;
         }
       } catch (err) {
         btn.disabled = false;
-        status.textContent = "upload failed: " + err;
+        if (err && err.name === "AbortError") {
+          status.textContent =
+            "The upload timed out. It may have arrived, so wait a moment before trying again.";
+        } else {
+          status.textContent =
+            "The connection was interrupted. It may have arrived, so wait a moment before trying again.";
+        }
+      } finally {
+        uploading = false;
       }
     });
 
