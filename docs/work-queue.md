@@ -226,3 +226,105 @@ the hand-authored rubric the pipeline recovers. This is the cheapest test of
 the compiler thesis and requires zero firm access. Deliverable: a recovery
 scorecard (issues recovered / severities matched / concepts matched) in
 `docs/matter-compiler.md`.
+
+## W14. Fix the training-export off-by-one (launch blocker)
+
+**Files:** `src/playbook_legal/export.py`, `training/build_pairs.py`,
+`artifacts/human_sft.jsonl`, new test.
+
+- `convert()` pairs each action with `event.observation` — the observation
+  *produced by* that action. The model is asked to predict `read_document`
+  from an observation that already contains the section text it returned. Pair
+  each action with the **previous** event's observation (the `reset()`
+  observation for the first action, which currently never appears in exports).
+- `build_pairs.py` slices `best_chat["messages"][:2]` as the DPO prompt and
+  inherits the bug — verify after the fix that the prompt no longer contains
+  the first action's result.
+- Regenerate every committed export artifact (including
+  `artifacts/human_sft.jsonl`); add a regression test asserting the content
+  returned by action *i* first appears in the user turn *after* it.
+- This contaminates `playbook-export`, `generate_rollouts`, `build_pairs`,
+  and `human_data` outputs equally — one fix in `convert()` covers all, but
+  all downstream artifacts must be rebuilt.
+
+## W15. Close the anchored-stuffing reward hole (hard gate before any RL)
+
+**Files:** `src/playbook_legal/rewards.py`, `tests/test_adversarial.py`.
+
+- Demonstrated exploit: submit each rubric issue citing its own anchor with
+  analysis/recommendation set to the concatenated `required_concepts`,
+  redline text = concatenated `redline_concepts`, questions/summary likewise
+  → **0.875 normalized, no critical failure, zero documents read** (reference
+  is 0.9375). The current adversarial suite only tests *un-anchored* stuffing.
+- First: add the anchored-stuffing episode as a failing regression test.
+- Then pick a mitigation (evaluate in this order): (a) issue credit requires
+  the anchor's section to have been read this episode — cheap, thematically
+  right ("cite what you've read"), and closes the zero-read variant entirely;
+  (b) a phrase-overlap ceiling — analysis that is mostly a concatenation of
+  matched concept strings earns degraded credit; (c) partial-credit curve on
+  concept density. Whatever ships must keep the reference trajectories ≥ 0.7.
+- Related small hole: quotes under `MINIMUM_QUOTE_CHARACTERS = 15` are
+  silently ignored — raise the floor or count a too-short quote as
+  unverified rather than invisible.
+- **No GRPO run happens before this ships** — the one-shot script-generation
+  shape of `grpo_env_reward.py` would optimize directly into the exploit.
+
+## W16. Make seeds real or remove them
+
+**Files:** `src/playbook_legal/env.py`, `bench.py`, `baseline.py`.
+
+- `self._rng` is seeded and never used; `playbook-bench --seeds 0 1 2` emits
+  identical rows per matter and averages them as if independent.
+- Either thread the seed into something real (pass it to the model client as
+  sampling seed/temperature in `baseline.py`, the only stochastic element) or
+  delete `--seeds` and the duplicate-row aggregation. Do not leave a
+  replication flag that fabricates replication.
+
+## W17. Documentation truth sweep (launch blocker)
+
+- `docs/evaluation.md`: "six actions" → nine. `docs/report.md`: "8 public dev
+  matters" → ten; reference-trajectory "≥ 0.97" → the real floor (0.7; lowest
+  actual 0.9375); fill or remove the ▢ placeholder tables before launch.
+- `docs/architecture.md` stale counts; README repository map is missing
+  `compiler/`.
+- README web-gym paragraph currently implies full parity ("same budgets and
+  gates the models face") while the client exposes five of nine actions —
+  qualify it until W4 ships.
+- `CITATION.cff` `date-released` should be set at release, not today.
+- Scorecards should record which split produced them (`bench.py` output
+  currently carries no split label; the dev/held-out discipline lives only
+  in prose).
+
+## W18. Licensing and repo hygiene
+
+- Add `SPDX-License-Identifier: AGPL-3.0-only` headers across `src/`,
+  `compiler/`, `training/`, `engine-worker/src/` (zero files carry one today).
+- `playbook-private`: add LICENSE and a minimal CI (lint + reference replay
+  with the 0.7 floor).
+- Stale `User-Agent: playbook-human-data/0.2` in `training/human_data.py`.
+
+## W19. Private split hardening
+
+- The held-out split (2 matters, both customer-side review) exercises none of
+  v0.3: no escalations, no counterparty, no clean matter — so escalation
+  recall and settled-issue ratio return vacuous 1.0 on the split SPEC §10
+  says to report. Add at minimum: one negotiation matter, one
+  escalation-bearing matter, one clean (no-material-issues) matter, each with
+  adversarial trajectories.
+
+## W20. CI and worker integrity
+
+- CI check that the vendored engine copy inside `engine-worker/` matches
+  `src/playbook_legal` (`vendor.py` output is currently unverified; a stale
+  vendor dir would deploy silently). Add a test for `entry.py` with `js`/
+  `workers` mocked.
+- Lint `compiler/` in CI (the compiler README instructs it; CI omits it).
+- Decide the terminal-trace posture for the web gym: on termination the
+  worker returns the full breakdown (criterion IDs, matched concepts), which
+  lets a user reconstruct rubric internals across a handful of episodes.
+  Acceptable for the assumed-contaminated dev split, but then say so: web
+  scores on public matters are not benchmark numbers. Alternatively trim the
+  breakdown returned in Benchmark mode.
+- Negotiation handlers accept `send_markup` on matters with no counterparty
+  (degrades to −0.5; unpublished action surface) — reject as protocol error
+  instead.
