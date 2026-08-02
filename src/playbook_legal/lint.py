@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Matter linter: validate a matter package against the v0.3 contract.
 
 Every matter that ships in a Playbook repository must pass this linter. It enforces

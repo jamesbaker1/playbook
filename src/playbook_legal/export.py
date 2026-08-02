@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Convert Playbook episode traces into chat-format SFT JSONL records."""
 
 from __future__ import annotations
@@ -18,12 +20,27 @@ def convert(trace: dict[str, Any], *, agent: str = "scripted") -> dict[str, Any]
 
     (e.g. ``scripted``, ``model:<name>``, ``human``) so mixed datasets stay separable.
     """
-    messages: list[dict[str, str]] = [{"role": "system", "content": SYSTEM_PROMPT}]
-    for event in trace["events"]:
-        observation = json.dumps(event["observation"], ensure_ascii=False)
+    events = trace["events"]
+    if "initial_observation" not in trace:
+        raise ValueError(
+            "trace has no initial_observation; regenerate it before export to avoid "
+            "training on a post-action observation"
+        )
+    observation = trace["initial_observation"]
+
+    messages: list[dict[str, str]] = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": json.dumps(observation, ensure_ascii=False)},
+    ]
+    for event in events:
         action = json.dumps(event["action"], ensure_ascii=False)
-        messages.append({"role": "user", "content": observation})
         messages.append({"role": "assistant", "content": action})
+        messages.append(
+            {
+                "role": "user",
+                "content": json.dumps(event["observation"], ensure_ascii=False),
+            }
+        )
     return {
         "matter_id": trace["matter"],
         "agent": agent,

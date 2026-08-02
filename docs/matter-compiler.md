@@ -1,10 +1,11 @@
 # The Matter Compiler
 
-**Status: design + partial implementation.** The tracked-changes miner and the
-correspondence document type work today (`compiler/`, `tests/test_compiler.py`).
-Everything that requires access to a real firm corpus is specified here and stubbed
-in `compiler/pipeline.py`. Nothing in this document changes the public repository's
-posture: **the public gym stays 100% synthetic, and the compiler is self-hosted.**
+**Status: design + Phase A known-answer implementation.** The tracked-changes miner,
+correspondence document type, and synthetic known-answer self-test work today
+(`compiler/`, `tests/test_compiler.py`). Everything that requires access to a real
+firm corpus remains specified here and stubbed in `compiler/pipeline.py`. Nothing in
+this document changes the public repository's posture: **the public gym stays 100%
+synthetic, and the compiler is self-hosted.**
 
 ---
 
@@ -818,17 +819,59 @@ Beyond the confidentiality argument, there are two research arguments:
   tested against an in-memory `.docx` with nested revisions.
 - ✅ `compiler/correspondence.py` — email threads as Playbook documents, verified
   against the real section parser and `load_documents()`.
+- ✅ `compiler/phase_a_selftest.py` — fabricated tracked-change version chains and
+  correspondence for `ai_saas_001`, scoped Stage 2–7 recovery adapters, and real
+  Stage 8 lint/replay validation.
 - Next, still with no firm data:
-  - a **synthetic evidence-bundle generator**: produce fake `.docx` version chains
-    with tracked changes and fake threads for one of the eight existing matters,
-    then compile it back into a matter package and diff against the hand-authored
-    original. This is a genuine end-to-end test of Stages 2–8 with a known answer,
-    and it is publishable;
   - the substantive/conforming **edit classifier** with rules plus a small labelled
     set drawn from synthetic redlines;
   - the emitter and the `--profile public|internal` lint proposal;
   - the `correspondence` document type in one public matter, and the `draft_email`
     action behind a v0.3 flag with its own adversarial tests.
+
+#### Phase A known-answer self-test
+
+`compiler/phase_a_selftest.py` now performs the cheapest falsifiable test of the
+compiler thesis against `ai_saas_001`. It generates ten structurally valid `.docx`
+files (a clean v1 and tracked-change v2 for each of five issues) plus five fabricated
+partner-to-associate messages. It then:
+
+1. orders each two-file chain using synthetic DMS version metadata (Stage 2);
+2. extracts the actual OOXML revisions with `redline_miner`, including intake-hash
+   verification (Stage 3);
+3. mines anchor, severity, and required concepts from the fabricated correspondence
+   record (Stage 4);
+4. makes a deterministic rubric proposal with an evidence id on every field and
+   compares it with the hand-authored rubric (Stage 5);
+5. applies an identity resynthesis adapter that refuses non-synthetic inputs and
+   emits the already-fictional source package (Stages 6–7); and
+6. runs the production linter and replays `examples/ai_saas_001/good.jsonl` through
+   `PlaybookEnv` (Stage 8).
+
+Reproduce it from the repository root:
+
+```bash
+python -m compiler.phase_a_selftest --work-dir /tmp/playbook-phase-a --json
+```
+
+Known-answer scorecard (2026-08-02, deterministic):
+
+| Measure | Recovered | Hand-authored | Recovery |
+| --- | ---: | ---: | ---: |
+| Issues | 5 | 5 | 100% |
+| Severities | 5 | 5 | 100% |
+| Required concepts | 18 | 18 | 100% |
+| Redline concepts | 11 | 11 | 100% |
+| All concepts | 29 | 29 | 100% |
+
+The emitted package has zero lint errors; its reference trajectory scores **0.9375**
+with **no critical failure**. These numbers establish that the evidence format can
+carry the known answer and that the package/replay boundary works. They do **not**
+measure generalization: the generator deliberately encodes a labelled synthetic
+record, the Stage 2–7 adapters understand only that published format, and Stage 6 is
+an identity operation because the input is already fictional. The production
+functions in `compiler/pipeline.py` therefore remain honest stubs pending a
+design-partner corpus and lawyer review.
 
 ### Phase B — needs a design-partner firm
 
@@ -898,7 +941,7 @@ happens); in-tenant adapter training; per-practice-area held-out sets.
    Nobody knows how many compiled matters are needed to beat the synthetic set, or
    whether Stage 6's rewriting destroys the very specificity that made the firm's
    data valuable. Cheapest way to find out before any firm access: run Phase A's
-   synthetic evidence-bundle generator, compile the eight public matters *back* from
+   synthetic evidence-bundle generator, compile the twelve public matters *back* from
    fabricated artifact trails, and measure how much of the hand-authored rubric the
    pipeline recovers. If the compiler cannot recover a rubric it was given the
    evidence for, no amount of real data will help.

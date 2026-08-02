@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Playbook: environments for realistic legal-agent work."""
 
 from .env import PlaybookEnv

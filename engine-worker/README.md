@@ -19,6 +19,10 @@ uv run pywrangler dev
 Run it again whenever engine code or matters change. Deploy with `uv run pywrangler deploy` only after
 tests and an authenticated staging check pass.
 
+Run `python engine-worker/vendor.py --check` to fail if either ignored deployment copy is
+missing, stale, or contains extra files. CI rebuilds the bundle and performs this parity check before
+tests; deployment workflows should do the same immediately before publishing.
+
 Configure `ALLOWED_ORIGIN` in `wrangler.toml` for the GitHub Pages origin. Production secrets or
 environment-specific values should be configured in Cloudflare rather than committed.
 
@@ -30,6 +34,9 @@ environment-specific values should be configured in Cloudflare rather than commi
 - `POST /api/step` with `{ "matter_id": "ai_saas_001", "seed": 0, "actions": [...] }`
 
 Nonterminal responses deliberately omit rewards and rubric details, preventing the public gym from
-becoming a scoring oracle. Terminal responses include the complete canonical trace and episode result
-for feedback and explicitly consented contribution. Public Workers must contain synthetic practice
-matters only; sealed evaluation matters belong in a separate private deployment.
+becoming a live scoring oracle. Terminal responses include the complete canonical trace and episode
+result, including criterion-level audit detail, for useful feedback and explicitly consented
+contribution. This is intentional only because the public synthetic matters are the assumed-
+contaminated development split: web-gym scores are practice feedback, not benchmark results. Public
+Workers must contain synthetic development matters only; sealed evaluation matters and reportable
+benchmark runs belong in a separate private deployment that does not expose terminal traces.

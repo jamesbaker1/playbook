@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Benchmark harness: score a runner across many matters and emit a scorecard.
 
 Runners:
@@ -58,7 +60,9 @@ def run_baseline(matter_dir: Path, seed: int, args: argparse.Namespace) -> dict[
     return run_episode(env, client, model=args.model, seed=seed, temperature=args.temperature)
 
 
-def to_markdown(rows: list[dict[str, Any]], aggregate: dict[str, Any], title: str) -> str:
+def to_markdown(
+    rows: list[dict[str, Any]], aggregate: dict[str, Any], title: str, split: str
+) -> str:
     def fmt(value: Any) -> str:
         if isinstance(value, bool):
             return "yes" if value else "no"
@@ -68,7 +72,7 @@ def to_markdown(rows: list[dict[str, Any]], aggregate: dict[str, Any], title: st
 
     header = "| " + " | ".join(label for _, label in _COLUMNS) + " |"
     divider = "|" + "|".join(" --- " for _ in _COLUMNS) + "|"
-    lines = [f"# {title}", "", header, divider]
+    lines = [f"# {title}", "", f"Split: `{split}`", "", header, divider]
     for row in rows:
         lines.append("| " + " | ".join(fmt(row.get(key, "")) for key, _ in _COLUMNS) + " |")
     lines += [
@@ -88,6 +92,11 @@ def main() -> None:
     parser.add_argument("--matters", type=Path, default=Path("matters"), help="Matter root directory")
     parser.add_argument("--examples", type=Path, default=Path("examples"))
     parser.add_argument("--runner", choices=["replay", "baseline"], default="replay")
+    parser.add_argument(
+        "--split",
+        choices=["dev", "held-out", "custom"],
+        help="Dataset split recorded in the scorecard (default: dev for ./matters, custom otherwise)",
+    )
     parser.add_argument("--seeds", type=int, nargs="+", default=[0])
     parser.add_argument("--model", default=os.environ.get("PLAYBOOK_MODEL", "gpt-4o-mini"))
     parser.add_argument(
@@ -97,6 +106,12 @@ def main() -> None:
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--out", type=Path, default=Path("artifacts/scorecard"))
     args = parser.parse_args()
+    split = args.split or ("dev" if args.matters == Path("matters") else "custom")
+    if args.runner == "replay" and len(args.seeds) != 1:
+        parser.error(
+            "reference replay is deterministic; pass exactly one seed instead of "
+            "creating duplicate benchmark rows"
+        )
 
     matter_dirs = discover_matter_dirs(args.matters)
     if not matter_dirs:
@@ -125,6 +140,7 @@ def main() -> None:
     payload = {
         "runner": args.runner,
         "label": label,
+        "split": split,
         "episodes": rows,
         "aggregate": aggregate,
         "skipped": skipped,
@@ -133,7 +149,10 @@ def main() -> None:
     json_path = args.out.with_suffix(".json")
     md_path = args.out.with_suffix(".md")
     json_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    md_path.write_text(to_markdown(rows, aggregate, f"Playbook scorecard — {label}"), encoding="utf-8")
+    md_path.write_text(
+        to_markdown(rows, aggregate, f"Playbook scorecard — {label}", split),
+        encoding="utf-8",
+    )
     if skipped:
         print(f"Skipped (no reference trajectory): {', '.join(skipped)}")
     print(json.dumps(aggregate, indent=2))

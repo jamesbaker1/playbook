@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Baseline runner: let any OpenAI-compatible chat model play a Playbook matter.
 
 The environment's actions are presented as native tool calls, so any model with
@@ -66,6 +68,7 @@ def run_episode(
             messages=messages,
             tools=tools,
             temperature=temperature,
+            seed=seed,
         )
         message = response.choices[0].message
         tool_calls = getattr(message, "tool_calls", None) or []

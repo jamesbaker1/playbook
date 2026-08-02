@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Cloudflare Python Worker entry point."""
 
 from __future__ import annotations
@@ -9,17 +11,23 @@ from core import DEFAULT_MAX_ACTIONS, DEFAULT_MAX_REQUEST_BYTES, handle_api
 from js import Headers
 from workers import Response, WorkerEntrypoint
 
+LOCAL_DEVELOPMENT_ORIGINS = {
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+}
+
 
 class Default(WorkerEntrypoint):
     async def fetch(self, request):
         origin = request.headers.get("Origin") or ""
         allowed_origin = str(getattr(self.env, "ALLOWED_ORIGIN", ""))
-        headers = _headers(origin, allowed_origin)
+        origin_allowed = origin == allowed_origin or origin in LOCAL_DEVELOPMENT_ORIGINS
+        headers = _headers(origin, origin_allowed)
         if request.method == "OPTIONS":
-            if origin != allowed_origin:
+            if not origin_allowed:
                 return _json_response(403, {"error": {"code": "origin_forbidden", "message": "Origin is not allowed."}}, headers)
             return Response(None, status=204, headers=headers)
-        if origin and origin != allowed_origin:
+        if origin and not origin_allowed:
             return _json_response(403, {"error": {"code": "origin_forbidden", "message": "Origin is not allowed."}}, headers)
         try:
             max_bytes = int(getattr(self.env, "MAX_REQUEST_BYTES", DEFAULT_MAX_REQUEST_BYTES))
@@ -40,13 +48,13 @@ class Default(WorkerEntrypoint):
             return _json_response(500, {"error": {"code": "internal_error", "message": "The scoring service could not process the request."}}, headers)
 
 
-def _headers(origin: str, allowed_origin: str):
+def _headers(origin: str, origin_allowed: bool):
     headers = Headers.new()
     headers.set("Content-Type", "application/json; charset=utf-8")
     headers.set("Cache-Control", "no-store")
     headers.set("Vary", "Origin")
-    if origin == allowed_origin:
-        headers.set("Access-Control-Allow-Origin", allowed_origin)
+    if origin and origin_allowed:
+        headers.set("Access-Control-Allow-Origin", origin)
         headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         headers.set("Access-Control-Allow-Headers", "Content-Type")
         headers.set("Access-Control-Max-Age", "86400")

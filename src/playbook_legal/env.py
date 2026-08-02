@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 from __future__ import annotations
 
 import json
@@ -112,6 +114,7 @@ class PlaybookEnv:
         self.trace = []
         self.reward_engine.reset()
         observation = self._observation()
+        self._initial_observation = deepcopy(observation)
         return observation, {"matter_id": self.matter["matter_id"], "seed": seed}
 
     def step(
@@ -133,8 +136,17 @@ class PlaybookEnv:
             self._last_result = {"error": f"Unknown action type: {action.get('type')}"}
             info["error"] = str(exc)
         else:
-            handler = getattr(self, f"_handle_{action_type.value}")
-            reward, info = handler(action)
+            if action_type.value in _NEGOTIATION_ACTIONS and not self.negotiation_enabled:
+                self._last_result = {
+                    "error": f"Action '{action_type.value}' is unavailable on this matter."
+                }
+                info = {
+                    "valid": False,
+                    "protocol_error": "negotiation actions require a scripted counterparty",
+                }
+            else:
+                handler = getattr(self, f"_handle_{action_type.value}")
+                reward, info = handler(action)
 
         if self._step_count >= self.max_steps and not self._terminated:
             self._truncated = True
@@ -169,6 +181,7 @@ class PlaybookEnv:
         destination.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "matter": self.matter["matter_id"],
+            "initial_observation": self._initial_observation,
             "events": [
                 {
                     "step": event.step,
@@ -203,6 +216,9 @@ class PlaybookEnv:
                 return -0.1, {"valid": False}
         else:
             content = document["text"]
+        self.reward_engine.record_document_read(
+            document_id, str(section) if section is not None else None
+        )
         self._last_result = {
             "document_id": document_id,
             "section": section,

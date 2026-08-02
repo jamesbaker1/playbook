@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import importlib
 import io
+import json
 import sys
 import zipfile
 from pathlib import Path
@@ -26,6 +27,7 @@ if str(ROOT) not in sys.path:
 
 correspondence = importlib.import_module("compiler.correspondence")
 redline_miner = importlib.import_module("compiler.redline_miner")
+phase_a_selftest = importlib.import_module("compiler.phase_a_selftest")
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 RELS = "http://schemas.openxmlformats.org/package/2006/relationships"
@@ -303,3 +305,36 @@ def test_build_message_normalizes_recipient_shapes() -> None:
 
     assert message.recipients == ("b@x", "c@x")
     assert correspondence.build_message({"body": "x"}).sender == "(unknown sender)"
+
+
+# ---------------------------------------------------------- Phase A known answer
+
+
+def test_phase_a_bundle_contains_real_versioned_docx_and_correspondence(tmp_path: Path) -> None:
+    source = ROOT / "matters" / "ai_saas_001"
+    manifest_path = phase_a_selftest.generate_evidence_bundle(source, tmp_path)
+    manifest = phase_a_selftest._yaml(manifest_path)
+
+    assert manifest["synthetic"] is True
+    assert len(manifest["artifacts"]) == 10
+    assert {item["version"] for item in manifest["artifacts"]} == {1, 2}
+    tracked = next(tmp_path.glob("*_v2_tracked.docx"))
+    assert redline_miner.extract_edits(tracked)
+    messages = json.loads((tmp_path / "correspondence.json").read_text(encoding="utf-8"))
+    assert len(messages) == 5
+
+
+def test_phase_a_recovers_known_answer_and_validates_emitted_package(tmp_path: Path) -> None:
+    result = phase_a_selftest.run_selftest(ROOT, tmp_path)
+
+    assert result["stages_exercised"] == [2, 3, 4, 5, 6, 7, 8]
+    assert result["recovery"] == {
+        "issues": {"recovered": 5, "expected": 5},
+        "severities": {"matched": 5, "expected": 5},
+        "required_concepts": {"matched": 18, "expected": 18},
+        "redline_concepts": {"matched": 11, "expected": 11},
+        "concepts": {"matched": 29, "expected": 29},
+    }
+    assert result["validation"]["lint_errors"] == 0
+    assert result["validation"]["normalized_score"] >= 0.7
+    assert result["validation"]["critical_failure"] is False

@@ -9,6 +9,8 @@
  * recomputes the score before anything reaches a dataset.
  */
 
+import policy from "../policy.json" with { type: "json" };
+
 const ALLOWED_ORIGINS = new Set([
   "https://jamesbaker1.github.io",
   "http://localhost:8000",
@@ -16,7 +18,7 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 
 const MAX_BYTES = 2_000_000;
-const CONSENT_VERSION = "2026-08-01";
+const CONSENT_VERSION = policy.consent_version;
 const BACKGROUNDS = new Set(["lawyer", "legal_professional", "law_student", "other"]);
 const MODES = new Set(["learn", "benchmark"]);
 

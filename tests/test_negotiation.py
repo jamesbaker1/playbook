@@ -234,6 +234,29 @@ def test_negotiation_actions_appear_only_when_a_counterparty_exists(tmp_path: Pa
     assert observation["budgets"]["negotiation_rounds_remaining"] == 8
 
 
+def test_send_markup_without_counterparty_is_a_protocol_error(ai_saas_env) -> None:
+    observation, reward, terminated, truncated, info = ai_saas_env.step(
+        {
+            "type": "send_markup",
+            "issue_id": "training",
+            "document_id": "msa",
+            "section": "4.2",
+            "proposed_text": "No training use.",
+        }
+    )
+
+    assert reward == 0.0
+    assert not terminated and not truncated
+    assert info == {
+        "valid": False,
+        "protocol_error": "negotiation actions require a scripted counterparty",
+    }
+    assert observation["last_result"]["error"] == (
+        "Action 'send_markup' is unavailable on this matter."
+    )
+    assert ai_saas_env._negotiation_rounds_used == 0
+
+
 def test_counterparty_resists_then_accepts(tmp_path: Path) -> None:
     env = make_env(tmp_path)
     env.step(dict(ISSUE_NOTICE))

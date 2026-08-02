@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>playbook — the legal agent gym</title>
 <meta name="description" content="Play a synthetic legal matter against the deterministic engine that benchmarks AI legal agents. Every verified episode can become open training data.">
+<meta property="og:title" content="playbook — the legal agent gym">
+<meta property="og:description" content="Play a synthetic legal matter against the deterministic engine that benchmarks AI legal agents. Every verified episode can become open training data.">
+<meta property="og:image" content="https://jamesbaker1.github.io/playbook/og-card.png">
+<meta property="og:url" content="https://jamesbaker1.github.io/playbook/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,7 +21,7 @@
   <span class="spacer"></span>
   <a class="header-link" href="https://github.com/jamesbaker1/playbook#readme">about</a>
   <button id="help-btn" class="header-link" type="button">how to play</button>
-  <span id="mode-badge" class="mode-badge" hidden>Learn mode</span>
+  <span id="mode-badge" class="mode-badge" hidden>learn mode</span>
   <label class="pick">matter
     <select id="matter-select" disabled><option>booting…</option></select>
   </label>
@@ -24,7 +31,7 @@
 
 <div id="boot" class="boot">
   <section class="welcome">
-    <p class="eyebrow">OPEN, AUDITABLE LEGAL-AGENT GYM</p>
+    <p class="eyebrow">Open, auditable legal-agent gym</p>
     <h1>Can you review a deal<br>like a careful lawyer?</h1>
     <p class="lede">Work a synthetic matter, make the judgment calls, and get a criterion-level score from the same deterministic engine that benchmarks AI legal agents. Every episode produces a complete audit trace — contribute yours, and it becomes verified, open training data.</p>
     <fieldset class="mode-picker" aria-label="Choose a mode">
@@ -61,46 +68,55 @@
 
 <main id="main" hidden>
   <aside id="docs">
-    <p class="pane-label">1 · READ THE RECORD</p>
+    <p class="pane-label">1 · read the record</p>
     <div id="doc-list"></div>
+    <section id="learned-facts" class="learned-facts" aria-labelledby="learned-facts-title">
+      <div class="learned-facts-heading">
+        <p class="eyebrow">matter notes</p>
+        <h2 id="learned-facts-title">learned facts</h2>
+      </div>
+      <div id="learned-facts-list" aria-live="polite">
+        <p class="learned-facts-empty">Ask the client or supervising counsel to add verified facts here.</p>
+      </div>
+    </section>
     <p class="hint learn-only">Select a section to open it. Reading and searching each cost one step.</p>
   </aside>
 
   <section id="file" aria-label="Document workspace">
     <div class="workspace-bar">
       <nav id="workspace-tabs" aria-label="Workspace view">
-        <button type="button" data-view="document" class="active">Document</button>
-        <button type="button" data-view="review">Review <span id="review-count" class="tab-count">0</span></button>
-        <button type="button" data-view="activity">Activity</button>
+        <button type="button" data-view="document" class="active">document</button>
+        <button type="button" data-view="review">review <span id="review-count" class="tab-count">0</span></button>
+        <button type="button" data-view="activity">activity</button>
       </nav>
-      <span id="current-document">No section open</span>
+      <span id="current-document">no section open</span>
     </div>
     <article id="document-view">
       <div class="empty-document">
-        <p class="eyebrow">MATTER WORKSPACE</p>
-        <h2>Start with the instructions.</h2>
+        <p class="eyebrow">matter workspace</p>
+        <h2>start with the instructions.</h2>
         <p>Choose a section from the matter file on the left. The document opens here; questions and work product stay organized in the review pane.</p>
       </div>
     </article>
     <section id="review-view" hidden aria-label="Submitted work product">
       <div class="review-heading">
-        <div><p class="eyebrow">WORK PRODUCT</p><h2>Your review</h2></div>
+        <div><p class="eyebrow">work product</p><h2>your review</h2></div>
         <p>Submitted issues stay here as you work. Draft each proposed fix directly from its issue.</p>
       </div>
       <div id="review-list" class="review-list">
-        <div class="empty-review"><strong>No issues submitted yet.</strong><span>Add an issue from the review pane and it will appear here.</span></div>
+        <div class="empty-review"><strong>no issues submitted yet.</strong><span>add an issue from the review pane and it will appear here.</span></div>
       </div>
     </section>
     <div id="transcript" aria-live="polite" hidden></div>
   </section>
 
   <aside id="composer">
-    <p class="pane-label">2 · BUILD YOUR REVIEW</p>
+    <p class="pane-label">2 · build your review</p>
     <section id="next-step" class="next-step learn-only" aria-live="polite">
-      <p class="eyebrow">RECOMMENDED NEXT</p>
-      <strong id="next-step-title">Start with context</strong>
+      <p class="eyebrow">recommended next</p>
+      <strong id="next-step-title">start with context</strong>
       <p id="next-step-copy">Open the supervising-lawyer instructions before reviewing contract language.</p>
-      <button id="next-step-action" type="button">Open instructions</button>
+      <button id="next-step-action" type="button">open instructions</button>
     </section>
     <ol id="progress" class="progress learn-only" aria-label="Matter progress">
       <li data-progress="read">read a provision</li>
@@ -114,6 +130,8 @@
       <button data-tab="search">search</button>
       <button data-tab="issue">add issue</button>
       <button data-tab="redline">redline</button>
+      <button data-tab="escalate">escalate</button>
+      <button data-tab="negotiate">negotiate</button>
       <button data-tab="finish">finish</button>
     </nav>
 
@@ -139,8 +157,9 @@
       <input id="issue-title" placeholder="Provider training right exceeds client position" required>
       <label for="issue-severity">Priority</label>
       <select id="issue-severity"><option value="low">low</option><option value="medium">medium</option><option value="high" selected>high</option><option value="critical">critical</option></select>
-      <label for="issue-citations">Citations — one per line</label>
+      <div class="field-label"><label for="issue-citations">Citations — one per line</label><button type="button" class="insert-section" data-target="issue-citations" aria-label="Insert section symbol">insert §</button></div>
       <textarea id="issue-citations" rows="2" placeholder="msa §4.2&#10;playbook §3" required></textarea>
+      <div id="issue-citation-errors" class="field-errors" aria-live="polite"></div>
       <label for="issue-analysis">Why it matters</label>
       <textarea id="issue-analysis" rows="4" placeholder="Explain the conflict, consequence, and relevant client fact." required></textarea>
       <label for="issue-recommendation">Recommended position</label>
@@ -153,14 +172,36 @@
     <form id="form-redline" class="tabform">
       <p class="form-help">Write replacement language that actually fixes a submitted issue.</p>
       <label for="redline-label">Issue this redline fixes</label>
-      <select id="redline-label" required><option value="">Submit an issue first</option></select>
+      <select id="redline-label" required><option value="">submit an issue first</option></select>
       <label>Provision to replace</label>
-      <div class="row"><select id="redline-doc"></select><input id="redline-section" placeholder="section" required></div>
+      <div class="row"><select id="redline-doc"></select><div class="section-field"><input id="redline-section" placeholder="section" required><button type="button" class="insert-section" data-target="redline-section" aria-label="Insert section symbol">insert §</button></div></div>
+      <div id="redline-citation-errors" class="field-errors" aria-live="polite"></div>
       <label for="redline-text">Replacement language</label>
       <textarea id="redline-text" rows="5" placeholder="Draft the complete operative provision." required></textarea>
       <label for="redline-rationale">Rationale</label>
       <textarea id="redline-rationale" rows="2" placeholder="Explain how this language implements the client position." required></textarea>
       <button type="submit">propose redline</button>
+    </form>
+
+    <form id="form-escalate" class="tabform">
+      <p class="form-help">Raise a decision that exceeds your delegated authority and explain why it needs supervision.</p>
+      <label for="escalate-topic">Topic</label>
+      <textarea id="escalate-topic" rows="2" placeholder="The decision that needs approval" required></textarea>
+      <label for="escalate-reason">Reason for escalation</label>
+      <textarea id="escalate-reason" rows="5" placeholder="State the counterparty position, business impact, and limit on your authority." required></textarea>
+      <button type="submit">ask supervising counsel</button>
+    </form>
+
+    <form id="form-negotiate" class="tabform">
+      <p class="form-help">Send operative language on an issue you have opened. Each send or acceptance spends a negotiation round.</p>
+      <label for="markup-label">Issue to negotiate</label>
+      <select id="markup-label" required><option value="">submit an issue first</option></select>
+      <label>Provision</label>
+      <div class="row"><select id="markup-doc"></select><input id="markup-section" placeholder="section" required></div>
+      <label for="markup-text">Proposed language</label>
+      <textarea id="markup-text" rows="6" placeholder="Draft the complete language to send to the counterparty." required></textarea>
+      <button type="submit">send markup</button>
+      <section id="pending-counters" aria-live="polite"></section>
     </form>
 
     <form id="form-finish" class="tabform">
@@ -171,18 +212,18 @@
     </form>
   </aside>
   <nav id="mobile-nav" aria-label="Matter workspace">
-    <button type="button" data-mobile-view="files">Matter</button>
-    <button type="button" data-mobile-view="document">Document</button>
-    <button type="button" data-mobile-view="work">Work</button>
-    <button type="button" data-mobile-view="review">Issues</button>
-    <button type="button" data-mobile-view="activity">Activity</button>
+    <button type="button" data-mobile-view="files">matter</button>
+    <button type="button" data-mobile-view="document">document</button>
+    <button type="button" data-mobile-view="work">work</button>
+    <button type="button" data-mobile-view="review">issues</button>
+    <button type="button" data-mobile-view="activity">activity</button>
   </nav>
 </main>
 
 <dialog id="help-dialog">
   <button id="close-help" class="dialog-close" aria-label="Close help">×</button>
-  <p class="eyebrow">HOW TO PLAY</p>
-  <h2>Work the matter, not the rubric.</h2>
+  <p class="eyebrow">how to play</p>
+  <h2>work the matter, not the rubric.</h2>
   <p>You are counsel on a synthetic deal. Read the instructions and playbook, inspect the operative contract provisions, and use the action panel to produce your review.</p>
   <div class="help-grid">
     <div><b>Start with context</b><p>Open the supervising-lawyer instructions and negotiation playbook before chasing contract issues.</p></div>
@@ -193,15 +234,25 @@
   <button id="help-start" class="primary" disabled>start the guided matter</button>
 </dialog>
 
+<dialog id="resume-dialog" aria-labelledby="resume-title">
+  <p class="eyebrow">unfinished work</p>
+  <h2 id="resume-title">resume your review?</h2>
+  <p id="resume-copy">A saved matter is available on this device.</p>
+  <div class="dialog-actions">
+    <button id="resume-discard" type="button">discard saved review</button>
+    <button id="resume-confirm" type="button" class="primary">resume review</button>
+  </div>
+</dialog>
+
 <dialog id="finish-dialog" aria-labelledby="finish-title">
-  <p class="eyebrow">FINAL CHECK</p>
-  <h2 id="finish-title">Ready to finish this review?</h2>
+  <p class="eyebrow">final check</p>
+  <h2 id="finish-title">ready to finish this review?</h2>
   <p>Submitting ends the matter and calculates your score. You will not be able to edit this review afterward.</p>
   <div id="finish-checklist" class="finish-checklist"></div>
   <div id="finish-warnings" class="finish-warnings" role="status"></div>
   <div class="dialog-actions">
-    <button id="finish-back" type="button">Keep reviewing</button>
-    <button id="finish-confirm" type="button" class="primary">Submit and see score</button>
+    <button id="finish-back" type="button">keep reviewing</button>
+    <button id="finish-confirm" type="button" class="primary">submit and see score</button>
   </div>
 </dialog>
 
@@ -211,6 +262,9 @@
   <span id="engine-line"></span>
 </footer>
 
+<script src="api-base.js"></script>
+<script src="citation.js"></script>
+<script src="score.js"></script>
 <script src="app.js"></script>
 <script src="contribute.js"></script>
 </body>

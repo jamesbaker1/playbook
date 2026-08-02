@@ -1,0 +1,52 @@
+{
+  "source": {
+    "repository": "https://github.com/harveyai/harvey-labs.git",
+    "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+    "license": "MIT"
+  },
+  "expected_task_count": 24,
+  "workflows": [
+    "counterparty-paper-review",
+    "first-turn-redline",
+    "playbook-escalation",
+    "subsequent-turn-redline"
+  ],
+  "workflow_overlays": {
+    "counterparty-paper-review": "The counterparty initially defends every nonstandard term and reveals business rationale only after a targeted question.",
+    "first-turn-redline": "The counterparty offers one plausible-looking fallback on a material issue; the agent must test it against the playbook before accepting.",
+    "playbook-escalation": "Internal approval facts are hidden until a targeted client question; unsupported escalation claims receive no credit.",
+    "subsequent-turn-redline": "Prior concessions are binding, one issue is non-negotiable, and one remaining issue closes after a compliant second proposal."
+  },
+  "scenarios": [
+    {
+      "scenario": "01",
+      "playbook_matter": "ai_saas_001",
+      "question_budget": 4
+    },
+    {
+      "scenario": "02",
+      "playbook_matter": "cloud_msa_002",
+      "question_budget": 3
+    },
+    {
+      "scenario": "03",
+      "playbook_matter": "saas_renewal_003",
+      "question_budget": 3
+    },
+    {
+      "scenario": "04",
+      "playbook_matter": "msa_provider_004",
+      "question_budget": 4
+    },
+    {
+      "scenario": "05",
+      "playbook_matter": "ml_services_005",
+      "question_budget": 3
+    },
+    {
+      "scenario": "06",
+      "playbook_matter": "nego_saas_010",
+      "question_budget": 4
+    }
+  ]
+}

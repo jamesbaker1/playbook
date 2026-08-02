@@ -61,6 +61,16 @@ def test_fake_model_replaying_good_trajectory_matches_direct_replay() -> None:
     assert result["protocol_failures"] == 0
     # Tool schemas were offered on every request.
     assert all("tools" in request for request in client.requests)
+    assert all(request["seed"] == 0 for request in client.requests)
+
+
+def test_seed_is_forwarded_to_every_model_request() -> None:
+    actions = load_good_actions()
+    client = FakeClient([tool_call_message(action) for action in actions])
+    env = PlaybookEnv.from_directory(MATTER)
+    run_episode(env, client, model="fake", seed=42)
+    assert client.requests
+    assert all(request["seed"] == 42 for request in client.requests)
 
 
 def test_missing_tool_call_is_nudged_then_recovers() -> None:

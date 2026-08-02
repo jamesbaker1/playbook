@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Matter-compiler pipeline: staged, checkpointed, human-reviewable.
 
 Every stage takes a checkpoint from the previous stage and writes its own, so a

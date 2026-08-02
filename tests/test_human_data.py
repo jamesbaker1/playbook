@@ -10,7 +10,7 @@ from conftest import EXAMPLES, MATTERS, ROOT
 
 sys.path.insert(0, str(ROOT / "training"))
 
-from human_data import export_verified, verify_record
+from human_data import CONSENT_VERSION, export_verified, verify_record
 
 from playbook_legal import PlaybookEnv
 
@@ -29,7 +29,7 @@ def build_genuine_record() -> dict:
         "app_version": "0.3",
         "mode": "benchmark",
         "background": "lawyer",
-        "consent": {"version": "2026-08-01", "training_and_evaluation": True},
+        "consent": {"version": CONSENT_VERSION, "training_and_evaluation": True},
         "trace": {
             "matter": "ai_saas_001",
             "seed": 0,
@@ -133,7 +133,7 @@ def test_export_tags_human_agent(tmp_path: Path) -> None:
         "app": "web-gym",
         "app_version": "0.3",
         "mode": "benchmark",
-        "consent_version": "2026-08-01",
+        "consent_version": CONSENT_VERSION,
         "contributor_background": "lawyer",
     }
     assert "test-player" not in json.dumps(line)

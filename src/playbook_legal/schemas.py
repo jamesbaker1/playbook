@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Action schemas for the Playbook environment.
 
 The environment's native protocol is a structured action dictionary. This module

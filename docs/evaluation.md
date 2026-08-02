@@ -10,10 +10,11 @@ export OPENAI_API_KEY=...            # and optionally:
 export PLAYBOOK_BASE_URL=https://openrouter.ai/api/v1
 
 playbook-baseline matters/ai_saas_001 --model gpt-4o-mini        # one matter
-playbook-bench --runner baseline --model gpt-4o-mini             # full scorecard
+playbook-bench --runner baseline --model gpt-4o-mini --split dev # full scorecard
 ```
 
-The runner presents the six environment actions as native tool calls, nudges the
+The runner presents the nine environment actions as native tool calls (with the two
+negotiation actions omitted on matters without a counterparty), nudges the
 model if it answers without a tool call, and force-closes the episode after
 repeated protocol failures (counted in the result as `protocol_failures`).
 
@@ -22,8 +23,10 @@ instead — the deterministic ceiling, useful for validating a matter set.
 
 ## The scorecard
 
-`playbook-bench` writes `scorecard.json` and `scorecard.md` with per-episode rows
-and an aggregate implementing SPEC §10 (via `playbook_legal.metrics`):
+`playbook-bench` writes `scorecard.json` and `scorecard.md` with the declared dataset
+split, per-episode rows, and an aggregate implementing SPEC §10 (via
+`playbook_legal.metrics`). The default `matters/` root is labeled `dev`; other roots
+default to `custom`, so pass `--split held-out` for private evaluation:
 
 | Metric | Meaning |
 | --- | --- |

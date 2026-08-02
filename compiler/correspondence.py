@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Email threads as first-class Playbook documents — stdlib only.
 
 Correspondence is where the *reasoning* of a deal lives: the supervising lawyer's

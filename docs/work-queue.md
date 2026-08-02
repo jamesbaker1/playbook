@@ -1,8 +1,11 @@
 # Work queue — implementation specs
 
-*Companion to `plan-2026-08.md`. Each item is written to be picked up cold: the
-files to touch, the behavior to implement, and the acceptance check. Nothing
-here is started; order within a section is priority order.*
+*Companion to `plan-2026-08.md`. Each item is written as an implementation spec:
+the files involved, required behavior, and acceptance check. As of 2026-08-02,
+the repository implementation for W1–W20 is complete. W10 and W12 still require
+approved paid model runs and human traces before results can be reported; W11 still
+requires review by a practicing M&A lawyer; deployed social-card unfurls require a
+post-deployment check. The detailed requirements remain below as the release audit.*
 
 ## W1. Link previews and favicon (plan A1)
 
@@ -173,6 +176,11 @@ here is started; order within a section is priority order.*
 ## W10. Baseline sprint procedure (plan B1 — awaiting budget approval)
 
 **Blocked on:** owner-provided API key and model list. Nothing runs until then.
+
+Local preparation is complete: `playbook-baseline-sprint` emits an auditable plan without
+making requests, hard-gates execution on credentials and the private split, validates the
+required metrics, and generates README/report-ready output only from measured scorecards.
+See `docs/baseline-sprint.md`.
 
 - `playbook-bench --runner baseline --model <m>` per model over `matters/`,
   then top models over the private split. Capture SPEC §10 metrics including

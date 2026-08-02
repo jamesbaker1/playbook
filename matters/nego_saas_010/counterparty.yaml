@@ -22,6 +22,7 @@ positions:
         text: >-
           Copperfield shall notify Customer within 48 hours after Copperfield confirms a
           Security Incident that materially affects Customer Personal Data.
+        trap: true
     reject_message: >-
       We have already come from 72 hours to 48 hours after confirmation. That is the end of
       our authority on incident notice.
@@ -41,6 +42,7 @@ positions:
           Copperfield may use de-identified data derived from Customer Data and Outputs to
           improve and train Copperfield's models, including models made available to other
           Copperfield customers.
+        trap: true
     reject_message: >-
       Our data-use position is final. We cannot give a blanket prohibition on training.
   # Copperfield pushes back once for form and then folds if pressed. Their 60-day counter is

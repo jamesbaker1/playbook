@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Generate scored rollouts from an OpenAI-compatible model for SFT/DPO data.
 
 Runs the baseline agent N times per matter (varying seed/temperature), saves every

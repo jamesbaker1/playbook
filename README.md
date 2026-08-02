@@ -21,7 +21,9 @@ in other domains.
 
 **Play it yourself:** [jamesbaker1.github.io/playbook](https://jamesbaker1.github.io/playbook/)
 — the web gym uses the canonical scoring engine through a dedicated Cloudflare
-service, under the same budgets and gates the models face. The interface uses a
+service, under the same budgets and scoring gates the models face. Its action controls
+are driven by the engine contract, including escalation and scripted negotiation when
+a matter publishes them. The interface uses a
 familiar legal-workspace model: matter file on the left, document in the center,
 and structured review actions on the right. On mobile, a bottom bar switches among
 Matter, Document, Work, Issues, and Activity without losing drafts. See the
@@ -85,6 +87,7 @@ function calling can play the environment via the baseline runner.
 | `playbook-lint --all matters` | Validate matter packages (anchors, citations, canary) |
 | `playbook-baseline <matter> --model <m>` | Let an OpenAI-compatible model play a matter |
 | `playbook-bench --runner replay\|baseline` | Score a runner across all matters → scorecard |
+| `playbook-baseline-sprint --models ...` | Plan or run the budget-gated, split-labeled baseline sprint |
 | `playbook-render <trace> <out.html>` | Render a trace as an HTML audit report |
 | `playbook-export <trace> <out.jsonl>` | Convert a trace to chat-format SFT data |
 
@@ -102,6 +105,13 @@ reopen cited evidence or start a linked redline. Before final submission, a pref
 shows sections reviewed, questions used, issues submitted, draft coverage, and remaining
 steps. These are workflow warnings, not legal-quality judgments.
 
+An unfinished review is saved on that device after every accepted step as its matter ID,
+seed, and action sequence. On return, the browser offers to resume by deterministically
+replaying that exact sequence through the scoring service. Finishing, discarding, or
+replacing the review clears the saved episode. Learned client and supervisor facts stay
+visible beneath the document list; questions and searches open Activity, while submitted
+issues and redlines open Review.
+
 Review actions are processed by the scoring service. Completed traces are uploaded to
 the separate training-data collector only if the user explicitly chooses
 **contribute trace** and records explicit, versioned training consent. The ingestion
@@ -112,7 +122,7 @@ handles remain in raw storage and are excluded from training exports. See [Using
 
 ## Matters
 
-Ten public development matters (all synthetic; each carries a contamination canary
+Twelve public development matters (all synthetic; each carries a contamination canary
 string), varied by document architecture, role, leverage, and hidden-fact pivots:
 
 | Matter | Scenario | What it tests |
@@ -127,6 +137,8 @@ string), varied by document architecture, role, leverage, and hidden-fact pivots
 | `source_license_008` | Inbound SDK license | GPLv3/copyleft analysis without the classic overclaim |
 | `clean_msa_009` | A compliant renewal — the paper is fine | False-positive discipline: the right answer is "no material issues" |
 | `nego_saas_010` | Live negotiation vs. scripted counterparty | Standing firm on non-negotiables, authorized concessions, escalation under pressure |
+| `public_merger_target_011` | Public-target merger markup, target side | MAE carveouts, board matching rights, ordinary-course control, fee-tail traps |
+| `private_acquisition_buyer_012` | Private-target acquisition, buyer side | Knowledge inquiry plus deductible, cap, and survival allocation |
 
 Private held-out evaluation matters live in a separate private repository so
 published models can be scored on unseen work. Every matter ships a validated
@@ -138,6 +150,7 @@ reversed-redline trajectories must trip the critical gate).
 
 ```text
 src/playbook_legal/       Environment, scoring, schemas, linter, baseline, bench
+compiler/                 Matter-compilation pipeline and validation tools
 matters/                  Public synthetic matters (dev split)
 examples/<matter_id>/     Reference + adversarial trajectories per matter
 web/                      Lightweight GitHub Pages client for the web gym

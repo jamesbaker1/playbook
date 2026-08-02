@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Safely inspect, verify, and export records from the trace Worker.
 
 The default operation is read-only: records are fetched into memory, replayed,

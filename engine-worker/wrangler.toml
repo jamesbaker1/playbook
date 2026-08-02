@@ -3,6 +3,10 @@ main = "src/entry.py"
 compatibility_date = "2026-08-02"
 compatibility_flags = ["python_workers"]
 
+[dev]
+port = 8787
+local_protocol = "http"
+
 # Matter packs are data, not code — bundle their YAML/Markdown into the Worker
 # so core.py can read them from the module filesystem.
 [[rules]]

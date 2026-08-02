@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """LoRA supervised fine-tuning on exported Playbook chat trajectories.
 
 Designed to run on a GPU box or Modal (see ``modal_app.py``); heavy imports live

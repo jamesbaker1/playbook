@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Modal app wrapping the training scaffolds. NOTHING here runs automatically.
 
 Setup (one time):

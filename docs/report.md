@@ -1,12 +1,13 @@
 # Playbook: a benchmark and training environment for multi-step legal work
 
-*Technical report — draft skeleton. Sections marked ▢ await experimental results.*
+*Technical report — pre-results draft. No model or human benchmark has been run or
+reported here.*
 
 ## Abstract
 
-▢ One paragraph after baselines: the environment, the contract, N models compared,
-the headline finding (expected shape: strong issue-spotting, weaker fact-gathering
-discipline and fabrication avoidance under pressure), and the held-out result.
+Playbook is a partially observable, deterministic environment for evaluating and
+training legal agents on multi-step work. This draft documents the environment and
+evaluation protocol; it makes no empirical claim about model or human performance.
 
 ## 1. Motivation
 
@@ -22,7 +23,8 @@ technology-transactions practice.
 ## 2. Environment design
 
 Summarize [architecture](architecture.md) + [environment API](environment.md):
-matter packages, six actions exposed as tool calls, budgets, observation
+matter packages, nine actions exposed as tool calls (two only when a matter has a
+counterparty), budgets, observation
 hygiene (no hidden state, no scoring detail agent-side).
 
 ## 3. The scoring contract
@@ -34,8 +36,9 @@ State the anti-gaming invariants and that they are enforced as CI tests.
 
 ## 4. The matter corpus
 
-8 public dev matters + 2 private held-out matters, all synthetic, canary-tagged,
-lint-enforced, each shipping a validated reference trajectory (≥ 0.97) and
+12 public dev matters + 6 private held-out matters, all synthetic, canary-tagged,
+lint-enforced, each shipping a validated reference trajectory (≥ 0.7; the lowest
+public reference replay is 0.9375) and
 adversarial trajectories that must trip the gates. Table of matters with their
 structural variations (exhibit traps, amendment cross-referencing, role flip,
 hidden severity pivots, regulatory framing, divergent vocabulary in the held-out
@@ -43,25 +46,28 @@ set).
 
 ## 5. Baseline results
 
-▢ Scorecard table: models × SPEC §10 metrics on the public dev split.
-▢ Same table on the private held-out split.
-▢ Human baseline: at least one attorney playing under the same budgets.
-▢ Failure-mode analysis: where do models lose points — question discipline,
-   severity calibration, quote fabrication, protocol failures?
+No model or human baseline results are available. Results should be added only from
+saved, reproducible scorecards that identify the `dev` or `held-out` split. Reference
+trajectory replays validate authored matters and the scorecard pipeline; they are not
+model benchmark results.
+
+The [baseline sprint runbook](baseline-sprint.md) generates a measured, paste-ready table
+with the dev-to-held-out delta and the required escalation, over-escalation, settlement,
+and `nego_saas_010` trap-counter checks. This section must only be replaced from that
+generated artifact; no placeholder or estimated scores belong here.
 
 ## 6. Training experiments
 
-▢ Rollout generation stats; SFT (LoRA) on filtered high-scoring trajectories;
-DPO on within-matter pairs; whether GRPO with the environment-owned reward was
-run and what the adversarial re-testing showed. Pre-registered metric and the
-held-out delta.
+No training experiment results are available. A future report must state the rollout
+corpus, training method, pre-registered metric, adversarial re-test, and held-out delta.
 
 ## 7. Limitations
 
 - Deterministic concept/anchor scoring measures *coverage of the expert answer*,
   not persuasive quality of prose; drafting nuance needs the planned judge layer.
-- Ten matters cover one practice area (technology transactions), one side of the
-  v0.2 contract's assumptions (single-round review, no counterparty simulator).
+- Twelve public matters principally cover technology transactions, with two synthetic
+  M&A matters adding a second practice area; the small corpus cannot establish broad
+  performance across either practice area.
 - Public matters must be presumed contaminated after publication; the held-out
   set is small.
 - Synthetic paper is simplified relative to real negotiated agreements.
@@ -74,5 +80,6 @@ advice. Environment outputs are research artifacts, not counsel.
 
 ## Appendix
 
-▢ Full scorecards, per-matter rubrics summary, reproduction commands
-(`playbook-bench` invocations, seeds, model versions, dates).
+Future result-bearing revisions should include full scorecards, per-matter rubric
+summaries, and reproduction commands (`playbook-bench` invocations, split, seeds,
+model versions, and dates).

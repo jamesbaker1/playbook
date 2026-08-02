@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Build DPO chosen/rejected pairs from scored rollouts.
 
 Pairs are formed within a matter: the highest-scoring critical-free rollout is
@@ -16,6 +18,14 @@ from pathlib import Path
 
 def transcript(messages: list[dict]) -> str:
     return "\n".join(m["content"] for m in messages if m["role"] == "assistant")
+
+
+def initial_prompt(messages: list[dict]) -> str:
+    """Serialize the system prompt and reset observation used for the first action."""
+    prompt = messages[:2]
+    if [message.get("role") for message in prompt] != ["system", "user"]:
+        raise ValueError("chat must start with system and initial user observation")
+    return json.dumps(prompt, ensure_ascii=False)
 
 
 def main() -> None:
@@ -58,7 +68,7 @@ def main() -> None:
             pairs.append(
                 {
                     "matter_id": matter_id,
-                    "prompt": json.dumps(best_chat["messages"][:2], ensure_ascii=False),
+                    "prompt": initial_prompt(best_chat["messages"]),
                     "chosen": transcript(best_chat["messages"]),
                     "rejected": transcript(other_chat["messages"]),
                     "chosen_score": best["normalized_score"],

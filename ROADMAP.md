@@ -80,6 +80,9 @@ decide, and what you give away when someone pushes back.
       replay-verified export pipeline (`training/human_data.py`). Consent is explicit
       and versioned; source, app version, play mode, seed, and optional professional
       background are retained as provenance; handles are excluded from exports.
+- [x] Browser parity for escalation and deterministic negotiation, with action-schema
+      driven forms, citation and quote preflight, retry/busy states, episode resume,
+      persistent learned facts, auditable score diagnosis, and shareable result cards.
 - [ ] Run a paid calibration pilot with 5–10 practicing lawyers. Measure completion
       time, rubric/expert agreement, repeat consistency, and cost per reviewed trace.
 - [ ] Add blinded expert review: first material error, corrected next action, and

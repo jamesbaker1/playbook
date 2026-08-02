@@ -19,7 +19,8 @@ are synthetic.
 3. Open the supervising-lawyer instructions and playbook before reviewing the
    contract. Opening a section is an action and spends one step.
 4. Work the matter using the controls described below. The budget indicator in the
-   header shows the steps and client questions that remain.
+   header shows the steps, client questions, escalations, and (when applicable)
+   negotiation rounds that remain.
 5. Add a final supervising-lawyer update, choose **submit final work product**, and
    review the preflight check. Final submission ends the matter and cannot be
    undone.
@@ -28,6 +29,15 @@ are synthetic.
 
 Use **how to play** in the header for a shorter reminder inside the application.
 
+## Leaving and resuming
+
+While a matter is unfinished, the browser saves its matter ID, seed, mode, and exact
+accepted action sequence in local storage after every step. If you return on the same
+device, choose **resume review** to replay that sequence through the scoring service and
+reconstruct the workspace deterministically. The browser warns before a page exit or
+before replacing an active review. Final submission and an explicit discard remove the
+saved episode.
+
 ## The desktop workspace
 
 The layout borrows familiar ideas from Outlook, Word, and Teams without attempting
@@ -35,11 +45,14 @@ to reproduce those products.
 
 | Area | Purpose |
 | --- | --- |
-| **Matter** | The left pane is the matter file. It lists documents and their sections. Select a section to read it. Previously opened sections are marked. |
+| **Matter** | The left pane is the matter file. It lists documents and their sections, followed by facts learned from the client or supervising counsel. Select a section to read it. Previously opened sections are marked. |
 | **Document** | The center workspace displays the current provision. Citations in submitted issues can reopen their source text. |
 | **Work** | The right pane contains the actions used to investigate the matter and create work product. |
 | **Issues** | The center **Review** tab collects submitted issues, their priority, analysis, citations, recommendation, and redline status. It is the closest view to a working issues list. |
-| **Activity** | The center **Activity** tab is the chronological audit trail: actions, client responses, search results, errors, and the final score. Intermediate rewards are deliberately withheld. |
+| **Activity** | The center **Activity** tab is the chronological audit trail: actions, client responses, search results, errors, and the final score. Questions and searches navigate here automatically. Intermediate rewards are deliberately withheld. |
+
+Submitting an issue or redline navigates to **Review**, so the new work product and its
+status are immediately visible.
 
 The progress checklist in Learn mode is orientation, not a guarantee of a good
 score. Benchmark mode hides this guidance. Legal correctness, grounding,
@@ -94,6 +107,24 @@ card. Choose the linked issue, identify the provision, supply complete replaceme
 language, and explain how it implements the client position. Merely describing a
 change is not replacement language.
 
+### Escalate a decision
+
+When the engine publishes **escalate**, use it for a point outside your delegated
+authority. Name the topic and explain the counterparty position, business impact,
+and reason approval is required. A valid escalation spends the limited escalation
+budget. Guidance returned by supervising counsel appears as a distinct earned entry
+in Activity.
+
+### Negotiate markup
+
+Matters with a scripted counterparty publish **negotiate**. First submit the issue,
+then choose that issue label, identify the provision, and send complete proposed
+language. The issue card shows whether the point is open, countered, settled, or
+refused. A pending counterparty proposal can be accepted explicitly. Each markup
+sent and each acceptance consumes a negotiation round. Check a counter against the
+playbook before accepting it: plausible language can still cross a non-negotiable
+boundary.
+
 ### Finish the review
 
 Use **finish** for a concise update to the supervising lawyer. Lead with material
@@ -101,8 +132,11 @@ risks, relevant learned facts, recommended positions, and anything that should
 block signature.
 
 In Learn mode, the preflight dialog reports sections reviewed, questions asked, issues submitted,
-redline coverage, and steps remaining. It warns about obvious workflow gaps, such
-as a high-priority issue without draft language. It does **not** assess whether the
+redline coverage, escalation and negotiation workflow counts, and steps remaining.
+It warns about obvious workflow gaps, such as a high-priority issue without draft
+language, an unused escalation workflow, or an open negotiated issue. These are
+workflow reminders only: the browser does not identify required escalation topics
+or reveal what the counterparty will accept. It does **not** assess whether the
 legal judgment is correct. Choose **Keep reviewing** to return safely, or confirm
 submission to end the episode.
 
@@ -116,7 +150,13 @@ score even if other work earned points.
 Choose **download trace** to save the complete JSON audit trail locally. For the
 meaning of each scoring component, penalties, and caps, read
 [The scoring contract](scoring.md). Scores measure performance on a synthetic
-benchmark; they are not a credential or a measure of general legal competence.
+practice environment; they are not a credential or a measure of general legal competence.
+
+The terminal audit deliberately includes criterion IDs, matched concepts, and reward events. That
+detail makes practice feedback useful, but repeated runs can reveal the rubric. All matters served by
+the public web gym are therefore the assumed-contaminated **development split**. A web-gym score is
+not a reportable benchmark number. Held-out evaluations run through the private harness and do not
+publish matters, rubrics, or terminal traces.
 
 ## Mobile use
 
@@ -148,17 +188,24 @@ The scoring service necessarily processes your actions during play. Choosing
 collector. After a completed matter, **contribute trace** offers that additional,
 optional upload and requires explicit, versioned training/evaluation consent. Its
 payload contains the action trace, score, Learn/Benchmark mode, application version,
-and optional professional-background category and handle. Contributions are
-replay-verified before export; identifying handles are excluded from training exports.
+and optional professional-background category and handle. The optional handle is
+stored with the restricted raw contribution as provenance, then deliberately omitted
+by `training/human_data.py` from every training export. Contributions are
+replay-verified before export.
 Do not enter real client or confidential information: these are synthetic exercises.
+
+The consent version has one source, `web/policy.json`, read by the upload UI, trace
+worker, and replay/export verifier. The application version is the engine version
+returned by the canonical scoring service and displayed in the footer; the browser
+does not maintain a separate version literal.
 
 ## Common pitfalls
 
 - **Loose quotation:** never put a paraphrase in a quote field. A non-verbatim quote
   is treated as fabrication and triggers the score cap.
-- **Budget drift:** reads, searches, questions, issues, redlines, and final
-  submission all consume steps. Every client question also consumes its separate
-  budget.
+- **Budget drift:** reads, searches, questions, issues, redlines, escalations,
+  negotiation actions, and final submission all consume steps. Questions,
+  escalations, and negotiation rounds also have separate budgets.
 - **Redline before issue:** redlines must link to one of your submitted issue
   labels. Submit and check the issue first.
 - **Wrong citation order:** cite the operative contract provision first, then the

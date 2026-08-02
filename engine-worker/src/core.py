@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Runtime-independent request handling for the Playbook engine Worker."""
 
 from __future__ import annotations

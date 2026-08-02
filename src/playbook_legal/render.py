@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Render a Playbook JSON trace as a self-contained HTML audit report."""
 
 from __future__ import annotations

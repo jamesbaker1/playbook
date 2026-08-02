@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Gymnasium adapter: PlaybookEnv as a text-in / text-out gymnasium.Env.
 
 Language-agent convention: observations and actions are JSON strings. The action

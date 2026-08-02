@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """GRPO with the environment-owned episode reward.
 
 Prompt-only dataset: each row is the matter's initial observation plus a matter

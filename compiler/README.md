@@ -1,4 +1,4 @@
-# Matter compiler (skeleton)
+# Matter compiler
 
 Turn a firm's own deal record — email threads, Word redlines, DMS version chains,
 executed agreements — into Playbook matter packages, **inside the firm's walls**.
@@ -13,11 +13,13 @@ Design document: [`../docs/matter-compiler.md`](../docs/matter-compiler.md).
 | --- | --- |
 | `redline_miner.py` | **Working.** Extracts `w:ins` / `w:del` / `w:moveFrom` / `w:moveTo` tracked changes and `w:comment` margin comments from a `.docx`, with author, timestamp, paragraph context, and a clause-number hint. |
 | `correspondence.py` | **Working.** Renders email threads as Playbook Markdown documents (`## <thread>.<message> From: …`) that the existing section parser addresses and the reward engine can cite. |
+| `phase_a_selftest.py` | **Working, Phase A scope.** Generates fabricated tracked-change chains and correspondence for `ai_saas_001`, mines the known-answer bundle through scoped Stage 2–7 adapters, then runs the real linter and reference replay at Stage 8. |
 | `pipeline.py` | **Typed stubs.** Every stage raises `NotImplementedError` naming the design section that has to be settled — most of them need a design-partner firm before code is worth writing. |
 
-No third-party dependencies: `zipfile` + `xml.etree` + `dataclasses`. Nothing here
-opens a network connection; connectors and model calls are injected by the caller,
-which is what lets the whole thing run with egress disabled.
+The format miners use only `zipfile`, `xml.etree`, and `dataclasses`; the self-test
+also uses the project's existing PyYAML dependency and engine. Nothing here opens a
+network connection; connectors and model calls are injected by the caller, which is
+what lets the whole thing run with egress disabled.
 
 **This package must never be pointed at a corpus without a consent record, and no
 package it produces may enter the public repository or the public trace collector.**
@@ -56,6 +58,17 @@ recovered by diffing versions.
 python -m pytest -q tests/test_compiler.py
 ruff check compiler tests/test_compiler.py
 ```
+
+Run the publishable known-answer experiment (the output directory may be anywhere
+outside the repository):
+
+```bash
+python -m compiler.phase_a_selftest --work-dir /tmp/playbook-phase-a --json
+```
+
+The checked-in scorecard and the boundary between the deterministic Phase A adapters
+and the still-stubbed production pipeline are documented in
+[`../docs/matter-compiler.md`](../docs/matter-compiler.md#phase-a-known-answer-self-test).
 
 The tests build a real OPC package in memory (including a deletion nested inside
 another author's insertion) and round-trip a rendered thread through

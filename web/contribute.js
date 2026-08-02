@@ -52,27 +52,47 @@
     }
   }
 
+  let policyPromise;
+
+  function getPolicy() {
+    if (!policyPromise) {
+      policyPromise = fetch("policy.json", { cache: "no-cache" }).then((response) => {
+        if (!response.ok) throw new Error("contribution policy unavailable");
+        return response.json();
+      });
+    }
+    return policyPromise;
+  }
+
   window.playbookContribute = function (result, actionsRow, getTraceJson) {
     if (!TRACE_ENDPOINT) return;
 
     const wrap = document.createElement("div");
-    wrap.style.marginTop = "10px";
+    wrap.className = "contribute";
 
-    const note = document.createElement("div");
+    const note = document.createElement("p");
+    note.className = "contribute-note";
     note.textContent =
-      "contribute this trace to the public training corpus? anonymous — just your " +
-      "actions and scores. every trace is re-verified by replay before it trains anything.";
-    note.style.color = "var(--muted)";
-    note.style.marginBottom = "6px";
+      "contribute this trace to the public training corpus? the raw contribution stores " +
+      "your actions, score, mode, optional background, and optional handle. every trace " +
+      "is re-verified by replay before use.";
+
+    const detail = document.createElement("p");
+    detail.className = "contribute-detail";
+    detail.textContent =
+      "your handle stays with the restricted raw contribution for provenance, but is " +
+      "excluded from training exports.";
+
+    const fields = document.createElement("div");
+    fields.className = "contribute-fields";
 
     const handle = document.createElement("input");
     handle.placeholder = "sign it (optional handle)";
+    handle.setAttribute("aria-label", "optional contributor handle");
     handle.maxLength = 40;
-    handle.style.marginBottom = "6px";
 
     const background = document.createElement("select");
-    background.setAttribute("aria-label", "Professional background (optional)");
-    background.style.marginBottom = "6px";
+    background.setAttribute("aria-label", "professional background (optional)");
     for (const [value, label] of [
       ["", "background (optional)"],
       ["lawyer", "lawyer"],
@@ -85,16 +105,14 @@
       option.textContent = label;
       background.appendChild(option);
     }
+    fields.append(handle, background);
 
     const consentLabel = document.createElement("label");
-    consentLabel.style.display = "flex";
-    consentLabel.style.gap = "8px";
-    consentLabel.style.margin = "4px 0 8px";
+    consentLabel.className = "contribute-consent";
     const consent = document.createElement("input");
     consent.type = "checkbox";
-    consent.style.width = "auto";
     consentLabel.append(consent, document.createTextNode(
-      "I agree that this trace may be used to train and evaluate AI models."
+      "i agree that this trace may be used to train and evaluate AI models."
     ));
 
     const btn = document.createElement("button");
@@ -102,10 +120,12 @@
     btn.textContent = "contribute trace";
 
     const status = document.createElement("span");
+    status.className = "contribute-status";
     status.setAttribute("role", "status");
     status.setAttribute("aria-live", "polite");
-    status.style.marginLeft = "10px";
-    status.style.color = "var(--muted)";
+    const submitRow = document.createElement("div");
+    submitRow.className = "contribute-submit";
+    submitRow.append(btn, status);
 
     let submitted = false;
     let uploading = false;
@@ -119,28 +139,30 @@
       }
       uploading = true;
       btn.disabled = true;
-      status.textContent = "Uploading your trace…";
+      status.textContent = "uploading your trace…";
       try {
+        const policy = await getPolicy();
+        if (!window.playbookAppVersion) throw new Error("engine version unavailable");
         const payload = {
           app: "web-gym",
-          app_version: "0.3",
+          app_version: window.playbookAppVersion,
           mode: window.playbookMode === "benchmark" ? "benchmark" : "learn",
           handle: handle.value.trim() || null,
           background: background.value || null,
           consent: {
-            version: "2026-08-01",
+            version: policy.consent_version,
             training_and_evaluation: true,
           },
           trace: JSON.parse(getTraceJson()),
         };
         // Serialize once so every safe retry sends exactly the same trace.
         const response = await postTrace(JSON.stringify(payload), (attempt) => {
-          status.textContent = `The service is busy. Retrying (${attempt}/${MAX_TRANSIENT_RETRIES})…`;
+          status.textContent = `the service is busy. retrying (${attempt}/${MAX_TRANSIENT_RETRIES})…`;
         });
         const body = await responseBody(response);
         if (response.ok && body.ok) {
           submitted = true;
-          status.textContent = "Received — thank you. It counts once it replays clean.";
+          status.textContent = "received — thank you. it counts once it replays clean.";
           handle.disabled = true;
           background.disabled = true;
           consent.disabled = true;
@@ -148,30 +170,24 @@
           btn.disabled = false;
           const reason = body.error || `server error ${response.status}`;
           status.textContent = response.status >= 500 || response.status === 429
-            ? `The service is temporarily unavailable (${reason}). Please try again.`
-            : `This trace was not accepted: ${reason}.`;
+            ? `the service is temporarily unavailable (${reason}). please try again.`
+            : `this trace was not accepted: ${reason}.`;
         }
       } catch (err) {
         btn.disabled = false;
         if (err && err.name === "AbortError") {
           status.textContent =
-            "The upload timed out. It may have arrived, so wait a moment before trying again.";
+            "the upload timed out. it may have arrived, so wait a moment before trying again.";
         } else {
           status.textContent =
-            "The connection was interrupted. It may have arrived, so wait a moment before trying again.";
+            "the connection was interrupted. it may have arrived, so wait a moment before trying again.";
         }
       } finally {
         uploading = false;
       }
     });
 
-    wrap.appendChild(note);
-    wrap.appendChild(handle);
-    wrap.appendChild(document.createElement("br"));
-    wrap.appendChild(background);
-    wrap.appendChild(consentLabel);
-    wrap.appendChild(btn);
-    wrap.appendChild(status);
-    actionsRow.parentNode.insertBefore(wrap, actionsRow.nextSibling);
+    wrap.append(note, detail, fields, consentLabel, submitRow);
+    actionsRow.parentNode.insertBefore(wrap, actionsRow);
   };
 })();

@@ -17,7 +17,8 @@ runtime never needs to change when the corpus grows.
 ┌─ Environment (runtime, matter-agnostic) ──────────────────────┐
 │  PlaybookEnv: partially observable episode loop with budgets. │
 │  Actions: read_document / search_matter / ask_client /        │
-│  submit_issue / propose_redline / submit_final                │
+│  escalate / submit_issue / propose_redline / send_markup /    │
+│  accept_counterparty / submit_final (negotiation conditional) │
 │  (also published as OpenAI-compatible tool definitions).      │
 └───────────────────────────────────────────────────────────────┘
                 ↓ every action scored by

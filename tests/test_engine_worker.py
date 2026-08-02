@@ -4,6 +4,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+from conftest import replay
+
 ROOT = Path(__file__).parents[1]
 SPEC = importlib.util.spec_from_file_location("worker_core", ROOT / "engine-worker/src/core.py")
 assert SPEC and SPEC.loader
@@ -86,3 +88,23 @@ def test_request_limits_and_episode_boundary():
     )
     assert status == 409
     assert response["error"]["code"] == "episode_complete"
+
+
+def test_negotiation_reference_replays_like_browser_and_matches_cli_exactly():
+    """The browser resends the complete action list after every user action."""
+    matter_id = "nego_saas_010"
+    actions_path = ROOT / "examples" / matter_id / "good.jsonl"
+    actions = [json.loads(line) for line in actions_path.read_text(encoding="utf-8").splitlines()]
+
+    for end in range(1, len(actions) + 1):
+        status, response = request(
+            "POST", "/api/step", {"matter_id": matter_id, "seed": 0, "actions": actions[:end]}
+        )
+        assert status == 200
+        assert response["terminated"] is (end == len(actions))
+
+    cli_result = replay(ROOT / "matters" / matter_id, actions_path)
+    assert response["result"] == cli_result
+    assert {"escalate", "send_markup", "accept_counterparty"} <= {
+        action["type"] for action in actions
+    }

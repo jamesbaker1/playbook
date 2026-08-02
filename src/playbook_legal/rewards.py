@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Deterministic reward engine for Playbook environments.
 
 v0.2 scoring contract
@@ -57,6 +59,7 @@ class RewardState:
     invalid_citations: list[str] = field(default_factory=list)
     unsupported_issues: list[str] = field(default_factory=list)
     fabricated_quotes: list[str] = field(default_factory=list)
+    read_citations: set[str] = field(default_factory=set)
     events: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -82,6 +85,14 @@ class RewardEngine:
 
     def reset(self) -> None:
         self.state = RewardState()
+
+    def record_document_read(self, document_id: str, section: str | None = None) -> None:
+        """Record the sections whose full text the agent has actually received."""
+        document = self.documents.get(document_id)
+        if document is None:
+            return
+        sections = [section] if section is not None else document["sections"].keys()
+        self.state.read_citations.update(f"{document_id} §{item}" for item in sections)
 
     # ------------------------------------------------------------------ questions
 
@@ -179,6 +190,15 @@ class RewardEngine:
             )
 
         rubric_id = str(criterion["id"])
+        anchor = str(criterion["anchor"])
+        if anchor not in self.state.read_citations:
+            self.state.unsupported_issues.append(label)
+            return self._record(
+                -0.5 - invalid_penalty,
+                "unread_anchor_issue",
+                label,
+                {"reason": "the operative anchor must be read before issue credit is awarded"},
+            )
         if rubric_id in self.state.matched_issues:
             return self._record(-0.2, "duplicate_issue", rubric_id)
         self.state.matched_issues.add(rubric_id)
@@ -250,7 +270,8 @@ class RewardEngine:
             text = str(quote.get("text", "")) if isinstance(quote, dict) else str(quote)
             normalized = _normalize(text)
             if len(normalized) < MINIMUM_QUOTE_CHARACTERS:
-                details.append({"citation": citation, "status": "ignored_too_short"})
+                delta -= 0.25
+                details.append({"citation": citation, "status": "unverified_too_short"})
                 continue
             section_text = self._resolve_citation(citation)
             if section_text is not None and normalized in _normalize(section_text):
@@ -428,6 +449,7 @@ class RewardEngine:
                 "invalid_citations": self.state.invalid_citations,
                 "unsupported_issues": self.state.unsupported_issues,
                 "fabricated_quotes": self.state.fabricated_quotes,
+                "read_citations": sorted(self.state.read_citations),
                 "reward_events": self.state.events,
             },
         }

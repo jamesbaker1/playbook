@@ -88,6 +88,44 @@ def test_keyword_stuffing_scores_far_below_good_trajectory() -> None:
     assert good["normalized_score"] - stuffed["normalized_score"] >= 0.6
 
 
+def test_anchored_rubric_stuffing_without_reads_scores_far_below_reference() -> None:
+    """Knowing every hidden phrase and anchor cannot substitute for reading."""
+    env = PlaybookEnv.from_directory(MATTER)
+    env.reset(seed=7)
+    for index, issue in enumerate(env.rubric["issues"]):
+        concepts = " ".join(issue.get("required_concepts", []))
+        env.step(
+            {
+                "type": "submit_issue",
+                "issue_id": f"stuffed-{index}",
+                "title": concepts,
+                "severity": issue["severity"],
+                "citations": issue["required_citations"],
+                "analysis": concepts,
+                "recommendation": concepts,
+            }
+        )
+        if issue.get("redline_points", 0):
+            document_id, section = issue["anchor"].split(" §", maxsplit=1)
+            env.step(
+                {
+                    "type": "propose_redline",
+                    "issue_id": f"stuffed-{index}",
+                    "document_id": document_id,
+                    "section": section,
+                    "replacement_text": " ".join(issue.get("redline_concepts", [])),
+                    "rationale": concepts,
+                }
+            )
+    env.step({"type": "submit_final", "summary": "rubric " * 30})
+    stuffed = env.episode_result()
+    good = replay(MATTER, EXAMPLES / "ai_saas_001" / "good.jsonl")
+    assert stuffed["breakdown"]["matched_issues"] == []
+    assert stuffed["normalized_score"] <= 0.25
+    assert good["normalized_score"] >= 0.7
+    assert good["normalized_score"] - stuffed["normalized_score"] >= 0.45
+
+
 def test_fabricated_quote_trajectory_is_capped() -> None:
     result = replay(MATTER, EXAMPLES / "ai_saas_001" / "bad_fabricated_quote.jsonl")
     assert result["critical_failure"] is True

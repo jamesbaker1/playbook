@@ -33,6 +33,7 @@ playbook-export = "playbook_legal.export:main"
 playbook-render = "playbook_legal.render:main"
 playbook-baseline = "playbook_legal.baseline:main"
 playbook-bench = "playbook_legal.bench:main"
+playbook-baseline-sprint = "playbook_legal.baseline_sprint:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

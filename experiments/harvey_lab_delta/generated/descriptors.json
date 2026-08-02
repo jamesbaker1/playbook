@@ -1,0 +1,914 @@
+[
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-counterparty-paper-review/scenario-01",
+      "title": "Review Advertising Agency Master Services Agreement Counterparty Paper",
+      "documents": [
+        "chow-to-ellingham-business-context.eml",
+        "compensation-schedule-agency-draft.xlsx",
+        "ellingham-to-liao-engagement-email.eml",
+        "kaleidoscope-draft-msa.docx",
+        "kaleidoscope-insurance-certificate.docx",
+        "retrovibe-agency-engagement-playbook-v4-1.docx",
+        "retrovibe-standard-form-agency-msa.docx",
+        "scope-of-services-exhibit.docx"
+      ],
+      "criterion_count": 56,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ai_saas_001",
+      "matter_path": "matters/ai_saas_001",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ai_saas_001/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "counterparty-paper-review-scenario-01",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ai_saas_001/hidden_facts.yaml",
+        "behavior": "The counterparty initially defends every nonstandard term and reveals business rationale only after a targeted question."
+      },
+      "adaptation_note": "Preserves the LAB counterparty-paper-review source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-counterparty-paper-review/scenario-02",
+      "title": "Review Cro Services Agreement Counterparty Paper",
+      "documents": [
+        "cro-transmittal-email.eml",
+        "engagement-email-from-sponsor.eml",
+        "internal-guidance-memo-matsuda.eml",
+        "pinnacle-draft-msa-exhibit-a-scope-of-work.docx",
+        "pinnacle-draft-msa-exhibit-b-budget.xlsx",
+        "pinnacle-draft-msa-exhibit-c-kpis.docx",
+        "pinnacle-draft-msa-exhibit-d-insurance.docx",
+        "pinnacle-draft-msa.docx",
+        "regulatory-affairs-input-ranganathan.eml",
+        "veridian-cro-contracting-playbook-v4-2.docx",
+        "veridian-standard-dpa-template.docx"
+      ],
+      "criterion_count": 65,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "cloud_msa_002",
+      "matter_path": "matters/cloud_msa_002",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/cloud_msa_002/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "counterparty-paper-review-scenario-02",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/cloud_msa_002/hidden_facts.yaml",
+        "behavior": "The counterparty initially defends every nonstandard term and reveals business rationale only after a targeted question."
+      },
+      "adaptation_note": "Preserves the LAB counterparty-paper-review source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-counterparty-paper-review/scenario-03",
+      "title": "Review Master Services Agreement Counterparty Paper",
+      "documents": [
+        "axionex-insurance-certificate.docx",
+        "axionex-msa-draft-v1.docx",
+        "axionex-msa-exhibit-a-sow.docx",
+        "axionex-msa-exhibit-b-rate-card.xlsx",
+        "axionex-msa-exhibit-c-sla.docx",
+        "axionex-transmittal-email.eml",
+        "email-derek-yuen-commercial-context.eml",
+        "instruction-email-rachel-to-team.eml",
+        "verdantis-msa-playbook-v4-2.docx",
+        "verdantis-standard-dpa-template.docx"
+      ],
+      "criterion_count": 60,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "saas_renewal_003",
+      "matter_path": "matters/saas_renewal_003",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/saas_renewal_003/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "counterparty-paper-review-scenario-03",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/saas_renewal_003/hidden_facts.yaml",
+        "behavior": "The counterparty initially defends every nonstandard term and reveals business rationale only after a targeted question."
+      },
+      "adaptation_note": "Preserves the LAB counterparty-paper-review source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-counterparty-paper-review/scenario-04",
+      "title": "Review Gas Gathering Processing Agreement Counterparty Paper",
+      "documents": [
+        "borrowing-base-and-lc-capacity.xlsx",
+        "dedication-area-acreage-and-well-schedule.xlsx",
+        "internal-review-assignment.eml",
+        "midstream-contracting-playbook.docx",
+        "production-forecast-type-curves.xlsx",
+        "proposed-gg-pa.docx",
+        "title-summary-meridian.docx",
+        "transmittal-proposed-gg-pa.eml"
+      ],
+      "criterion_count": 51,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "msa_provider_004",
+      "matter_path": "matters/msa_provider_004",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/msa_provider_004/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "counterparty-paper-review-scenario-04",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/msa_provider_004/hidden_facts.yaml",
+        "behavior": "The counterparty initially defends every nonstandard term and reveals business rationale only after a targeted question."
+      },
+      "adaptation_note": "Preserves the LAB counterparty-paper-review source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-counterparty-paper-review/scenario-05",
+      "title": "Review Oilfield Master Service Agreement Counterparty Paper",
+      "documents": [
+        "claymore-contracting-playbook.docx",
+        "claymore-insurance-program-summary.docx",
+        "exhibit-a-rate-schedule.xlsx",
+        "exhibit-b-work-order-schedule.xlsx",
+        "exhibit-c-insurance-requirements.docx",
+        "granite-basin-form-msa.docx",
+        "internal-review-assignment.eml",
+        "msa-transmittal-from-granite-basin.eml"
+      ],
+      "criterion_count": 69,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ml_services_005",
+      "matter_path": "matters/ml_services_005",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ml_services_005/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "counterparty-paper-review-scenario-05",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ml_services_005/hidden_facts.yaml",
+        "behavior": "The counterparty initially defends every nonstandard term and reveals business rationale only after a targeted question."
+      },
+      "adaptation_note": "Preserves the LAB counterparty-paper-review source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-counterparty-paper-review/scenario-06",
+      "title": "Review Subcontract Agreement Counterparty Paper",
+      "documents": [
+        "insurance-benchmarking-memo.docx",
+        "prime-contract-agreement.docx",
+        "prime-contract-exhibit-j-safety-plan.docx",
+        "prime-contract-exhibit-m-bim-execution-plan.docx",
+        "triton-draft-subcontract-agreement.docx",
+        "triton-scope-and-pricing-exhibit.xlsx",
+        "triton-transmittal-email.eml",
+        "vmcg-subcontracting-playbook.docx"
+      ],
+      "criterion_count": 53,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "nego_saas_010",
+      "matter_path": "matters/nego_saas_010",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/nego_saas_010/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "counterparty-paper-review-scenario-06",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/nego_saas_010/hidden_facts.yaml",
+        "behavior": "The counterparty initially defends every nonstandard term and reveals business rationale only after a targeted question."
+      },
+      "adaptation_note": "Preserves the LAB counterparty-paper-review source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-first-turn-redline/scenario-01",
+      "title": "Redline Advertising Agency Master Services Agreement First Turn",
+      "documents": [
+        "agency-first-markup-msa.docx",
+        "kellner-to-munoz-assignment-email.eml",
+        "luminaire-client-form-msa.docx",
+        "luminaire-negotiation-playbook.docx",
+        "sample-sow-template.docx",
+        "schedule-a-services-description.docx",
+        "schedule-b-rate-card.xlsx",
+        "taniguchi-business-context-email.eml",
+        "thornwell-transmittal-email.eml",
+        "vasquez-bowen-to-kellner-instruction-email.eml"
+      ],
+      "criterion_count": 74,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ai_saas_001",
+      "matter_path": "matters/ai_saas_001",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ai_saas_001/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "first-turn-redline-scenario-01",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ai_saas_001/hidden_facts.yaml",
+        "behavior": "The counterparty offers one plausible-looking fallback on a material issue; the agent must test it against the playbook before accepting."
+      },
+      "adaptation_note": "Preserves the LAB first-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-first-turn-redline/scenario-02",
+      "title": "Redline Gas Gathering Processing Agreement First Turn",
+      "documents": [
+        "coburn-to-vasquez-clarifications.eml",
+        "coburn-to-vasquez-review-instructions.eml",
+        "exhibit-a-ami-map-and-legal-description.docx",
+        "exhibit-b-receipt-points.xlsx",
+        "exhibit-c-mvc-ramp-schedule.xlsx",
+        "exhibit-d-fee-schedule.xlsx",
+        "exhibit-e-form-of-dedication-instrument.docx",
+        "gatherer-markup-transmittal.eml",
+        "gga-gatherer-first-markup-v2.docx",
+        "gga-producer-original-draft-v1.docx",
+        "meridian-development-plan-summary.xlsx",
+        "meridian-negotiation-playbook.docx",
+        "vasquez-to-coburn-preliminary-questions.eml"
+      ],
+      "criterion_count": 62,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "cloud_msa_002",
+      "matter_path": "matters/cloud_msa_002",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/cloud_msa_002/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "first-turn-redline-scenario-02",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/cloud_msa_002/hidden_facts.yaml",
+        "behavior": "The counterparty offers one plausible-looking fallback on a material issue; the agent must test it against the playbook before accepting."
+      },
+      "adaptation_note": "Preserves the LAB first-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-first-turn-redline/scenario-03",
+      "title": "Redline Master Services Agreement First Turn",
+      "documents": [
+        "email-halcyon-markup-transmittal.eml",
+        "email-rachel-to-tara-commercial-guidance.eml",
+        "email-tara-to-rachel-review-instructions.eml",
+        "fee-schedule-exhibit-c.xlsx",
+        "halcyon-first-markup-hrg-rev1-060925.docx",
+        "halcyon-services-scope-exhibit-a.docx",
+        "internal-review-meeting-notes.docx",
+        "sla-schedule-exhibit-b.xlsx",
+        "veridian-contracting-playbook.docx",
+        "veridian-data-security-addendum-template.docx",
+        "veridian-insurance-certificates.docx",
+        "veridian-msa-template-vsi-2025-0147.docx"
+      ],
+      "criterion_count": 57,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "saas_renewal_003",
+      "matter_path": "matters/saas_renewal_003",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/saas_renewal_003/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "first-turn-redline-scenario-03",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/saas_renewal_003/hidden_facts.yaml",
+        "behavior": "The counterparty offers one plausible-looking fallback on a material issue; the agent must test it against the playbook before accepting."
+      },
+      "adaptation_note": "Preserves the LAB first-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-first-turn-redline/scenario-04",
+      "title": "Redline Oilfield Master Service Agreement First Turn",
+      "documents": [
+        "estimated-spend-summary.xlsx",
+        "forwarding-email-from-hollis.eml",
+        "insurance-requirements-matrix.xlsx",
+        "nakamura-review-instructions.eml",
+        "pinnacle-form-msa.docx",
+        "pinnacle-msa-negotiation-playbook.docx",
+        "rate-schedule-exhibit-b.xlsx",
+        "redrock-cover-letter.docx",
+        "redrock-first-markup.docx",
+        "well-control-bridging-document.docx"
+      ],
+      "criterion_count": 51,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "msa_provider_004",
+      "matter_path": "matters/msa_provider_004",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/msa_provider_004/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "first-turn-redline-scenario-04",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/msa_provider_004/hidden_facts.yaml",
+        "behavior": "The counterparty offers one plausible-looking fallback on a material issue; the agent must test it against the playbook before accepting."
+      },
+      "adaptation_note": "Preserves the LAB first-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-first-turn-redline/scenario-05",
+      "title": "Redline Cro Services Agreement First Turn",
+      "documents": [
+        "cro-services-agreement-v1-0.docx",
+        "cro-services-agreement-v1-1-markup.docx",
+        "exhibit-c-payment-schedule.xlsx",
+        "exhibit-d-time-and-materials-rates.xlsx",
+        "niles-transmittal-cover-letter.eml",
+        "precedent-cro-agreement-redacted.docx",
+        "protocol-synopsis-vcr-4088-201.docx",
+        "veracure-clinical-ops-risk-assessment.docx",
+        "veracure-insurance-program-summary.docx"
+      ],
+      "criterion_count": 34,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ml_services_005",
+      "matter_path": "matters/ml_services_005",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ml_services_005/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "first-turn-redline-scenario-05",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ml_services_005/hidden_facts.yaml",
+        "behavior": "The counterparty offers one plausible-looking fallback on a material issue; the agent must test it against the playbook before accepting."
+      },
+      "adaptation_note": "Preserves the LAB first-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-first-turn-redline/scenario-06",
+      "title": "Redline Subcontract Agreement First Turn",
+      "documents": [
+        "exhibit-a-division-26-specifications.docx",
+        "initial-draft-subcontract-agreement.docx",
+        "internal-negotiation-guidance.eml",
+        "prime-contract.docx",
+        "subcontractor-markup-subcontract-agreement.docx",
+        "subcontractor-markup-transmittal.eml"
+      ],
+      "criterion_count": 52,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "nego_saas_010",
+      "matter_path": "matters/nego_saas_010",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/nego_saas_010/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "first-turn-redline-scenario-06",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/nego_saas_010/hidden_facts.yaml",
+        "behavior": "The counterparty offers one plausible-looking fallback on a material issue; the agent must test it against the playbook before accepting."
+      },
+      "adaptation_note": "Preserves the LAB first-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-playbook-escalation/scenario-01",
+      "title": "Escalate Advertising Agency Master Services Agreement Out Of Policy Terms",
+      "documents": [
+        "akintola-business-case-email.eml",
+        "contracting-authority-matrix-v4-2.xlsx",
+        "deal-economics-summary.xlsx",
+        "designated-competitor-list-schedule-4.docx",
+        "exclusive-negotiation-letter.docx",
+        "luminark-standard-agency-msa.docx",
+        "negotiation-history-summary.docx",
+        "prism-msa-redline-v3.docx",
+        "tsao-escalation-request-email.eml",
+        "whitfield-archer-legal-assessment.eml"
+      ],
+      "criterion_count": 72,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ai_saas_001",
+      "matter_path": "matters/ai_saas_001",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ai_saas_001/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "playbook-escalation-scenario-01",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ai_saas_001/hidden_facts.yaml",
+        "behavior": "Internal approval facts are hidden until a targeted client question; unsupported escalation claims receive no credit."
+      },
+      "adaptation_note": "Preserves the LAB playbook-escalation source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-playbook-escalation/scenario-02",
+      "title": "Escalate Cro Services Agreement Out Of Policy Terms",
+      "documents": [
+        "clearpoint-liability-cap-benchmarking-report.docx",
+        "clinical-data-governance-sop.docx",
+        "cro-services-agreement-meridian-draft.docx",
+        "cro-services-agreement-pinnacle-redline-v2.docx",
+        "escalation-guidance-email-cale.eml",
+        "fallback-matrix-rev7.xlsx",
+        "negotiation-status-email-tseng.eml",
+        "pinnacle-negotiation-call-notes-nov18.docx",
+        "strathmore-risk-assessment-memo.docx",
+        "term-sheet-mtx-4170-201.docx"
+      ],
+      "criterion_count": 46,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "cloud_msa_002",
+      "matter_path": "matters/cloud_msa_002",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/cloud_msa_002/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "playbook-escalation-scenario-02",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/cloud_msa_002/hidden_facts.yaml",
+        "behavior": "Internal approval facts are hidden until a targeted client question; unsupported escalation claims receive no credit."
+      },
+      "adaptation_note": "Preserves the LAB playbook-escalation source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-playbook-escalation/scenario-03",
+      "title": "Escalate Gas Gathering Processing Agreement Out Of Policy Terms",
+      "documents": [
+        "acreage-dedication-exhibit-a.xlsx",
+        "cimarron-final-term-sheet.docx",
+        "escalation-request-email.eml",
+        "ggpa-draft-3-clean.docx",
+        "ggpa-draft-4-redline.docx",
+        "lc-demand-letter-cimarron.docx",
+        "redstone-contract-authority-matrix-v4-2.xlsx",
+        "redstone-escalation-memo-template.docx",
+        "redstone-ipo-timeline-memo.docx",
+        "redstone-reserves-summary-ye2024.xlsx",
+        "wellford-negotiation-summary-email.eml"
+      ],
+      "criterion_count": 70,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "saas_renewal_003",
+      "matter_path": "matters/saas_renewal_003",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/saas_renewal_003/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "playbook-escalation-scenario-03",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/saas_renewal_003/hidden_facts.yaml",
+        "behavior": "Internal approval facts are hidden until a targeted client question; unsupported escalation claims receive no credit."
+      },
+      "adaptation_note": "Preserves the LAB playbook-escalation source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-playbook-escalation/scenario-04",
+      "title": "Escalate Master Services Agreement Out Of Policy Terms",
+      "documents": [
+        "cro-deal-support-email.eml",
+        "cyber-liability-insurance-summary.docx",
+        "deal-desk-authority-matrix-v4-2.xlsx",
+        "deal-financial-model-helix.xlsx",
+        "escalation-request-email.eml",
+        "helix-msa-redline-april-14.docx",
+        "helix-msa-verdantis-initial-draft.docx",
+        "infosec-risk-assessment-memo.docx",
+        "oleander-instructions-to-mehta.eml",
+        "redline-comparison-matrix.xlsx",
+        "verdantis-msa-template-v7-1.docx"
+      ],
+      "criterion_count": 100,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "msa_provider_004",
+      "matter_path": "matters/msa_provider_004",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/msa_provider_004/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "playbook-escalation-scenario-04",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/msa_provider_004/hidden_facts.yaml",
+        "behavior": "Internal approval facts are hidden until a targeted client question; unsupported escalation claims receive no credit."
+      },
+      "adaptation_note": "Preserves the LAB playbook-escalation source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-playbook-escalation/scenario-05",
+      "title": "Escalate Subcontract Agreement Out Of Policy Terms",
+      "documents": [
+        "bid-comparison-summary.xlsx",
+        "castellan-proposal.docx",
+        "escalation-request-email.eml",
+        "insurance-coverage-confirmation.eml",
+        "negotiated-subcontract-agreement.docx",
+        "negotiation-log.xlsx",
+        "oig-standard-form-subcontract.docx",
+        "outside-counsel-review-memo.eml",
+        "prime-contract-excerpts.docx",
+        "schedule-risk-analysis-excerpt.docx",
+        "subcontract-fallback-authority-matrix.xlsx"
+      ],
+      "criterion_count": 51,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ml_services_005",
+      "matter_path": "matters/ml_services_005",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ml_services_005/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "playbook-escalation-scenario-05",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ml_services_005/hidden_facts.yaml",
+        "behavior": "Internal approval facts are hidden until a targeted client question; unsupported escalation claims receive no credit."
+      },
+      "adaptation_note": "Preserves the LAB playbook-escalation source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-playbook-escalation/scenario-06",
+      "title": "Escalate Oilfield Master Service Agreement Out Of Policy Terms",
+      "documents": [
+        "approved-vendor-list.xlsx",
+        "campaign-spend-estimate.xlsx",
+        "contracting-authority-matrix.docx",
+        "diamondback-gpa-excerpt.docx",
+        "msa-standard-form.docx",
+        "negotiation-tracker.xlsx",
+        "oilfield-msa-redline-v4.docx",
+        "outside-counsel-input.eml",
+        "redtail-certificate-of-insurance.docx",
+        "redtail-hse-summary.docx",
+        "redtail-redline-transmittal.eml",
+        "risk-management-insurance-memo.docx",
+        "tascosa-availability.eml"
+      ],
+      "criterion_count": 32,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "nego_saas_010",
+      "matter_path": "matters/nego_saas_010",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/nego_saas_010/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "playbook-escalation-scenario-06",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/nego_saas_010/hidden_facts.yaml",
+        "behavior": "Internal approval facts are hidden until a targeted client question; unsupported escalation claims receive no credit."
+      },
+      "adaptation_note": "Preserves the LAB playbook-escalation source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-subsequent-turn-redline/scenario-01",
+      "title": "Redline Cro Services Agreement Subsequent Turn",
+      "documents": [
+        "arcline-standard-cro-msa-template.docx",
+        "cro-services-agreement-turn1-arcline-template.docx",
+        "cro-services-agreement-turn2-sponsor-redline.docx",
+        "email-thread-march22-april2.eml",
+        "exhibit-a-scope-of-work.docx",
+        "exhibit-b-budget-payment-schedule.xlsx",
+        "exhibit-d-pre-approved-subcontractors.docx",
+        "internal-memo-cro-turn3-instructions.eml",
+        "issues-list-post-turn2.xlsx",
+        "veridian-cro-contracting-playbook.docx"
+      ],
+      "criterion_count": 65,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ai_saas_001",
+      "matter_path": "matters/ai_saas_001",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ai_saas_001/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "subsequent-turn-redline-scenario-01",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ai_saas_001/hidden_facts.yaml",
+        "behavior": "Prior concessions are binding, one issue is non-negotiable, and one remaining issue closes after a compliant second proposal."
+      },
+      "adaptation_note": "Preserves the LAB subsequent-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-subsequent-turn-redline/scenario-02",
+      "title": "Redline Gas Gathering Processing Agreement Subsequent Turn",
+      "documents": [
+        "call-notes-april-11.docx",
+        "email-thread-april-7-11.eml",
+        "exhibit-a-dedication-area.docx",
+        "exhibit-d-fee-schedule.xlsx",
+        "gga-initial-draft-gatherer.docx",
+        "gga-producer-first-redline.docx",
+        "issues-list-turn-2.xlsx",
+        "permian-highway-tariff-specs.docx",
+        "producer-negotiation-playbook.docx",
+        "turn-3-instruction-email.eml"
+      ],
+      "criterion_count": 51,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "cloud_msa_002",
+      "matter_path": "matters/cloud_msa_002",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/cloud_msa_002/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "subsequent-turn-redline-scenario-02",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/cloud_msa_002/hidden_facts.yaml",
+        "behavior": "Prior concessions are binding, one issue is non-negotiable, and one remaining issue closes after a compliant second proposal."
+      },
+      "adaptation_note": "Preserves the LAB subsequent-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-subsequent-turn-redline/scenario-03",
+      "title": "Redline Oilfield Master Service Agreement Subsequent Turn",
+      "documents": [
+        "cpe-msa-2025-0047-base-form.docx",
+        "cpe-msa-2025-0047-turn-1-redline.docx",
+        "cpe-msa-2025-0047-turn-2-redline.docx",
+        "insurance-requirements-exhibit-b.xlsx",
+        "interim-loi-cpe-2024-0389.docx",
+        "negotiation-email-thread.eml",
+        "open-issues-tracker-turn-2.xlsx",
+        "permian-surety-umbrella-letter.docx",
+        "rate-schedule-exhibit-a.xlsx",
+        "turn-3-instruction-email.eml"
+      ],
+      "criterion_count": 48,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "saas_renewal_003",
+      "matter_path": "matters/saas_renewal_003",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/saas_renewal_003/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "subsequent-turn-redline-scenario-03",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/saas_renewal_003/hidden_facts.yaml",
+        "behavior": "Prior concessions are binding, one issue is non-negotiable, and one remaining issue closes after a compliant second proposal."
+      },
+      "adaptation_note": "Preserves the LAB subsequent-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-subsequent-turn-redline/scenario-04",
+      "title": "Redline Subcontract Agreement Subsequent Turn",
+      "documents": [
+        "email-alonzo-to-quresh-2025-03-21.eml",
+        "email-lehane-to-quresh-2025-03-27.eml",
+        "email-quresh-to-alonzo-2025-03-25.eml",
+        "exhibit-a-scope-of-work.docx",
+        "exhibit-b-schedule-of-values.xlsx",
+        "exhibit-c-milestone-schedule.xlsx",
+        "exhibit-d-insurance-requirements.docx",
+        "exhibit-e-prime-contract-flow-down.docx",
+        "prime-contract-ld-provisions-excerpt.docx",
+        "subcontract-agreement-turn-0-initial-draft.docx",
+        "subcontract-agreement-turn-1-redline.docx",
+        "subcontract-agreement-turn-2-redline.docx",
+        "surety-bond-confirmation.docx"
+      ],
+      "criterion_count": 57,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "msa_provider_004",
+      "matter_path": "matters/msa_provider_004",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/msa_provider_004/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "subsequent-turn-redline-scenario-04",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/msa_provider_004/hidden_facts.yaml",
+        "behavior": "Prior concessions are binding, one issue is non-negotiable, and one remaining issue closes after a compliant second proposal."
+      },
+      "adaptation_note": "Preserves the LAB subsequent-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-subsequent-turn-redline/scenario-05",
+      "title": "Redline Advertising Agency Master Services Agreement Subsequent Turn",
+      "documents": [
+        "issues-list-draft-3.xlsx",
+        "msa-draft-1.docx",
+        "msa-draft-2-redline.docx",
+        "msa-draft-3-redline.docx",
+        "negotiation-email-thread.eml",
+        "oryon-security-questionnaire.xlsx",
+        "oryon-standard-dpa.docx"
+      ],
+      "criterion_count": 28,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "ml_services_005",
+      "matter_path": "matters/ml_services_005",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/ml_services_005/hidden_facts.yaml",
+      "question_budget": 3,
+      "counterparty_profile": "subsequent-turn-redline-scenario-05",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/ml_services_005/hidden_facts.yaml",
+        "behavior": "Prior concessions are binding, one issue is non-negotiable, and one remaining issue closes after a compliant second proposal."
+      },
+      "adaptation_note": "Preserves the LAB subsequent-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  },
+  {
+    "descriptor_version": 1,
+    "lab": {
+      "repository": "https://github.com/harveyai/harvey-labs.git",
+      "commit": "a30c248c5b70923d3d2a31db25235b619a67e5f2",
+      "task_id": "contracts/commercial-vendor-customer/master-services-agreement-subsequent-turn-redline/scenario-06",
+      "title": "Redline Master Services Agreement Subsequent Turn",
+      "documents": [
+        "borealis-subprocessor-agreement.docx",
+        "client-additional-terms-rider.docx",
+        "data-protection-addendum-exhibit-e.docx",
+        "fee-schedule-exhibit-c.xlsx",
+        "negotiation-email-thread.eml",
+        "open-issues-tracker.xlsx",
+        "provider-negotiation-strategy-memo.docx",
+        "round-1-msa-provider-form.docx",
+        "round-2-msa-client-markup.docx",
+        "round-3-msa-provider-counter.docx",
+        "service-level-schedule-exhibit-d.docx"
+      ],
+      "criterion_count": 34,
+      "observable_bundle": "tasks/<task-id>/documents plus agent instructions",
+      "held_out_from_agent": "inline rubric criteria during the run"
+    },
+    "playbook": {
+      "matter_id": "nego_saas_010",
+      "matter_path": "matters/nego_saas_010",
+      "document_policy": "Use the LAB source documents and playbook at the pinned path; do not substitute public facts for hidden state.",
+      "hidden_facts": "matters/nego_saas_010/hidden_facts.yaml",
+      "question_budget": 4,
+      "counterparty_profile": "subsequent-turn-redline-scenario-06",
+      "counterparty_script": {
+        "mode": "deterministic_position_ladder",
+        "source": "matters/nego_saas_010/hidden_facts.yaml",
+        "behavior": "Prior concessions are binding, one issue is non-negotiable, and one remaining issue closes after a compliant second proposal."
+      },
+      "adaptation_note": "Preserves the LAB subsequent-turn-redline source bundle while withholding the mapped Playbook facts and revealing counterparty movement only through actions."
+    }
+  }
+]

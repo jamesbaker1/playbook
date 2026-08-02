@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """LoRA DPO training on chosen/rejected pairs built by ``build_pairs.py``.
 
 Heavy imports live inside ``train`` so importing this module never requires torch.

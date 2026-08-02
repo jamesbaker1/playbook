@@ -19,7 +19,9 @@ jobs:
       - name: Install
         run: pip install -e ".[dev,gym]"
       - name: Ruff
-        run: ruff check src tests training
+        run: ruff check src tests training compiler
+      - name: Verify engine Worker vendor bundle
+        run: python engine-worker/vendor.py --check
       - name: Tests
         run: pytest -q
       - name: Lint matters

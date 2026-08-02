@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Tracked-changes extractor for Word (.docx) files — stdlib only.
 
 A ``.docx`` is an OPC package: a zip archive whose main part is normally

@@ -10,6 +10,7 @@ MATTER = MATTERS / "ai_saas_001"
 def make_env() -> PlaybookEnv:
     env = PlaybookEnv.from_directory(MATTER)
     env.reset(seed=1)
+    env.step({"type": "read_document", "document_id": "msa", "section": "4.2"})
     return env
 
 
@@ -54,6 +55,7 @@ def test_severity_mismatch_loses_severity_points() -> None:
     env = make_env()
     _, right, *_ = env.step(dict(ISSUE))
     env.reset(seed=1)
+    env.step({"type": "read_document", "document_id": "msa", "section": "4.2"})
     _, wrong, *_ = env.step(dict(ISSUE, severity="low"))
     assert right - wrong == 0.25
 
@@ -89,11 +91,24 @@ def test_fabricated_quote_is_critical_failure() -> None:
     assert result["normalized_score"] <= 0.25
 
 
-def test_short_quote_is_ignored_not_fabricated() -> None:
+def test_short_quote_is_unverified_and_penalized_without_fabrication() -> None:
     env = make_env()
     action = dict(ISSUE, quotes=[{"citation": "msa §4.2", "text": "Acme"}])
-    env.step(action)
+    _, reward, *_ = env.step(action)
+    baseline = make_env()
+    _, baseline_reward, *_ = baseline.step(dict(ISSUE))
+    assert reward == baseline_reward - 0.25
     assert env.episode_result()["critical_failure"] is False
+
+
+def test_issue_anchor_must_be_read_before_credit() -> None:
+    env = PlaybookEnv.from_directory(MATTER)
+    env.reset(seed=1)
+    _, reward, *_ = env.step(dict(ISSUE))
+    result = env.episode_result()
+    assert reward == -0.5
+    assert result["breakdown"]["matched_issues"] == []
+    assert result["breakdown"]["reward_events"][-1]["type"] == "unread_anchor_issue"
 
 
 def test_redline_links_by_label() -> None:

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Fetch, verify, and export human-contributed traces from the web gym.
 
 Nothing uploaded from a browser is trusted. For every record this pipeline
@@ -25,7 +27,8 @@ from playbook_legal.env import PlaybookEnv
 from playbook_legal.export import convert
 
 SCORE_TOLERANCE = 1e-6
-CONSENT_VERSION = "2026-08-01"
+POLICY_PATH = Path(__file__).resolve().parents[1] / "web" / "policy.json"
+CONSENT_VERSION = json.loads(POLICY_PATH.read_text(encoding="utf-8"))["consent_version"]
 ALLOWED_BACKGROUNDS = {"lawyer", "legal_professional", "law_student", "other"}
 ALLOWED_MODES = {"learn", "benchmark"}
 
@@ -36,7 +39,7 @@ def _get(url: str, token: str) -> Any:
         headers={
             "Authorization": f"Bearer {token}",
             # Cloudflare's edge rejects the bare urllib user agent.
-            "User-Agent": "playbook-human-data/0.2",
+            "User-Agent": "playbook-human-data/0.3",
         },
     )
     with urllib.request.urlopen(request, timeout=60) as response:
@@ -100,7 +103,7 @@ def verify_record(
     seed = trace.get("seed", 0)
     if isinstance(seed, bool) or not isinstance(seed, int) or not -(2**31) <= seed < 2**31:
         return False, "invalid replay seed", None
-    env.reset(seed=seed)
+    initial_observation, _ = env.reset(seed=seed)
     ended_at: int | None = None
     for index, event in enumerate(events):
         if not isinstance(event, dict):
@@ -136,6 +139,7 @@ def verify_record(
     payload = {
         "matter": matter_id,
         "seed": seed,
+        "initial_observation": initial_observation,
         "events": [
             {
                 "step": event.step,

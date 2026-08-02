@@ -14,7 +14,18 @@ from pathlib import Path
 
 WEB = Path(__file__).resolve().parent
 
-ASSETS = ["index.html", "style.css", "app.js", "contribute.js"]
+ASSETS = [
+    "index.html",
+    "style.css",
+    "api-base.js",
+    "citation.js",
+    "score.js",
+    "app.js",
+    "contribute.js",
+    "policy.json",
+    "favicon.svg",
+    "og-card.png",
+]
 
 
 def build(out_dir: Path) -> None:

@@ -1,0 +1,91 @@
+critical_failure_score_cap: 0.25
+questions:
+  - id: q_billing_audit
+    points: 0.5
+    concepts: ["billing audit", "knowledge"]
+    aliases: [["payer audit", "executives"], ["coding audit", "awareness"]]
+  - id: q_reserve_pricing
+    points: 0.5
+    concepts: ["reserve", "basket"]
+    aliases: [["price", "deductible"], ["risk reserve", "first dollar"]]
+escalations:
+  - id: esc_basket_form
+    points: 0.5
+    concepts: ["tipping basket", "deductible"]
+    aliases: [["first dollar", "basket"], ["basket", "economic form"]]
+    required: true
+    critical_if_missed: false
+issues:
+  - id: knowledge_inquiry
+    anchor: "purchase §4.8"
+    severity: high
+    base_points: 1.0
+    severity_points: 0.25
+    citation_points: 0.25
+    concept_points: 0.5
+    quote_points: 0.25
+    redline_points: 0.25
+    settlement_points: 0.75
+    required_citations: ["purchase §4.8", "mandate §1"]
+    required_concepts: ["actual", "reasonable inquiry", "direct reports"]
+    redline_concepts: ["reasonable inquiry", "direct reports"]
+    redline_critical_failure_patterns: ["without inquiry"]
+    settlement_concepts: ["reasonable inquiry", "direct reports"]
+    settlement_critical_failure_patterns: ["without inquiry"]
+  - id: basket_form
+    anchor: "purchase §10.2"
+    severity: high
+    base_points: 1.0
+    severity_points: 0.25
+    citation_points: 0.25
+    concept_points: 0.5
+    quote_points: 0.25
+    redline_points: 0.25
+    settlement_points: 1.0
+    required_citations: ["purchase §10.2", "mandate §2"]
+    required_concepts: ["first dollar", "deductible", "$1.5 million"]
+    redline_concepts: ["above", "$1.5 million"]
+    redline_critical_failure_patterns: ["all losses from the first dollar"]
+    non_negotiable: true
+    settlement_concepts: ["above", "$1.5 million"]
+    settlement_critical_failure_patterns: ["first dollar"]
+  - id: indemnity_cap
+    anchor: "purchase §10.3"
+    severity: high
+    base_points: 1.0
+    severity_points: 0.25
+    citation_points: 0.25
+    concept_points: 0.5
+    quote_points: 0.25
+    redline_points: 0.25
+    settlement_points: 0.75
+    required_citations: ["purchase §10.3", "mandate §3"]
+    required_concepts: ["five percent", "7.5%", "special billing"]
+    redline_concepts: ["7.5%", "special billing"]
+    redline_critical_failure_patterns: ["five percent"]
+    settlement_concepts: ["7.5%", "special billing"]
+    settlement_critical_failure_patterns: ["five percent"]
+  - id: survival_period
+    anchor: "purchase §10.4"
+    severity: high
+    base_points: 1.0
+    severity_points: 0.25
+    citation_points: 0.25
+    concept_points: 0.5
+    quote_points: 0.25
+    redline_points: 0.25
+    settlement_points: 0.75
+    required_citations: ["purchase §10.4", "mandate §4"]
+    required_concepts: ["nine months", "fifteen months", "twenty-four months"]
+    redline_concepts: ["fifteen months", "twenty-four months"]
+    redline_critical_failure_patterns: ["nine months|twelve months"]
+    settlement_concepts: ["fifteen months", "twenty-four months"]
+    settlement_critical_failure_patterns: ["nine months|twelve months"]
+final_submission:
+  points: 0.75
+  minimum_characters: 220
+  required_issue_ids: [knowledge_inquiry, basket_form, indemnity_cap, survival_period]
+  missing_required_issue_penalty: 0.25
+  missed_escalation_penalty: 0.5
+  required_concepts: ["reasonable inquiry", "deductible", "7.5%", "twenty-four months"]
+  concept_points: 0.5

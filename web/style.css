@@ -1,4 +1,6 @@
-/* playbook web gym — paper, ink, one redline accent. mono, committed. */
+/* playbook web gym — paper, ink, one redline accent. mono, committed.
+ * Voice: landing copy uses editorial sentence case and lowercase calls to
+ * action; the active workspace uses terse lowercase throughout. */
 
 :root {
   --paper: #faf9f6;
@@ -194,6 +196,16 @@ button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(-
   margin-bottom: 10px;
 }
 .pane-label, .entry-head, .budgets, .issue-meta, .issue-status, #engine-line { font-family: var(--mono); }
+
+.learned-facts { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.learned-facts-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.learned-facts-heading .eyebrow { margin: 0; }
+.learned-facts-heading h2 { margin: 0; font-size: 14px; }
+#learned-facts-list { display: grid; gap: 8px; margin-top: 10px; }
+.learned-fact { padding: 8px 9px; border-left: 2px solid var(--green); background: var(--paper-2); }
+.learned-fact dt { color: var(--muted); font: 700 10px/1.3 var(--mono); overflow-wrap: anywhere; }
+.learned-fact dd { margin: 3px 0 0; font-size: 12px; line-height: 1.45; white-space: pre-wrap; }
+.learned-facts-empty { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .progress { list-style: none; padding: 0 0 13px; margin: 0 0 12px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; color: var(--muted); font-size: 11px; }
 .progress li::before { content: "○"; display: inline-block; width: 16px; }
 .progress li.done { color: var(--green); }
@@ -255,7 +267,7 @@ button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(-
 .score .big.capped { color: var(--red); }
 .score-title { font-family: Georgia, "Times New Roman", serif; font-size: 30px; font-weight: 400; margin: 5px 0 2px; }
 .score .sub { color: var(--muted); margin-bottom: 12px; }
-.score-metrics { display: grid; grid-template-columns: repeat(4, 1fr); margin: 18px 0; border: 1px solid var(--line); }
+.score-metrics { display: grid; grid-template-columns: repeat(3, 1fr); margin: 18px 0; border: 1px solid var(--line); }
 .score-metric { display: grid; gap: 2px; padding: 12px; }
 .score-metric + .score-metric { border-left: 1px solid var(--line); }
 .score-metric strong { font-family: var(--mono); font-size: 20px; }
@@ -265,12 +277,27 @@ button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(-
 .feedback-panel h3 { font-size: 13px; }
 .feedback-panel ul { padding-left: 18px; margin-top: 7px; color: #514c47; }
 .feedback-panel li + li { margin-top: 4px; }
+.score-integrity { display: grid; gap: 10px; margin: 18px 0; }
+.integrity-panel { padding: 13px 15px; border-left: 3px solid var(--red); background: #8b1e140d; }
+.integrity-panel h3 { margin-bottom: 4px; font-size: 13px; }
+.integrity-panel p { color: #514c47; }
+.integrity-panel ul { margin: 7px 0 0; padding-left: 19px; font-family: var(--mono); overflow-wrap: anywhere; }
+.integrity-panel li + li { margin-top: 4px; }
+.integrity-panel.critical h3 { color: var(--red); }
 .score-detail { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
 .score-detail summary { cursor: pointer; color: var(--muted); }
 .score table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+.score th { padding: 5px 12px 5px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 10px; letter-spacing: .06em; text-align: left; text-transform: uppercase; }
 .score td { padding: 2px 12px 2px 0; vertical-align: top; font-variant-numeric: tabular-nums; }
-.score td.pts { text-align: right; white-space: nowrap; }
+.score .pts { text-align: right; white-space: nowrap; }
+.criterion-name { text-transform: capitalize; }
 .score .actions-row { margin-top: 14px; display: flex; gap: 10px; }
+.contribute { display: grid; gap: 8px; margin-top: 14px; padding: 14px; border-top: 1px solid var(--line); background: var(--paper-2); }
+.contribute-note, .contribute-detail, .contribute-status { color: var(--muted); font-size: 12px; }
+.contribute-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.contribute-consent { display: flex; align-items: flex-start; gap: 8px; }
+.contribute-consent input { flex: none; width: auto; margin-top: 4px; }
+.contribute-submit { display: flex; align-items: center; gap: 10px; }
 
 /* -------------------------------------------------------------- composer */
 
@@ -280,12 +307,63 @@ button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(-
 
 .tabform { display: none; flex-direction: column; gap: 8px; }
 .tabform.active { display: flex; }
+#composer[aria-busy="true"] .tabform.active {
+  pointer-events: none;
+}
+#composer[aria-busy="true"] .tabform.active > :not(button[type="submit"]) {
+  opacity: 0.45;
+}
+#composer[aria-busy="true"] .tabform.active::after {
+  content: "scoring\2026";
+  align-self: flex-end;
+  margin-top: -39px;
+  margin-right: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  pointer-events: none;
+}
+.retry-step { margin-top: 10px; border-color: var(--red); color: var(--red); background: transparent; }
 .row { display: flex; gap: 8px; }
 .row select { flex: 1; }
 .row input { width: 90px; }
 
+.field-label, .doc-heading, .quote-citation-tools { display: flex; align-items: center; gap: 8px; }
+.field-label label { margin-right: auto; }
+.insert-section, .copy-citation, .normalize-citation, .submit-anyway {
+  border: 0; background: transparent; color: var(--red); padding: 2px 4px;
+  font-family: var(--mono); font-size: 11px; text-decoration: underline; text-underline-offset: 2px;
+}
+.section-field { display: flex; flex: 0 0 auto; align-items: center; gap: 3px; }
+.section-field input { flex: 1; }
+.field-errors, .quote-error { display: grid; gap: 5px; }
+.field-error, .submission-warning, .quote-error:not(:empty) {
+  border-left: 2px solid var(--red); padding: 6px 9px; color: var(--red); font-size: 12px;
+}
+.field-error { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.submission-warning { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #8b1e1410; }
+.hard-warning { font-weight: 700; }
+[aria-invalid="true"] { border-color: var(--red); outline-color: var(--red); }
+.doc-heading { justify-content: space-between; }
+.doc-id { color: var(--muted); font-size: 10px; }
+.section-actions { display: flex; align-items: center; gap: 2px; }
+.copy-citation { color: var(--muted); font-size: 9px; }
+.quote-citation-tools .q-cite { flex: 1; }
+
 .quote-row { border: 1px dashed var(--line); padding: 8px; display: flex; flex-direction: column; gap: 6px; }
 .quote-row .remove { align-self: flex-end; border: none; background: none; color: var(--muted); }
+
+.supervisor-guidance { border-left: 3px solid var(--green); background: #edf3e9; padding: 12px; }
+.supervisor-guidance::before { content: "supervisor guidance"; display: block; margin-bottom: 5px; color: var(--green); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.counterparty-response { border-left: 3px solid var(--red); background: var(--paper-2); padding: 10px 12px; }
+.pending-counter { display: grid; gap: 8px; margin-top: 14px; padding: 12px; border: 1px solid var(--line); background: var(--paper-2); }
+.pending-counter pre { white-space: pre-wrap; margin: 0; font-family: inherit; }
+.accept-counter { justify-self: start; }
+.negotiation-chip { border: 1px solid currentColor; border-radius: 999px; padding: 3px 7px; font: 700 10px/1 ui-monospace, monospace; text-transform: uppercase; }
+.negotiation-chip.open { color: var(--muted); }
+.negotiation-chip.countered { color: #765b16; background: #fff8dc; }
+.negotiation-chip.settled { color: var(--green); background: #edf3e9; }
+.negotiation-chip.refused { color: var(--red); background: #f8e9e7; }
 
 /* ---------------------------------------------------------------- footer */
 
@@ -370,6 +448,7 @@ body.mode-benchmark.matter-active #help-btn { display: none; }
   .score-metrics, .score-feedback { grid-template-columns: 1fr 1fr; }
   .score-metric + .score-metric { border-left: 0; border-top: 1px solid var(--line); }
   .score .actions-row, .dialog-actions { flex-direction: column; }
+  .contribute-fields { grid-template-columns: 1fr; }
   .dialog-actions button { min-height: 48px; }
   #finish-dialog { width: 100%; max-width: none; max-height: 88dvh; margin: auto 0 0; border-width: 1px 0 0; padding: 20px 16px calc(16px + env(safe-area-inset-bottom)); }
 }

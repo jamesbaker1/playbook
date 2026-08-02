@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Episode-level metrics implementing the SPEC evaluation protocol."""
 
 from __future__ import annotations
@@ -30,11 +32,30 @@ def compute_metrics(
     asked = set(breakdown.get("asked_questions", []))
     raised = set(breakdown.get("raised_escalations", []))
     settled = set(breakdown.get("settled_issues", []))
+    reward_events = breakdown.get("reward_events", [])
     over_escalations = sum(
         1
-        for event in breakdown.get("reward_events", [])
+        for event in reward_events
         if event.get("type") == "off_rubric_escalation"
     )
+    trap_positions = {
+        str(position_id)
+        for position_id, position in ((counterparty or {}).get("positions", {}) or {}).items()
+        if any(counter.get("trap") for counter in position.get("counters", []) or [])
+    }
+    exposed_traps = {
+        str(event.get("criterion"))
+        for event in reward_events
+        if event.get("type") == "counterparty_counter"
+        and str(event.get("criterion")) in trap_positions
+    }
+    accepted_traps = {
+        str(event.get("criterion"))
+        for event in reward_events
+        if event.get("type") == "settlement"
+        and event.get("closed_by") == "theirs"
+        and str(event.get("criterion")) in exposed_traps
+    }
     valid_citations = int(breakdown.get("valid_citation_count", 0))
     invalid_citations = len(breakdown.get("invalid_citations", []))
     total_citations = valid_citations + invalid_citations
@@ -63,6 +84,8 @@ def compute_metrics(
             else 1.0
         ),
         "settled_issue_ratio": len(settled & positions) / len(positions) if positions else 1.0,
+        "trap_counter_exposure_count": len(exposed_traps),
+        "trap_counter_acceptance_count": len(accepted_traps),
         "fabricated_quote_count": len(breakdown.get("fabricated_quotes", [])),
         "critical_failure": bool(result.get("critical_failure", False)),
         "terminated": bool(result.get("terminated", False)),
@@ -76,6 +99,7 @@ def aggregate_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
         return {}
     numeric_keys = [
         "normalized_score",
+        "raw_score",
         "issue_recall",
         "required_issue_recall",
         "unsupported_issue_count",
@@ -86,6 +110,8 @@ def aggregate_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "over_escalation_count",
         "redline_completion",
         "settled_issue_ratio",
+        "trap_counter_exposure_count",
+        "trap_counter_acceptance_count",
         "fabricated_quote_count",
         "steps",
     ]

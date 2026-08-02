@@ -76,6 +76,39 @@ Manual browser checks should include 320×568, 390×844, and 768×1024 viewports
 keyboard-only use, switching every mobile pane with partially completed forms, an
 invalid issue/redline submission, and final-preflight cancellation.
 
+### Local web gym
+
+Run the static site and engine Worker in separate terminals from the repository root:
+
+```bash
+cd web
+python -m http.server 8000
+```
+
+```bash
+cd engine-worker
+python vendor.py
+npx wrangler dev
+```
+
+Then open
+`http://localhost:8000/?api=http%3A%2F%2Flocalhost%3A8787`. The static server is
+on port 8000 and the local Worker API is on port 8787. The engine's CORS policy
+accepts both `http://localhost:8000` and `http://127.0.0.1:8000`; keep the hostname
+consistent in the page URL and `api` value when substituting `127.0.0.1`.
+
+The `api` query parameter has precedence over the browser-local setting, which in
+turn has precedence over the production endpoint. To use the local Worker without
+keeping the query parameter, set the origin-only URL in the browser console:
+
+```js
+localStorage.setItem("playbook.api-base.v1", "http://localhost:8787")
+```
+
+Remove it with `localStorage.removeItem("playbook.api-base.v1")` to return to the
+production Worker. Only an `http` or `https` origin is accepted: credentials,
+paths, query strings, and fragments are rejected.
+
 Prepare the Worker bundle with `python engine-worker/vendor.py`. Deploy the Worker
 before deploying a frontend that requires a new API contract. Run the direct-engine
 parity tests before every Worker deployment; the Pages client and Worker deploy
