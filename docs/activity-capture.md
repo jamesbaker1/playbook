@@ -1,7 +1,29 @@
 # Attorney activity capture — design note
 
-*Status: design exploration. Nothing here is built, and the first section explains
-why the naive version never should be.*
+*Status: the public synthetic web workspace now has a semantic-capture foundation;
+the firm deployment described below remains a design.*
+
+## Public synthetic workspace implementation
+
+The web client exposes `PlaybookCapture`, a matter-scoped event journal with
+versioned affirmative consent, a persistent `Capture on/off/paused` control, and
+pause boundaries. It records only named semantic events. It deliberately has no
+screen, pointer-stream, raw-keystroke, unrelated clipboard, tab, or application
+capture capability. Declining capture clears the local semantic journal.
+
+At terminal submission, a consented journal is automatically attached as
+`interaction_trace` beside the canonical replay trace and uploaded once without
+a second consent prompt. People who declined semantic capture may still opt in
+to contributing only the canonical trace from the result screen. A UUID
+`contribution_id` makes retries idempotent; the collector stores each record at
+the deterministic `trace:contribution:<UUID>` key, so concurrent same-ID writes
+cannot create duplicates. The
+collector validates the two envelopes independently, limits semantic traces to
+2,500 events and the request to 4 MB, and stores the semantic trace without using
+it to calculate or verify the score. Training tooling likewise exports canonical
+SFT and semantic demonstrations separately. This collector is for synthetic
+Playbook matters only; real or confidential documents require the firm-controlled
+deployment below.
 
 ## The idea and the goal
 

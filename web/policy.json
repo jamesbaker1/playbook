@@ -1,3 +1,10 @@
 {
-  "consent_version": "2026-08-01"
+  "consent_version": "2026-08-02",
+  "interaction_capture": {
+    "synthetic_matters_only": true,
+    "captures": ["workspace events", "document and section activity", "searches", "selected-text anchors", "draft snapshots and revisions", "communications", "validation and transport errors"],
+    "excludes": ["screenshots", "screen video", "raw keystrokes", "raw pointer movement", "unrelated clipboard content", "other tabs or applications"],
+    "max_events": 2500,
+    "max_bytes": 4000000
+  }
 }

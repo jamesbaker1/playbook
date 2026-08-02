@@ -14,8 +14,15 @@
     search: window.location.search,
     storage: window.localStorage,
   });
+  const draftStore = window.PlaybookDraftStore.create({
+    indexedDB: window.indexedDB,
+    storage: window.localStorage,
+  });
   const RESUME_KEY = "playbook.unfinished-episode.v1";
+  const DRAFT_KEY_PREFIX = "playbook.workspace-draft.v1.";
   const SITE_URL = "jamesbaker1.github.io/playbook";
+  const capturePolicy = fetch("policy.json", { cache: "no-cache" })
+    .then((response) => response.ok ? response.json() : null).catch(() => null);
 
   let driver = null;
   let stepNo = 0;
@@ -23,8 +30,14 @@
   let readSections = new Set();
   let submittedLabels = new Set();
   let submittedIssues = new Map();
+  let submittedRedlines = new Map();
   let redlinedLabels = new Set();
   let sectionCache = new Map();
+  let documentCache = new Map();
+  let currentDocumentId = null;
+  let currentSelection = null;
+  let draftTimer = null;
+  let captureControls = null;
   let knownCitations = new Set();
   let questionsAsked = 0;
   let stepsRemaining = 0;
@@ -41,9 +54,35 @@
   const matterTitles = new Map();
   const ACTION_TABS = {
     ask_client: "ask", search_matter: "search", submit_issue: "issue",
-    propose_redline: "redline", escalate: "escalate", send_markup: "negotiate",
+    revise_issue: "issue", propose_redline: "redline", revise_redline: "redline",
+    escalate: "escalate", send_markup: "negotiate",
     accept_counterparty: "negotiate", submit_final: "finish",
   };
+
+  function capture(type, target = {}, data = {}, durationMs) {
+    return window.playbookCaptureSession?.record(type, target, data, durationMs);
+  }
+
+  async function beginCapture(matterId, sessionId = null) {
+    const policy = await capturePolicy;
+    if (!policy?.consent_version || !window.PlaybookCapture) return;
+    captureControls?.element?.remove();
+    window.playbookCaptureSession = window.PlaybookCapture.create({
+      storage: window.localStorage,
+      consentVersion: policy.consent_version,
+      matterId,
+      engineVersion: window.playbookAppVersion || "unknown",
+      ...(sessionId ? { sessionId } : {}),
+    });
+    captureControls = window.PlaybookCapture.mountControls(document.querySelector("header"), window.playbookCaptureSession);
+    let openedRecorded = false;
+    window.playbookCaptureSession.onStatus((status) => {
+      if (status.enabled && !openedRecorded) {
+        openedRecorded = true;
+        capture(sessionId ? "matter.resumed" : "matter.opened", {}, { mode: playMode });
+      }
+    });
+  }
   function setPlayMode(mode) {
     playMode = mode === "benchmark" ? "benchmark" : "learn";
     window.playbookMode = playMode;
@@ -52,8 +91,8 @@
       input.checked = input.value === playMode;
       input.closest(".mode-option").classList.toggle("selected", input.checked);
     });
-    $("welcome-start").textContent = playMode === "benchmark" ? "start a sealed benchmark" : "try the guided matter";
-    $("mode-badge").textContent = playMode === "benchmark" ? "benchmark mode" : "learn mode";
+    $("welcome-start").textContent = playMode === "benchmark" ? "start assessment review" : "start guided review";
+    $("mode-badge").textContent = playMode === "benchmark" ? "assessment review" : "guided review";
   }
   document.querySelectorAll('input[name="play-mode"]').forEach((input) => {
     input.addEventListener("change", () => setPlayMode(input.value));
@@ -73,17 +112,17 @@
         headers: { "Content-Type": "application/json", ...(options.headers || {}) },
       });
     } catch (error) {
-      if (error.name === "AbortError") throw new Error("The scoring service took too long to respond. Please retry.");
+      if (error.name === "AbortError") throw new Error("The workspace took too long to respond. Please retry.");
       throw error;
     } finally {
       window.clearTimeout(timeout);
     }
     let payload;
     try { payload = await response.json(); }
-    catch (_) { throw new Error(`Scoring service returned ${response.status}.`); }
+    catch (_) { throw new Error(`Workspace service returned ${response.status}.`); }
     if (!response.ok) {
       const detail = typeof payload.error === "object" ? payload.error.message : payload.error;
-      throw new Error(detail || `Scoring service returned ${response.status}.`);
+      throw new Error(detail || `Workspace service returned ${response.status}.`);
     }
     return payload;
   }
@@ -137,10 +176,73 @@
         seed: episode.seed,
         mode: playMode,
         actions: episode.actions,
+        capture_session_id: window.playbookCaptureSession?.status?.().session_id || null,
       }));
     } catch (_) {
       // Storage can be disabled or full; the live matter remains usable.
     }
+  }
+
+  function draftKey() {
+    return episode?.matter_id ? DRAFT_KEY_PREFIX + episode.matter_id : null;
+  }
+
+  async function persistWorkspaceDraft() {
+    const key = draftKey();
+    if (!key || !matterActive || finished) return;
+    const fields = {};
+    document.querySelectorAll("#composer input[id], #composer textarea[id], #composer select[id]")
+      .forEach((field) => { fields[field.id] = field.value; });
+    try {
+      await draftStore.set(key, { version: 1, fields, currentDocumentId });
+      $("save-status").hidden = false;
+      $("save-status").textContent = "saved locally";
+      const active = document.querySelector("#composer .tabform.active");
+      const typeByForm = {
+        "form-ask": "communication.draft_updated", "form-escalate": "communication.draft_updated",
+        "form-negotiate": "counterparty.draft_updated", "form-issue": "issue.draft_updated",
+        "form-redline": "redline.draft_updated", "form-finish": "final.draft_updated",
+      };
+      const eventType = typeByForm[active?.id];
+      if (eventType) {
+        const snapshot = {};
+        active.querySelectorAll("input[id], textarea[id], select[id]").forEach((field) => {
+          if (field.value) snapshot[field.id] = field.value;
+        });
+        if (Object.keys(snapshot).length) capture(eventType, {
+          document_id: currentSelection?.documentId,
+          section: currentSelection?.section,
+          issue_id: snapshot["issue-label"] || snapshot["redline-label"] || snapshot["markup-label"],
+        }, { snapshot });
+      }
+    } catch (_) {
+      $("save-status").hidden = false;
+      $("save-status").textContent = "save unavailable";
+    }
+  }
+
+  function queueDraftSave() {
+    if (!matterActive || finished) return;
+    $("save-status").hidden = false;
+    $("save-status").textContent = "saving…";
+    window.clearTimeout(draftTimer);
+    draftTimer = window.setTimeout(persistWorkspaceDraft, 500);
+  }
+
+  async function restoreWorkspaceDraft() {
+    const key = draftKey();
+    if (!key) return null;
+    try {
+      const saved = await draftStore.get(key);
+      if (!saved || saved.version !== 1 || !saved.fields) return null;
+      Object.entries(saved.fields).forEach(([id, value]) => {
+        const field = $(id);
+        if (field && typeof value === "string") field.value = value;
+      });
+      $("save-status").hidden = false;
+      $("save-status").textContent = "draft restored";
+      return typeof saved.currentDocumentId === "string" ? saved.currentDocumentId : null;
+    } catch (_) { return null; }
   }
 
   function clearSavedEpisode() {
@@ -173,7 +275,7 @@
       guidedStartPending = true;
       $("welcome-start").disabled = true;
       $("welcome-start").textContent = "connecting…";
-      $("boot-status").textContent = "warming the scoring engine — a few seconds…";
+      $("boot-status").textContent = "preparing the matter — a few seconds…";
       return;
     }
     matterSelect.value = "ai_saas_001";
@@ -185,15 +287,6 @@
     if (item) item.classList.add("done");
   }
 
-  console.log(
-    "%cplaybook",
-    "font-weight:bold",
-    "— the scoring engine you are playing against is the same python package " +
-      "the RL trainer and benchmark use, served through the canonical API. " +
-      "download the trace at the end: every point is accounted for. " +
-      "engine source: https://github.com/jamesbaker1/playbook"
-  );
-
   function boot(line, replace) {
     if (replace) bootLog.lastChild && bootLog.removeChild(bootLog.lastChild);
     bootLog.appendChild(document.createTextNode((bootLog.childNodes.length ? "\n" : "") + line));
@@ -202,7 +295,7 @@
   /* ------------------------------------------------------------- bootstrap */
 
   try {
-    boot("connecting to scoring service…");
+    boot("preparing matter service…");
     const response = await driver.listMatters();
     const matters = response.matters;
 
@@ -218,24 +311,23 @@
     startBtn.disabled = false;
     $("welcome-start").disabled = false;
     $("help-start").disabled = false;
-    $("boot-status").textContent = `${matters.length} matters ready — choose one or try the guided matter`;
-    $("engine-line").textContent =
-      `engine ${response.engine_version} · ${matters.length} matters available`;
+    $("boot-status").textContent = `${matters.length} matters ready — choose one or start the guided review`;
+    $("engine-line").textContent = `${matters.length} matters available`;
     window.playbookAppVersion = response.engine_version;
-    boot("scoring service ready.");
+    boot("workspace ready.");
     if (guidedStartPending) {
       matterSelect.value = "ai_saas_001";
       await startMatter();
     }
     savedResume = savedEpisode();
     if (savedResume && matters.some((matter) => matter.id === savedResume.matter_id)) {
-      $("resume-copy").textContent = `Resume ${savedResume.matter_id} with ${savedResume.actions.length} completed step${savedResume.actions.length === 1 ? "" : "s"}?`;
+      $("resume-copy").textContent = `Resume ${savedResume.matter_id} with ${savedResume.actions.length} saved review action${savedResume.actions.length === 1 ? "" : "s"}?`;
       $("resume-dialog").showModal();
     } else if (savedResume) {
       clearSavedEpisode();
     }
   } catch (err) {
-    $("boot-status").textContent = "scoring service unavailable";
+    $("boot-status").textContent = "workspace temporarily unavailable";
     $("welcome-start").textContent = "retry connection";
     $("welcome-start").disabled = false;
     boot("connection failed: " + err.message);
@@ -329,21 +421,162 @@
       });
     });
     input.setAttribute("aria-invalid", String(!valid));
+    if (!valid) capture("validation.failed", {}, { form: "issue", field: "citations" });
     return valid;
+  }
+
+  function sectionNumber(heading) {
+    const match = String(heading).trim().match(/^(?:section\s+)?([0-9]+(?:\.[0-9]+)*)\b/i);
+    return match ? match[1] : null;
+  }
+
+  function contentHash(value) {
+    let hash = 2166136261;
+    for (let index = 0; index < value.length; index += 1) {
+      hash ^= value.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `fnv1a-${(hash >>> 0).toString(16).padStart(8, "0")}`;
+  }
+
+  function cacheDocumentSections(documentId, content) {
+    const lines = String(content).split(/\r?\n/);
+    let active = null;
+    let buffer = [];
+    const commit = () => {
+      if (active) sectionCache.set(`${documentId} §${active}`, buffer.join("\n").trim());
+    };
+    for (const line of lines) {
+      const heading = line.match(/^#{2,6}\s+(.+)$/);
+      const next = heading && sectionNumber(heading[1]);
+      if (next) {
+        commit();
+        active = next;
+        buffer = [line];
+      } else if (active) buffer.push(line);
+    }
+    commit();
+  }
+
+  function appendInlineMarkdown(parent, value) {
+    const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+    let cursor = 0;
+    for (const match of String(value).matchAll(pattern)) {
+      if (match.index > cursor) parent.appendChild(document.createTextNode(value.slice(cursor, match.index)));
+      const token = match[0];
+      if (token.startsWith("**")) parent.appendChild(el("strong", "", token.slice(2, -2)));
+      else if (token.startsWith("*")) parent.appendChild(el("em", "", token.slice(1, -1)));
+      else parent.appendChild(el("code", "", token.slice(1, -1)));
+      cursor = match.index + token.length;
+    }
+    if (cursor < value.length) parent.appendChild(document.createTextNode(value.slice(cursor)));
+  }
+
+  function tableCells(line) {
+    return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+  }
+
+  function renderDocument(documentId, content, targetSection = null) {
+    currentDocumentId = documentId;
+    const canvas = $("document-view");
+    const article = el("div", "document-paper");
+    let currentSection = null;
+    let paragraph = [];
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      const p = el("p", "document-paragraph");
+      appendInlineMarkdown(p, paragraph.join(" ").trim());
+      if (currentSection) p.dataset.section = currentSection;
+      article.appendChild(p);
+      paragraph = [];
+    };
+    const lines = String(content).split(/\r?\n/);
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      const heading = line.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) {
+        flushParagraph();
+        const level = Math.min(heading[1].length + 1, 6);
+        const title = heading[2].trim();
+        const section = sectionNumber(title);
+        if (section) currentSection = section;
+        const node = el(`h${level}`, "document-heading");
+        appendInlineMarkdown(node, title);
+        if (currentSection) {
+          node.dataset.section = currentSection;
+          node.id = `section-${documentId}-${currentSection.replaceAll(".", "-")}`;
+        }
+        article.appendChild(node);
+        continue;
+      }
+      const nextLine = lines[index + 1] || "";
+      if (line.includes("|") && /^\s*\|?\s*:?-{3,}/.test(nextLine)) {
+        flushParagraph();
+        const table = el("table", "document-table");
+        if (currentSection) table.dataset.section = currentSection;
+        const head = el("thead");
+        const headerRow = el("tr");
+        tableCells(line).forEach((cell) => {
+          const th = el("th"); appendInlineMarkdown(th, cell); headerRow.appendChild(th);
+        });
+        head.appendChild(headerRow); table.appendChild(head);
+        const body = el("tbody");
+        index += 2;
+        while (index < lines.length && lines[index].includes("|") && lines[index].trim()) {
+          const row = el("tr");
+          tableCells(lines[index]).forEach((cell) => {
+            const td = el("td"); appendInlineMarkdown(td, cell); row.appendChild(td);
+          });
+          body.appendChild(row);
+          index += 1;
+        }
+        index -= 1;
+        table.appendChild(body); article.appendChild(table);
+        continue;
+      }
+      const listItem = line.match(/^\s*(?:([-+*])|(\d+)\.)\s+(.+)$/);
+      if (listItem) {
+        flushParagraph();
+        const ordered = Boolean(listItem[2]);
+        const list = el(ordered ? "ol" : "ul", "document-list");
+        if (currentSection) list.dataset.section = currentSection;
+        while (index < lines.length) {
+          const item = lines[index].match(/^\s*(?:([-+*])|(\d+)\.)\s+(.+)$/);
+          if (!item || Boolean(item[2]) !== ordered) break;
+          const li = el("li"); appendInlineMarkdown(li, item[3].trim()); list.appendChild(li);
+          index += 1;
+        }
+        index -= 1;
+        article.appendChild(list);
+        continue;
+      }
+      if (!line.trim()) flushParagraph();
+      else paragraph.push(line.trim());
+    }
+    flushParagraph();
+    canvas.replaceChildren(article);
+    $("current-document").textContent = documentId;
+    showWorkspace("document");
+    const target = targetSection && article.querySelector(`[data-section="${CSS.escape(targetSection)}"]`);
+    if (target) {
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+      target.classList.add("citation-target");
+      window.setTimeout(() => target.classList.remove("citation-target"), 1800);
+    }
+    queueDraftSave();
+    capture("document.viewed", { document_id: documentId, section: targetSection }, { cached: true });
   }
 
   function openCitation(citation) {
     const parsed = parseCitation(citation);
     if (!parsed) return;
-    const cached = sectionCache.get(`${parsed.documentId} §${parsed.section}`);
-    if (cached) {
-      $("document-view").replaceChildren(el("pre", "", cached));
-      $("current-document").textContent = `${parsed.documentId} §${parsed.section}`;
-      showWorkspace("document");
+    const cachedDocument = documentCache.get(parsed.documentId);
+    if (cachedDocument) {
+      renderDocument(parsed.documentId, cachedDocument, parsed.section);
       return;
     }
     if (finished) return;
-    readSection(parsed.documentId, parsed.section, null);
+    readDocument(parsed.documentId, parsed.section);
   }
 
   function selectComposerTab(name) {
@@ -402,7 +635,7 @@
       label = "draft the redline";
       action = () => draftRedline(undrafted);
     } else {
-      title = stepsRemaining <= 5 ? "finish before time runs out" : "review and close the loop";
+      title = stepsRemaining <= 5 ? "finish the priority work" : "review and close the loop";
       copy = "Check your submitted issues, then give the supervising lawyer a concise priority update.";
       label = "review and finish";
       action = () => { showWorkspace("review"); selectComposerTab("finish"); };
@@ -420,7 +653,10 @@
       .some((id) => $(id).value.trim());
     const switchingIssue = $("redline-label").value && $("redline-label").value !== issue.issue_id;
     if (redlineDirty && switchingIssue && !window.confirm("Discard the current redline draft and switch issues?")) return;
-    if (redlineDirty && switchingIssue) $("form-redline").reset();
+    if (switchingIssue) {
+      $("form-redline").reset();
+      resetRevisionForms();
+    }
     selectComposerTab("redline");
     $("redline-label").value = issue.issue_id;
     const operative = issue.citations.map(parseCitation).find(Boolean);
@@ -435,8 +671,60 @@
     if (!$("redline-rationale").value.trim()) {
       $("redline-rationale").value = issue.recommendation;
     }
+    const latest = operative && submittedRedlines.get(`${issue.issue_id}|${operative.documentId}|${operative.section}`);
+    if (latest) {
+      $("form-redline").dataset.revising = "true";
+      $("redline-label").disabled = true;
+      $("redline-doc").disabled = true;
+      $("redline-section").readOnly = true;
+      $("redline-text").value = latest.replacement_text;
+      $("redline-rationale").value = latest.rationale;
+      $("form-redline").querySelector("button[type='submit']").textContent = "save revised language";
+    }
     $("redline-text").focus();
     $("composer").scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  function editIssue(issue) {
+    const switchingIssue = $("form-issue").dataset.revising === "true" &&
+      $("issue-label").value && $("issue-label").value !== issue.issue_id;
+    const issueDirty = ["issue-title", "issue-citations", "issue-analysis", "issue-recommendation"]
+      .some((id) => $(id).value.trim());
+    if (switchingIssue && issueDirty && !window.confirm("Discard the current issue edits and switch issues?")) return;
+    if (switchingIssue) {
+      $("form-issue").reset();
+      $("quotes").replaceChildren();
+      resetRevisionForms();
+    }
+    selectComposerTab("issue");
+    $("form-issue").dataset.revising = "true";
+    $("issue-label").value = issue.issue_id;
+    $("issue-label").readOnly = true;
+    $("issue-title").value = issue.title;
+    $("issue-severity").value = issue.severity;
+    $("issue-citations").value = issue.citations.join("\n");
+    $("issue-analysis").value = issue.analysis;
+    $("issue-recommendation").value = issue.recommendation;
+    $("quotes").replaceChildren();
+    (issue.quotes || []).forEach((quote) => {
+      $("add-quote").click();
+      const row = $("quotes").lastElementChild;
+      row.querySelector(".q-cite").value = quote.citation;
+      row.querySelector(".q-text").value = quote.text;
+    });
+    $("form-issue").querySelector("button[type='submit']").textContent = "save issue changes";
+    $("issue-title").focus();
+  }
+
+  function resetRevisionForms() {
+    delete $("form-issue").dataset.revising;
+    $("issue-label").readOnly = false;
+    $("form-issue").querySelector("button[type='submit']").textContent = "submit issue";
+    delete $("form-redline").dataset.revising;
+    $("redline-label").disabled = false;
+    $("redline-doc").disabled = false;
+    $("redline-section").readOnly = false;
+    $("form-redline").querySelector("button[type='submit']").textContent = "propose redline";
   }
 
   function renderReview() {
@@ -478,15 +766,21 @@
         cite.type = "button";
         const cached = parsed && sectionCache.has(`${parsed.documentId} §${parsed.section}`);
         cite.disabled = !parsed || (finished && !cached);
-        cite.title = parsed ? (cached ? "Open reviewed section" : "Open cited section — costs one step") : "Citation cannot be opened automatically";
+        cite.title = parsed ? (cached ? "Open reviewed section" : "Open cited document") : "Citation cannot be opened automatically";
         if (parsed) cite.addEventListener("click", () => openCitation(citation));
         cites.appendChild(cite);
       });
-      const draft = el("button", "draft-redline", redlinedLabels.has(issue.issue_id) ? "Draft another redline" : "Draft redline");
+      const controls = el("div", "issue-card-buttons");
+      const edit = el("button", "edit-issue", "Edit issue");
+      edit.type = "button";
+      edit.disabled = finished;
+      edit.addEventListener("click", () => editIssue(issue));
+      const draft = el("button", "draft-redline", redlinedLabels.has(issue.issue_id) ? "Edit draft language" : "Draft change");
       draft.type = "button";
       draft.disabled = finished;
       draft.addEventListener("click", () => draftRedline(issue));
-      footer.append(cites, draft);
+      controls.append(edit, draft);
+      footer.append(cites, controls);
       card.appendChild(footer);
       list.appendChild(card);
     }
@@ -509,18 +803,18 @@
     const b = obs.budgets;
     const s = b.steps_remaining, q = b.client_questions_remaining;
     stepsRemaining = s;
-    const parts = [document.createTextNode("steps "),
+    const parts = [document.createTextNode("review capacity "),
       s <= 5 ? el("b", "", String(s)) : document.createTextNode(String(s)),
-      document.createTextNode(" · questions "),
+      document.createTextNode(" · client questions "),
       q <= 1 ? el("b", "", String(q)) : document.createTextNode(String(q))];
-    const labels = [`${s} steps remaining`, `${q} client questions remaining`];
+    const labels = [`${s} review actions available`, `${q} client questions available`];
     if (Object.hasOwn(b, "escalations_remaining")) {
-      parts.push(document.createTextNode(" · escalations "), el("b", "", String(b.escalations_remaining)));
-      labels.push(`${b.escalations_remaining} escalations remaining`);
+      parts.push(document.createTextNode(" · supervisor requests "), el("b", "", String(b.escalations_remaining)));
+      labels.push(`${b.escalations_remaining} supervisor requests available`);
     }
     if (Object.hasOwn(b, "negotiation_rounds_remaining")) {
-      parts.push(document.createTextNode(" · negotiation rounds "), el("b", "", String(b.negotiation_rounds_remaining)));
-      labels.push(`${b.negotiation_rounds_remaining} negotiation rounds remaining`);
+      parts.push(document.createTextNode(" · counterparty exchanges "), el("b", "", String(b.negotiation_rounds_remaining)));
+      labels.push(`${b.negotiation_rounds_remaining} counterparty exchanges available`);
     }
     budgetsEl.setAttribute("aria-label", labels.join("; "));
     budgetsEl.replaceChildren(...parts);
@@ -560,7 +854,13 @@
     for (const doc of obs.documents) {
       const wrap = el("div", "doc");
       const title = el("div", "doc-heading");
-      title.append(el("span", "doc-title", doc.title.toLowerCase()), el("code", "doc-id", doc.id));
+      const open = el("button", "doc-title", doc.title);
+      open.type = "button";
+      open.addEventListener("click", () => {
+        if (documentCache.has(doc.id)) renderDocument(doc.id, documentCache.get(doc.id));
+        else if (!finished) readDocument(doc.id);
+      });
+      title.append(open, el("code", "doc-id", doc.id));
       wrap.appendChild(title);
       const secs = el("div", "sections");
       for (const sec of doc.sections) {
@@ -573,7 +873,8 @@
         a.dataset.section = sec;
         a.addEventListener("click", (e) => {
           e.preventDefault();
-          if (!finished) readSection(doc.id, sec, a);
+          if (documentCache.has(doc.id)) renderDocument(doc.id, documentCache.get(doc.id), sec);
+          else if (!finished) readDocument(doc.id, sec);
         });
         const copy = el("button", "copy-citation", "copy citation");
         copy.type = "button";
@@ -610,6 +911,8 @@
     // Keep a transport-safe snapshot so a retry cannot pick up later form or object mutations.
     const requestAction = JSON.parse(JSON.stringify(action));
     requestInFlight = true;
+    $("save-status").hidden = false;
+    $("save-status").textContent = "sending…";
     const composer = $("composer");
     const activeSubmit = composer.querySelector(".tabform.active button[type='submit']");
     const submitWasDisabled = activeSubmit ? activeSubmit.disabled : false;
@@ -619,6 +922,9 @@
     try {
       resp = await driver.step(requestAction);
     } catch (err) {
+      $("save-status").hidden = false;
+      $("save-status").textContent = "needs attention";
+      capture("transport.error", {}, { action_type: requestAction.type, message: String(err) });
       const retryButton = el("button", "retry-step", "retry this action");
       retryButton.type = "button";
       retryButton.addEventListener("click", async () => {
@@ -626,7 +932,7 @@
         retryButton.disabled = true;
         await retry(requestAction);
       });
-      addEntry("engine error", null, [
+      addEntry("service unavailable", null, [
         el("div", "body error", String(err)),
         retryButton,
       ]);
@@ -643,37 +949,49 @@
     configureActionTabs(resp.observation);
     updateBudgets(resp.observation);
     if (resp.terminated || resp.truncated) {
+      capture("matter.completed", {}, { action_type: requestAction.type, truncated: Boolean(resp.truncated) });
+      window.playbookCaptureSession?.complete?.();
       finished = true;
       matterActive = false;
       clearSavedEpisode();
+      draftStore.delete(draftKey());
+      $("save-status").textContent = "delivered";
       disableComposer();
     } else {
       persistEpisode();
+      persistWorkspaceDraft();
     }
     return resp;
   }
 
-  async function readSection(docId, sec, link) {
-    const action = { type: "read_document", document_id: docId, section: sec };
+  async function readDocument(docId, targetSection = null) {
+    if (documentCache.has(docId)) {
+      renderDocument(docId, documentCache.get(docId), targetSection);
+      return true;
+    }
+    const action = { type: "read_document", document_id: docId };
     const resp = await doStep(action, (retryAction) =>
-      readSection(retryAction.document_id, retryAction.section, link));
+      readDocument(retryAction.document_id, targetSection));
     if (!resp) return;
     const lr = resp.observation.last_result;
     const body = [];
     if (lr.error) body.push(el("div", "body error", lr.error));
     else {
-      readSections.add(docId + "§" + sec);
-      if (link) link.classList.add("read");
+      const descriptor = currentObservation.documents.find((doc) => doc.id === docId);
+      (descriptor?.sections || []).forEach((sec) => readSections.add(docId + "§" + sec));
+      document.querySelectorAll(`.sections a[data-document="${CSS.escape(docId)}"]`)
+        .forEach((link) => link.classList.add("read"));
       body.push(el("pre", "body doc-text", lr.content));
-      $("document-view").replaceChildren(el("pre", "", lr.content));
-      sectionCache.set(`${docId} §${sec}`, lr.content);
-      $("current-document").textContent = `${docId} §${sec}`;
-      showWorkspace("document");
+      documentCache.set(docId, lr.content);
+      cacheDocumentSections(docId, lr.content);
+      capture("document.opened", { document_id: docId, section: targetSection }, { cached: false });
+      renderDocument(docId, lr.content, targetSection);
       markProgress("read");
     }
-    addEntry(`read ${docId} §${sec}`, resp.reward, body);
+    addEntry(`opened ${docId}`, resp.reward, body);
     updateNextStep();
     maybeScore(resp);
+    return !lr.error;
   }
 
   async function ask(question) {
@@ -687,8 +1005,9 @@
       body.push(el("div", "body answer", lr.answer));
       questionsAsked += 1;
       markProgress("question");
+      capture("communication.sent", {}, { recipient: "client", question, answered: true });
     }
-    addEntry("ask_client", resp.reward, body);
+    addEntry("client reply", resp.reward, body);
     showWorkspace("activity");
     updateNextStep();
     maybeScore(resp);
@@ -696,6 +1015,7 @@
   }
 
   async function search(query) {
+    capture("search.submitted", {}, { query });
     const action = { type: "search_matter", query };
     const resp = await doStep(action, (retryAction) => search(retryAction.query));
     if (!resp) return;
@@ -706,7 +1026,14 @@
     else {
       const list = el("div", "body");
       for (const h of lr.hits) {
-        list.appendChild(el("div", "", `${h.document_id} §${h.section} — …${h.snippet}…`));
+        const hit = el("button", "search-hit");
+        hit.type = "button";
+        hit.append(el("strong", "", `${h.document_id} §${h.section}`), el("span", "", `…${h.snippet}…`));
+        hit.addEventListener("click", () => {
+          capture("search.result_opened", { document_id: h.document_id, section: h.section }, { query });
+          openCitation(`${h.document_id} §${h.section}`);
+        });
+        list.appendChild(hit);
       }
       body.push(list);
     }
@@ -716,9 +1043,9 @@
     return !lr.error;
   }
 
-  async function submitIssue(payload) {
-    const action = { type: "submit_issue", ...payload };
-    const resp = await doStep(action, (retryAction) => submitIssue(retryAction));
+  async function submitIssue(payload, actionType = "submit_issue") {
+    const action = { type: actionType, ...payload };
+    const resp = await doStep(action, (retryAction) => submitIssue(retryAction, retryAction.type));
     if (!resp) return false;
     const lr = resp.observation.last_result;
     const body = [];
@@ -726,6 +1053,7 @@
     else {
       submittedLabels.add(payload.issue_id);
       submittedIssues.set(payload.issue_id, payload);
+      capture(actionType === "revise_issue" ? "issue.revised" : "issue.saved", { issue_id: payload.issue_id }, { severity: payload.severity, citations: payload.citations });
       markProgress("issue");
       refreshLabels();
       renderNegotiation(resp.observation);
@@ -733,16 +1061,16 @@
       body.push(el("div", "body", `${payload.severity} — ${payload.title}`));
       body.push(el("div", "body", "cites: " + payload.citations.join(", ")));
     }
-    addEntry(`submit_issue [${payload.issue_id}]`, resp.reward, body);
+    addEntry(`${actionType === "revise_issue" ? "issue updated" : "issue saved"} · ${payload.issue_id}`, resp.reward, body);
     showWorkspace("review");
     updateNextStep();
     maybeScore(resp);
     return !lr.error;
   }
 
-  async function proposeRedline(payload) {
-    const action = { type: "propose_redline", ...payload };
-    const resp = await doStep(action, (retryAction) => proposeRedline(retryAction));
+  async function proposeRedline(payload, actionType = "propose_redline") {
+    const action = { type: actionType, ...payload };
+    const resp = await doStep(action, (retryAction) => proposeRedline(retryAction, retryAction.type));
     if (!resp) return false;
     const lr = resp.observation.last_result;
     const body = [];
@@ -751,9 +1079,13 @@
       body.push(el("pre", "body doc-text", payload.replacement_text));
       markProgress("redline");
       redlinedLabels.add(payload.issue_id);
+      submittedRedlines.set(`${payload.issue_id}|${payload.document_id}|${payload.section}`, payload);
+      capture(actionType === "revise_redline" ? "redline.revised" : "redline.saved", { document_id: payload.document_id, section: payload.section, issue_id: payload.issue_id }, {
+        replacement_text: payload.replacement_text, rationale: payload.rationale,
+      });
       renderReview();
     }
-    addEntry(`propose_redline [${payload.issue_id}] ${payload.document_id} §${payload.section}`,
+    addEntry(`${actionType === "revise_redline" ? "draft updated" : "draft saved"} · ${payload.issue_id} · ${payload.document_id} §${payload.section}`,
       resp.reward, body);
     showWorkspace("review");
     updateNextStep();
@@ -767,8 +1099,11 @@
     const lr = resp.observation.last_result;
     const body = [el("div", "body", topic)];
     if (lr.error) body.push(el("div", "body error", lr.error));
-    else body.push(el("div", "body supervisor-guidance", lr.guidance));
-    addEntry("escalate", resp.reward, body);
+    else {
+      body.push(el("div", "body supervisor-guidance", lr.guidance));
+      capture("communication.sent", {}, { recipient: "supervising_lawyer", topic, reason, answered: true });
+    }
+    addEntry("supervising lawyer reply", resp.reward, body);
     showWorkspace("activity");
     maybeScore(resp);
     return !lr.error;
@@ -785,8 +1120,11 @@
     else {
       body.push(el("div", "body counterparty-response", lr.message));
       if (lr.counter_text) body.push(el("pre", "body counter-text", lr.counter_text));
+      capture("counterparty.markup_sent", {
+        document_id: payload.document_id, section: payload.section, issue_id: payload.issue_id,
+      }, { proposed_text: payload.proposed_text, response: lr.response });
     }
-    addEntry(`send_markup [${payload.issue_id}]`, resp.reward, body);
+    addEntry(`counterparty response · ${payload.issue_id}`, resp.reward, body);
     renderNegotiation(resp.observation);
     renderReview();
     showWorkspace("activity");
@@ -798,9 +1136,10 @@
     const resp = await doStep({ type: "accept_counterparty", issue_id: issueId }, (action) => acceptCounterparty(action.issue_id));
     if (!resp) return false;
     const lr = resp.observation.last_result;
-    addEntry(`accept_counterparty [${issueId}]`, resp.reward, [
+    addEntry(`counterparty language accepted · ${issueId}`, resp.reward, [
       el("div", lr.error ? "body error" : "body counterparty-response", lr.error || lr.message),
     ]);
+    if (!lr.error) capture("counterparty.accepted", { issue_id: issueId }, {});
     renderNegotiation(resp.observation);
     renderReview();
     showWorkspace("activity");
@@ -833,10 +1172,11 @@
   }
 
   async function submitFinal(summary) {
+    capture("final.submitted", {}, { summary });
     const action = { type: "submit_final", summary };
     const resp = await doStep(action, (retryAction) => submitFinal(retryAction.summary));
     if (!resp) return;
-    addEntry("submit_final", resp.reward, [el("div", "body", summary)]);
+    addEntry("status report delivered", resp.reward, [el("div", "body", summary)]);
     showWorkspace("activity");
     markProgress("finish");
     maybeScore(resp);
@@ -910,7 +1250,7 @@
     const finalEvent = [...breakdown.reward_events].reverse().find((event) => event.type === "final_submission");
     if (finalEvent?.missing_issues?.length) focus.push(`The final update omitted ${finalEvent.missing_issues.length} material issue${finalEvent.missing_issues.length === 1 ? "" : "s"}.`);
     if (r.critical_failure) focus.unshift("Address the critical error before refining lower-priority work.");
-    if (!focus.length) focus.push(percent >= 85 ? "Try a sealed benchmark next." : "Tighten analysis and drafting language to capture the remaining points.");
+    if (!focus.length) focus.push(percent >= 85 ? "Try an assessment review next." : "Tighten analysis and drafting language to capture the remaining points.");
     for (const [title, items] of [["What worked", strengths.slice(0, 3)], ["Next focus", focus.slice(0, 3)]]) {
       const panel = el("section", "feedback-panel");
       panel.appendChild(el("h3", "", title));
@@ -952,10 +1292,11 @@
       `${citationRate}% valid citations`,
       `${settledCount} settled · ${escalationCount} escalated`,
     ];
-    const summaryText = `Playbook result — ${matterTitle} (${playMode} mode): ${percent}/100, ${band.toLowerCase()}. ${cardMetrics.join("; ")}. ${SITE_URL}`;
+    const displayMode = playMode === "benchmark" ? "assessment review" : "guided review";
+    const summaryText = `Playbook result — ${matterTitle} (${displayMode}): ${percent}/100, ${band.toLowerCase()}. ${cardMetrics.join("; ")}. ${SITE_URL}`;
     const cardButton = el("button", "", "download card");
     cardButton.addEventListener("click", () => downloadResultCard({
-      matterId: r.matter_id, matterTitle, mode: playMode, band, percent, metrics: cardMetrics,
+      matterId: r.matter_id, matterTitle, mode: displayMode, band, percent, metrics: cardMetrics,
     }));
     const copyButton = el("button", "", "copy summary");
     copyButton.addEventListener("click", async () => {
@@ -1086,7 +1427,134 @@
   document.querySelectorAll("#tabs button").forEach((btn) => {
     btn.addEventListener("click", () => {
       selectComposerTab(btn.dataset.tab);
+      if (btn.dataset.tab === "finish" && !$("final-summary").value.trim() && submittedIssues.size) {
+        $("final-summary").value = buildStatusReport();
+        queueDraftSave();
+      }
     });
+  });
+
+  function buildStatusReport() {
+    const ordered = [...submittedIssues.values()].sort((a, b) =>
+      ["critical", "high", "medium", "low"].indexOf(a.severity) -
+      ["critical", "high", "medium", "low"].indexOf(b.severity));
+    const lines = ["Deal team —", "", "I have completed the current review. Key points:", ""];
+    ordered.forEach((issue, index) => {
+      const drafted = redlinedLabels.has(issue.issue_id) ? "Draft language prepared." : "Draft language remains open.";
+      lines.push(`${index + 1}. ${issue.title} (${issue.severity}; ${issue.citations[0] || "citation pending"})`);
+      lines.push(`${issue.recommendation} ${drafted}`, "");
+    });
+    lines.push("Please let me know if you would like to discuss any open authority or business points before signature.");
+    return lines.join("\n");
+  }
+
+  function selectedIssueId(documentId, section) {
+    const match = [...submittedIssues.values()].find((issue) =>
+      issue.citations.some((citation) => {
+        const parsed = parseCitation(citation);
+        return parsed?.documentId === documentId && parsed?.section === section;
+      }));
+    return match?.issue_id || [...submittedIssues.keys()][0] || "";
+  }
+
+  function hideSelectionTools() {
+    $("selection-tools").hidden = true;
+  }
+
+  $("document-view").addEventListener("mouseup", () => {
+    window.setTimeout(() => {
+      const selection = window.getSelection();
+      const text = selection?.toString().trim();
+      const anchor = selection?.anchorNode?.nodeType === Node.TEXT_NODE
+        ? selection.anchorNode.parentElement : selection?.anchorNode;
+      const sectionNode = anchor?.closest?.("[data-section]");
+      if (!text || !sectionNode || !$("document-view").contains(sectionNode) || !currentDocumentId) {
+        hideSelectionTools();
+        return;
+      }
+      const section = sectionNode.dataset.section;
+      currentSelection = { documentId: currentDocumentId, section, text: text.slice(0, 4000) };
+      capture("selection.created", { document_id: currentDocumentId, section }, {
+        content_hash: contentHash(text), length: text.length,
+      });
+      $("selection-citation").textContent = `${currentDocumentId} §${section}`;
+      const rect = selection.getRangeAt(0).getBoundingClientRect();
+      const tools = $("selection-tools");
+      tools.style.left = `${Math.max(12, Math.min(window.innerWidth - 360, rect.left))}px`;
+      tools.style.top = `${Math.max(12, rect.top - 48)}px`;
+      tools.hidden = false;
+    }, 0);
+  });
+
+  document.querySelectorAll("[data-selection-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!currentSelection) return;
+      const { documentId, section, text } = currentSelection;
+      const citation = `${documentId} §${section}`;
+      if (button.dataset.selectionAction === "copy") {
+        await copyText(citation);
+        button.textContent = "copied";
+        window.setTimeout(() => { button.textContent = "copy citation"; }, 1200);
+        return;
+      }
+      if (button.dataset.selectionAction === "issue") {
+        resetRevisionForms();
+        $("form-issue").reset();
+        selectComposerTab("issue");
+        let issueId = `${documentId}-${section.replaceAll(".", "-")}`;
+        let suffix = 2;
+        while (submittedIssues.has(issueId)) issueId = `${documentId}-${section.replaceAll(".", "-")}-${suffix++}`;
+        $("issue-label").value = issueId;
+        $("issue-title").value = `Review ${documentId} §${section}`;
+        $("issue-citations").value = citation;
+        $("issue-analysis").placeholder = `Explain why this language matters:\n“${text.slice(0, 220)}${text.length > 220 ? "…" : ""}”`;
+        $("issue-analysis").focus();
+      } else {
+        if (!submittedIssues.size) {
+          resetRevisionForms();
+          $("form-issue").reset();
+          selectComposerTab("issue");
+          $("issue-citations").value = citation;
+          $("issue-analysis").focus();
+        } else {
+          resetRevisionForms();
+          $("form-redline").reset();
+          selectComposerTab("redline");
+          $("redline-label").value = selectedIssueId(documentId, section);
+          $("redline-doc").value = documentId;
+          $("redline-section").value = section;
+          $("redline-text").value = text;
+          $("redline-text").select();
+        }
+      }
+      hideSelectionTools();
+      queueDraftSave();
+    });
+  });
+
+  document.querySelectorAll("#composer input, #composer textarea, #composer select")
+    .forEach((field) => {
+      field.addEventListener("input", queueDraftSave);
+      field.addEventListener("change", queueDraftSave);
+      field.addEventListener("blur", persistWorkspaceDraft);
+    });
+
+  document.addEventListener("keydown", (event) => {
+    if (!matterActive || finished) return;
+    const modifier = event.ctrlKey || event.metaKey;
+    if (modifier && event.shiftKey && event.key.toLowerCase() === "f") {
+      event.preventDefault();
+      selectComposerTab("search");
+      $("search-query").focus();
+    } else if (event.altKey && event.key.toLowerCase() === "i") {
+      event.preventDefault();
+      selectComposerTab("issue");
+      $("issue-title").focus();
+    } else if (event.altKey && event.key.toLowerCase() === "r") {
+      event.preventDefault();
+      selectComposerTab("redline");
+      $("redline-text").focus();
+    }
   });
 
   document.querySelectorAll("#workspace-tabs button").forEach((btn) => {
@@ -1130,13 +1598,13 @@
   $("form-ask").addEventListener("submit", async (e) => {
     e.preventDefault();
     const q = $("ask-question").value.trim();
-    if (q && await ask(q)) $("ask-question").value = "";
+    if (q && await ask(q)) { $("ask-question").value = ""; persistWorkspaceDraft(); }
   });
 
   $("form-search").addEventListener("submit", async (e) => {
     e.preventDefault();
     const q = $("search-query").value.trim();
-    if (q && await search(q)) $("search-query").value = "";
+    if (q && await search(q)) { $("search-query").value = ""; persistWorkspaceDraft(); }
   });
 
   $("form-issue").addEventListener("submit", async (e) => {
@@ -1185,12 +1653,18 @@
       }
     });
     const submit = async () => {
-      if (!await submitIssue(payload)) return;
+      const actionType = e.target.dataset.revising === "true" ? "revise_issue" : "submit_issue";
+      if (!await submitIssue(payload, actionType)) return;
       e.target.reset();
+      resetRevisionForms();
       $("quotes").replaceChildren();
       clearFieldErrors("issue-citation-errors");
+      persistWorkspaceDraft();
     };
     if (hardFailure || unreadQuote) {
+      capture("validation.warning", { issue_id: payload.issue_id }, {
+        form: "issue", reason: hardFailure ? "quotation_mismatch" : "quotation_unread",
+      });
       const warning = el("div", "submission-warning");
       warning.appendChild(el("strong", "", hardFailure ? "quotation check failed" : "quotation could not be checked"));
       const anyway = el("button", "submit-anyway", hardFailure ? "submit anyway" : "continue without verifying");
@@ -1213,26 +1687,31 @@
     const citation = `${$("redline-doc").value} §${section}`;
     const citationResult = window.PlaybookCitations.validateCitation(citation, knownCitations);
     if (!citationResult.valid) {
+      capture("validation.failed", {
+        document_id: $("redline-doc").value, section,
+        issue_id: $("redline-label").value,
+      }, { form: "redline", field: "citation", message: citationResult.error });
       addFieldError($("redline-citation-errors"), citationResult.error, null, null);
       $("redline-section").setAttribute("aria-invalid", "true");
       return;
     }
     $("redline-section").setAttribute("aria-invalid", "false");
+    const actionType = e.target.dataset.revising === "true" ? "revise_redline" : "propose_redline";
     const accepted = await proposeRedline({
       issue_id: $("redline-label").value.trim(),
       document_id: $("redline-doc").value,
       section,
       replacement_text: $("redline-text").value.trim(),
       rationale: $("redline-rationale").value.trim(),
-    });
-    if (accepted) e.target.reset();
+    }, actionType);
+    if (accepted) { e.target.reset(); resetRevisionForms(); persistWorkspaceDraft(); }
   });
 
   $("form-escalate").addEventListener("submit", async (e) => {
     e.preventDefault();
     const topic = $("escalate-topic").value.trim();
     const reason = $("escalate-reason").value.trim();
-    if (topic && reason && await escalate(topic, reason)) e.target.reset();
+    if (topic && reason && await escalate(topic, reason)) { e.target.reset(); persistWorkspaceDraft(); }
   });
 
   $("form-negotiate").addEventListener("submit", async (e) => {
@@ -1246,6 +1725,7 @@
     if (accepted) {
       $("markup-section").value = "";
       $("markup-text").value = "";
+      persistWorkspaceDraft();
     }
   });
 
@@ -1267,8 +1747,8 @@
 
   function renderFinishPreflight() {
     const sealed = playMode === "benchmark";
-    $("finish-title").textContent = sealed ? "submit this sealed attempt?" : "ready to finish this review?";
-    $("finish-confirm").textContent = sealed ? "submit benchmark" : "submit and see score";
+    $("finish-title").textContent = sealed ? "deliver this assessment review?" : "ready to finish this review?";
+    $("finish-confirm").textContent = "deliver status report";
     const rows = [
       ["Sections reviewed", readSections.size],
       ["Client questions asked", questionsAsked],
@@ -1278,7 +1758,7 @@
         ? [["Escalations raised", currentObservation.submitted_escalation_topics?.length || 0]] : []),
       ...(currentObservation && Object.hasOwn(currentObservation.budgets, "negotiation_rounds_remaining")
         ? [["Negotiated issues", Object.keys(currentObservation.negotiation || {}).length]] : []),
-      ["Steps remaining", stepsRemaining],
+      ["Review capacity remaining", stepsRemaining],
     ];
     const checklist = $("finish-checklist");
     checklist.hidden = sealed;
@@ -1290,7 +1770,7 @@
     });
     const warnings = [];
     if (!readSections.size) warnings.push("You have not reviewed any provisions.");
-    if (!submittedIssues.size) warnings.push("You have not submitted any issues. Your score may be very low.");
+    if (!submittedIssues.size) warnings.push("You have not recorded any issues. Confirm that the documents are acceptable as drafted.");
     const highWithoutDraft = Array.from(submittedIssues.values())
       .filter((issue) => ["high", "critical"].includes(issue.severity) && !redlinedLabels.has(issue.issue_id));
     if (highWithoutDraft.length) warnings.push(`${highWithoutDraft.length} high-priority issue(s) have no draft language. Confirm that is intentional.`);
@@ -1300,7 +1780,7 @@
     }
     const openNegotiations = Object.values(currentObservation?.negotiation || {}).filter((state) => state.status !== "closed");
     if (openNegotiations.length) warnings.push(`${openNegotiations.length} negotiated issue(s) remain open. Confirm that the final update explains their status.`);
-    if (stepsRemaining <= 3) warnings.push(`Only ${stepsRemaining} steps remain.`);
+    if (stepsRemaining <= 3) warnings.push(`Only ${stepsRemaining} review actions remain available.`);
     if (!warnings.length) warnings.push("No obvious workflow gaps found. This check does not assess legal correctness.");
     $("finish-warnings").hidden = sealed;
     $("finish-warnings").replaceChildren(...warnings.map((message) => el("p", "", message)));
@@ -1329,7 +1809,12 @@
       matterSelect.value = episode?.matter_id || id;
       return;
     }
-    if (matterActive && !finished) clearSavedEpisode();
+    if (matterActive && !finished) {
+      capture("matter.discarded", {}, { replacement_matter_id: id });
+      window.playbookCaptureSession?.complete?.();
+      window.playbookCaptureSession = null;
+      clearSavedEpisode();
+    }
     startBtn.disabled = true;
     $("welcome-start").disabled = true;
     $("welcome-start").textContent = "opening matter…";
@@ -1359,15 +1844,19 @@
     guidedStartPending = false;
     starterPayload = null;
     $("welcome-start").disabled = false;
-    $("welcome-start").textContent = "try the guided matter";
+    $("welcome-start").textContent = "start guided review";
     const obs = payload.observation;
     stepNo = 0;
     finished = false;
     readSections = new Set();
     submittedLabels = new Set();
     submittedIssues = new Map();
+    submittedRedlines = new Map();
     redlinedLabels = new Set();
     sectionCache = new Map();
+    documentCache = new Map();
+    currentDocumentId = null;
+    currentSelection = null;
     knownCitations = new Set();
     questionsAsked = 0;
     if (resume) {
@@ -1375,28 +1864,39 @@
         const result = options.replayed[index]?.observation?.last_result || {};
         if (result.error) return;
         if (action.type === "read_document") {
-          readSections.add(action.document_id + "§" + action.section);
-          if (result.content) sectionCache.set(`${action.document_id} §${action.section}`, result.content);
+          if (action.section) {
+            readSections.add(action.document_id + "§" + action.section);
+            if (result.content) sectionCache.set(`${action.document_id} §${action.section}`, result.content);
+          } else if (result.content) {
+            documentCache.set(action.document_id, result.content);
+            cacheDocumentSections(action.document_id, result.content);
+            const descriptor = obs.documents.find((doc) => doc.id === action.document_id);
+            (descriptor?.sections || []).forEach((sec) => readSections.add(action.document_id + "§" + sec));
+          }
         } else if (action.type === "ask_client") questionsAsked += 1;
-        else if (action.type === "submit_issue") {
+        else if (["submit_issue", "revise_issue"].includes(action.type)) {
           submittedLabels.add(action.issue_id);
           submittedIssues.set(action.issue_id, action);
-        } else if (action.type === "propose_redline") redlinedLabels.add(action.issue_id);
+        } else if (["propose_redline", "revise_redline"].includes(action.type)) {
+          redlinedLabels.add(action.issue_id);
+          submittedRedlines.set(`${action.issue_id}|${action.document_id}|${action.section}`, action);
+        }
       });
       stepNo = resume.actions.length;
     }
     document.querySelectorAll(".tabform").forEach((form) => form.reset());
+    resetRevisionForms();
     $("quotes").replaceChildren();
     refreshLabels();
     renderReview();
     transcript.replaceChildren();
-    $("current-document").textContent = "no section open";
+    $("current-document").textContent = "no document open";
     const empty = el("div", "empty-document");
     empty.append(el("p", "eyebrow", obs.matter.matter_id), el("h2", "", obs.matter.title));
     const role = el("p");
     role.append(el("strong", "", "You are: "), document.createTextNode(obs.matter.role));
     empty.append(role, el("p", "", obs.matter.assignment));
-    if (id === "ai_saas_001") empty.append(el("p", "matter-time", "Starter matter · about 15–20 minutes · 30-step limit"));
+    if (id === "ai_saas_001") empty.append(el("p", "matter-time", "Starter matter · about 15–20 minutes"));
     if (playMode === "learn") empty.append(el("p", "start-hint", "start by opening the supervising-lawyer instructions and playbook from the matter file."));
     $("document-view").replaceChildren(empty);
     showWorkspace("document");
@@ -1404,7 +1904,7 @@
     if (resume) {
       const restoredProgress = {
         read_document: "read", ask_client: "question", submit_issue: "issue",
-        propose_redline: "redline", submit_final: "finish",
+        revise_issue: "issue", propose_redline: "redline", revise_redline: "redline", submit_final: "finish",
       };
       resume.actions.forEach((action) => markProgress(restoredProgress[action.type]));
     }
@@ -1413,6 +1913,11 @@
     renderDocs(obs);
     renderNegotiation(obs);
     renderReview();
+    matterActive = true;
+    const restoredDocumentId = await restoreWorkspaceDraft();
+    if (restoredDocumentId && documentCache.has(restoredDocumentId)) {
+      renderDocument(restoredDocumentId, documentCache.get(restoredDocumentId));
+    }
     updateBudgets(obs);
     updateNextStep();
     budgetsEl.hidden = false;
@@ -1423,6 +1928,7 @@
     $("mode-badge").hidden = false;
     window.scrollTo(0, 0);
     setMobileView("files");
+    await beginCapture(id, resume?.capture_session_id || null);
 
     const m = obs.matter;
     addEntry("matter opened — " + m.matter_id, null, [
@@ -1431,10 +1937,9 @@
       el("div", "body", "assignment: " + m.assignment),
       ...(playMode === "learn" ? [el("div", "body answer",
         "house rules: cite provisions as 'doc §section', operative provision first. " +
-        "quotes must be verbatim — a fabricated quote is a critical failure. " +
-        "every client question spends budget. finish before the steps run out.")] : []),
+        "quotes must be verbatim. Use client and supervising-lawyer requests for points that can change your advice.")] : []),
     ]);
-    if (resume) addEntry(`review resumed — ${resume.actions.length} steps replayed`, null, [
+    if (resume) addEntry(`review resumed — ${resume.actions.length} saved actions restored`, null, [
       el("div", "body answer", "Restored with the saved matter, seed, and exact action sequence."),
     ]);
     persistEpisode();

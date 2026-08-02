@@ -31,6 +31,45 @@ POLICY_PATH = Path(__file__).resolve().parents[1] / "web" / "policy.json"
 CONSENT_VERSION = json.loads(POLICY_PATH.read_text(encoding="utf-8"))["consent_version"]
 ALLOWED_BACKGROUNDS = {"lawyer", "legal_professional", "law_student", "other"}
 ALLOWED_MODES = {"learn", "benchmark"}
+INTERACTION_TYPES = re.compile(
+    r"^(matter|document|search|selection|issue|redline|communication|counterparty|fact|final|capture|validation|transport)\.[a-z0-9_.-]+$"
+)
+UUID = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
+
+
+def verify_interaction_trace(record: dict[str, Any]) -> tuple[bool, str]:
+    """Validate the optional semantic trace independently from canonical replay."""
+    interaction = record.get("interaction_trace")
+    if interaction is None:
+        return True, "not present"
+    if not isinstance(interaction, dict) or interaction.get("schema_version") != "1":
+        return False, "invalid interaction trace schema"
+    if (
+        not UUID.fullmatch(str(record.get("contribution_id", "")))
+        or interaction.get("contribution_id") != record.get("contribution_id")
+        or interaction.get("matter_id") != (record.get("trace") or {}).get("matter")
+        or interaction.get("engine_version") != record.get("app_version")
+        or interaction.get("consent_version") != CONSENT_VERSION
+        or not UUID.fullmatch(str(interaction.get("session_id", "")))
+    ):
+        return False, "interaction trace provenance mismatch"
+    events = interaction.get("events")
+    if not isinstance(events, list) or len(events) > 2500:
+        return False, "malformed interaction events"
+    ids: set[str] = set()
+    for sequence, event in enumerate(events, 1):
+        if not isinstance(event, dict) or event.get("sequence") != sequence:
+            return False, "malformed interaction event order"
+        event_id = str(event.get("event_id", ""))
+        if not UUID.fullmatch(event_id) or event_id in ids:
+            return False, "malformed interaction event id"
+        ids.add(event_id)
+        if not INTERACTION_TYPES.fullmatch(str(event.get("type", ""))):
+            return False, "invalid interaction event type"
+    return True, "ok"
 
 
 def _get(url: str, token: str) -> Any:
@@ -80,6 +119,9 @@ def verify_record(
         return False, "missing or invalid app version", None
     if record.get("app", "web-gym") != "web-gym":
         return False, "invalid contribution source", None
+    interaction_ok, interaction_reason = verify_interaction_trace(record)
+    if not interaction_ok:
+        return False, interaction_reason, None
     background = record.get("background")
     if background is not None and background not in ALLOWED_BACKGROUNDS:
         return False, "invalid contributor background", None
@@ -185,6 +227,22 @@ def export_verified(
     return kept, rejected, reasons
 
 
+def export_interactions(records: list[dict[str, Any]], out_path: Path) -> tuple[int, int]:
+    """Export validated semantic traces separately; never mix them into canonical SFT."""
+    kept = rejected = 0
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("w", encoding="utf-8") as handle:
+        for record in records:
+            ok, _reason = verify_interaction_trace(record)
+            interaction = record.get("interaction_trace")
+            if not ok:
+                rejected += 1
+            elif interaction is not None:
+                handle.write(json.dumps(interaction, ensure_ascii=False) + "\n")
+                kept += 1
+    return kept, rejected
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--endpoint", required=False, help="Worker base URL")
@@ -193,6 +251,7 @@ def main() -> None:
     parser.add_argument(
         "--out", "--output", dest="out", type=Path, default=Path("artifacts/human_sft.jsonl")
     )
+    parser.add_argument("--interaction-out", type=Path, help="Write validated semantic traces")
     parser.add_argument("--skip-fetch", action="store_true", help="Verify/export raw-dir only")
     args = parser.parse_args()
 
@@ -214,6 +273,10 @@ def main() -> None:
     for reason in reasons:
         print(f"  rejected: {reason}")
     print(args.out)
+    if args.interaction_out:
+        interaction_kept, interaction_rejected = export_interactions(records, args.interaction_out)
+        print(f"exported {interaction_kept} interaction traces; rejected {interaction_rejected}")
+        print(args.interaction_out)
 
 
 if __name__ == "__main__":

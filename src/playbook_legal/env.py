@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -49,6 +50,7 @@ class PlaybookEnv:
         self._learned_facts: dict[str, Any] = {}
         self._issue_submissions: list[dict[str, Any]] = []
         self._redline_submissions: list[dict[str, Any]] = []
+        self._work_product_submissions: list[tuple[str, dict[str, Any]]] = []
         self._escalation_topics: list[str] = []
         self._negotiation_state: dict[str, dict[str, Any]] = {}
         self._negotiation_labels: dict[str, str] = {}
@@ -107,6 +109,7 @@ class PlaybookEnv:
         self._learned_facts = deepcopy(self.matter.get("public_facts", {}))
         self._issue_submissions = []
         self._redline_submissions = []
+        self._work_product_submissions = []
         self._escalation_topics = []
         self._negotiation_state = {}
         self._negotiation_labels = {}
@@ -298,9 +301,32 @@ class PlaybookEnv:
             return -0.25, {"valid": False}
         reward, reward_info = self.reward_engine.score_issue(action)
         self._issue_submissions.append(deepcopy(action))
+        self._work_product_submissions.append(("issue", deepcopy(action)))
         # Scoring detail stays harness-side (info/trace); the agent-visible
         # observation only acknowledges receipt, so the rubric cannot be probed.
         self._last_result = {"message": "Issue submitted.", "issue_id": action["issue_id"]}
+        return reward, {"valid": True, "reward": reward_info}
+
+    def _handle_revise_issue(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+        required = ["issue_id", "title", "severity", "citations", "analysis", "recommendation"]
+        missing = [field for field in required if field not in action]
+        if missing:
+            self._last_result = {"error": "Missing issue fields.", "missing": missing}
+            return -0.25, {"valid": False}
+        label = str(action["issue_id"])
+        index = next(
+            (i for i, item in enumerate(self._issue_submissions) if str(item["issue_id"]) == label),
+            None,
+        )
+        if index is None:
+            self._last_result = {"error": "Issue revision target does not exist.", "issue_id": label}
+            return -0.25, {"valid": False}
+        revised = deepcopy(action)
+        self._issue_submissions[index] = revised
+        self._replace_work_product("issue", lambda item: str(item["issue_id"]) == label, revised)
+        reward = self._rescore_work_products()
+        reward_info = {"type": "issue_revision", "criterion": label, "points": round(reward, 4)}
+        self._last_result = {"message": "Issue revised.", "issue_id": label}
         return reward, {"valid": True, "reward": reward_info}
 
     def _handle_propose_redline(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
@@ -316,8 +342,72 @@ class PlaybookEnv:
             return -0.75, {"valid": False}
         reward, reward_info = self.reward_engine.score_redline(action)
         self._redline_submissions.append(deepcopy(action))
+        self._work_product_submissions.append(("redline", deepcopy(action)))
         self._last_result = {"message": "Redline submitted.", "issue_id": action["issue_id"]}
         return reward, {"valid": True, "reward": reward_info}
+
+    def _handle_revise_redline(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+        required = ["issue_id", "document_id", "section", "replacement_text", "rationale"]
+        missing = [field for field in required if field not in action]
+        if missing:
+            self._last_result = {"error": "Missing redline fields.", "missing": missing}
+            return -0.25, {"valid": False}
+        document_id = str(action["document_id"])
+        section = str(action["section"])
+        if document_id not in self.documents or section not in self.documents[document_id]["sections"]:
+            self._last_result = {"error": "Redline target does not exist."}
+            return -0.75, {"valid": False}
+        key = (str(action["issue_id"]), document_id, section)
+        index = next(
+            (
+                i
+                for i, item in enumerate(self._redline_submissions)
+                if (str(item["issue_id"]), str(item["document_id"]), str(item["section"])) == key
+            ),
+            None,
+        )
+        if index is None:
+            self._last_result = {"error": "Redline revision target does not exist."}
+            return -0.25, {"valid": False}
+        revised = deepcopy(action)
+        self._redline_submissions[index] = revised
+        self._replace_work_product(
+            "redline",
+            lambda item: (
+                str(item["issue_id"]), str(item["document_id"]), str(item["section"])
+            ) == key,
+            revised,
+        )
+        reward = self._rescore_work_products()
+        reward_info = {
+            "type": "redline_revision",
+            "criterion": key[0],
+            "points": round(reward, 4),
+        }
+        self._last_result = {"message": "Redline revised.", "issue_id": key[0]}
+        return reward, {"valid": True, "reward": reward_info}
+
+    def _replace_work_product(
+        self,
+        kind: str,
+        matches: Callable[[dict[str, Any]], bool],
+        revised: dict[str, Any],
+    ) -> None:
+        for index, (item_kind, item) in enumerate(self._work_product_submissions):
+            if item_kind == kind and matches(item):
+                self._work_product_submissions[index] = (kind, deepcopy(revised))
+                return
+        raise RuntimeError("Work-product revision target disappeared.")
+
+    def _rescore_work_products(self) -> float:
+        previous = self.reward_engine.state.raw_score
+        self.reward_engine.clear_work_product_scores()
+        for kind, item in self._work_product_submissions:
+            if kind == "issue":
+                self.reward_engine.score_issue(item)
+            else:
+                self.reward_engine.score_redline(item)
+        return self.reward_engine.state.raw_score - previous
 
     def _handle_send_markup(self, action: dict[str, Any]) -> tuple[float, dict[str, Any]]:
         if self._negotiation_rounds_used >= self.max_negotiation_rounds:

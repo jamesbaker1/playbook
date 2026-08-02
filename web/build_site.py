@@ -20,6 +20,8 @@ ASSETS = [
     "api-base.js",
     "citation.js",
     "score.js",
+    "capture.js",
+    "draft-store.js",
     "app.js",
     "contribute.js",
     "policy.json",

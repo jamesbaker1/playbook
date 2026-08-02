@@ -68,6 +68,46 @@ def test_terminal_response_includes_full_trace():
     assert response["trace"]["engine_version"] == response["engine_version"]
 
 
+def test_worker_replays_revision_actions_and_scores_latest_version():
+    anchor = core.PlaybookEnv.from_directory(ROOT / "matters" / "ai_saas_001").rubric["issues"][0][
+        "anchor"
+    ]
+    actions = [
+        {"type": "read_document", "document_id": "msa", "section": "4.2"},
+        {
+            "type": "submit_issue",
+            "issue_id": "training",
+            "title": "Training right",
+            "severity": "low",
+            "citations": [anchor],
+            "analysis": "Initial analysis.",
+            "recommendation": "Review it.",
+        },
+        {
+            "type": "revise_issue",
+            "issue_id": "training",
+            "title": "Provider training right exceeds playbook",
+            "severity": "high",
+            "citations": [anchor],
+            "analysis": "Customer Data and Outputs may be used to train generalized models.",
+            "recommendation": "Prohibit training on Customer Data and Outputs.",
+        },
+        {"type": "submit_final", "summary": "Review complete. " * 10},
+    ]
+    status, response = request(
+        "POST", "/api/step", {"matter_id": "ai_saas_001", "seed": 0, "actions": actions}
+    )
+    assert status == 200
+    assert response["terminated"] is True
+    assert [event["action"]["type"] for event in response["trace"]["events"]] == [
+        "read_document",
+        "submit_issue",
+        "revise_issue",
+        "submit_final",
+    ]
+    assert response["result"]["breakdown"]["matched_issues"] == ["data_training"]
+
+
 def test_request_limits_and_episode_boundary():
     status, response = core.handle_api(
         "POST", "/api/step", b"{}" * 20, matters_root=ROOT / "matters", max_request_bytes=4

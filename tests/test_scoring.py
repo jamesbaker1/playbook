@@ -161,6 +161,98 @@ def test_redline_on_unscored_section_is_unsupported() -> None:
     assert reward == -0.5
 
 
+def test_issue_revision_replaces_original_score_and_preserves_trace() -> None:
+    env = make_env()
+    _, original_reward, *_ = env.step(dict(ISSUE, severity="low", analysis="Too broad."))
+    revised = dict(
+        ISSUE,
+        type="revise_issue",
+        analysis=(
+            "Customer Data and Outputs may be used to train generalized models; the playbook "
+            "permits only aggregated analytics."
+        ),
+    )
+    observation, revision_delta, *_ = env.step(revised)
+
+    baseline = make_env()
+    _, expected_reward, *_ = baseline.step(dict(ISSUE))
+    assert original_reward + revision_delta == expected_reward
+    assert observation["last_result"] == {
+        "message": "Issue revised.",
+        "issue_id": "my-own-label",
+    }
+    assert [event.action["type"] for event in env.trace] == [
+        "read_document",
+        "submit_issue",
+        "revise_issue",
+    ]
+    assert env.episode_result()["breakdown"]["matched_issues"] == ["data_training"]
+
+
+def test_issue_revision_can_remove_fabrication_critical_failure() -> None:
+    env = make_env()
+    env.step(
+        dict(
+            ISSUE,
+            quotes=[{"citation": "msa Â§4.2", "text": "This language is fabricated entirely."}],
+        )
+    )
+    assert env.episode_result()["critical_failure"] is True
+    env.step(dict(ISSUE, type="revise_issue", quotes=[]))
+    assert env.episode_result()["critical_failure"] is False
+    assert env.episode_result()["breakdown"]["fabricated_quotes"] == []
+
+
+def test_issue_revision_requires_existing_issue_id() -> None:
+    env = make_env()
+    observation, reward, *_ = env.step(dict(ISSUE, type="revise_issue"))
+    assert reward == -0.25
+    assert "does not exist" in observation["last_result"]["error"]
+
+
+def test_redline_revision_replaces_original_score() -> None:
+    env = make_env()
+    env.step(dict(ISSUE))
+    original = {
+        "type": "propose_redline",
+        "issue_id": "my-own-label",
+        "document_id": "msa",
+        "section": "4.2",
+        "replacement_text": "Provider may use Customer Data.",
+        "rationale": "Initial draft.",
+    }
+    _, original_reward, *_ = env.step(original)
+    revised = {
+        **original,
+        "type": "revise_redline",
+        "replacement_text": (
+            "Provider may use aggregated and de-identified analytics but shall not use "
+            "Customer Data or Outputs to train any model."
+        ),
+    }
+    observation, revision_delta, *_ = env.step(revised)
+    assert original_reward + revision_delta == 1.0
+    assert observation["last_result"]["message"] == "Redline revised."
+    assert env.episode_result()["breakdown"]["matched_redlines"] == ["data_training"]
+
+
+def test_redline_revision_requires_same_existing_target() -> None:
+    env = make_env()
+    env.step(dict(ISSUE))
+    observation, reward, *_ = env.step(
+        {
+            "type": "revise_redline",
+            "issue_id": "my-own-label",
+            "document_id": "msa",
+            "section": "4.2",
+            "replacement_text": "Provider shall not train on Customer Data.",
+            "rationale": "No original redline exists.",
+        }
+    )
+    assert reward == -0.25
+    assert "does not exist" in observation["last_result"]["error"]
+
+
 def test_final_missing_required_issues_penalized() -> None:
     env = make_env()
     _, reward, *_ = env.step({"type": "submit_final", "summary": "x" * 200})

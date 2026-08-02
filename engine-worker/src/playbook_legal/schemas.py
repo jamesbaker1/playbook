@@ -114,6 +114,35 @@ _ACTIONS: dict[str, dict[str, Any]] = {
             "required": ["issue_id", "title", "severity", "citations", "analysis", "recommendation"],
         },
     },
+    "revise_issue": {
+        "description": (
+            "Replace a previously submitted issue with a revised version. The issue_id must "
+            "identify an existing issue. Only the latest version is used for scoring."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "issue_id": {"type": "string", "description": "Label of the issue to revise."},
+                "title": {"type": "string"},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "citations": {"type": "array", "items": {"type": "string"}},
+                "analysis": {"type": "string"},
+                "recommendation": {"type": "string"},
+                "quotes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "citation": {"type": "string"},
+                            "text": {"type": "string"},
+                        },
+                        "required": ["citation", "text"],
+                    },
+                },
+            },
+            "required": ["issue_id", "title", "severity", "citations", "analysis", "recommendation"],
+        },
+    },
     "propose_redline": {
         "description": (
             "Propose replacement language for one section. Target the operative provision of "
@@ -123,6 +152,23 @@ _ACTIONS: dict[str, dict[str, Any]] = {
             "type": "object",
             "properties": {
                 "issue_id": {"type": "string", "description": "Label of your submitted issue."},
+                "document_id": {"type": "string"},
+                "section": {"type": "string"},
+                "replacement_text": {"type": "string"},
+                "rationale": {"type": "string"},
+            },
+            "required": ["issue_id", "document_id", "section", "replacement_text", "rationale"],
+        },
+    },
+    "revise_redline": {
+        "description": (
+            "Replace the latest redline for an existing issue and provision. Only the latest "
+            "version for that issue/document/section target is used for scoring."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "issue_id": {"type": "string"},
                 "document_id": {"type": "string"},
                 "section": {"type": "string"},
                 "replacement_text": {"type": "string"},
@@ -196,7 +242,8 @@ PROTOCOL: dict[str, str] = {
     ),
     "labels": (
         "issue_id is your own label. Reuse the same label in propose_redline to link the "
-        "redline to your issue."
+        "redline to your issue. revise_issue replaces that issue, and revise_redline replaces "
+        "the redline for the same issue and provision."
     ),
     "escalation": (
         "Escalations are budgeted. Escalate departures from non-negotiable positions and "

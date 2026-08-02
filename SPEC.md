@@ -64,13 +64,22 @@ v0.3 supports:
 - `ask_client(question)` — free natural-language text; every question consumes budget
 - `escalate(topic, reason)` — free natural-language text; budgeted (§7)
 - `submit_issue(issue_id, title, severity, citations, analysis, recommendation, quotes?)`
+- `revise_issue(issue_id, title, severity, citations, analysis, recommendation, quotes?)`
 - `propose_redline(issue_id, document_id, section, replacement_text, rationale)`
+- `revise_redline(issue_id, document_id, section, replacement_text, rationale)`
 - `send_markup(issue_id, document_id, section, proposed_text)` — negotiation only (§8)
 - `accept_counterparty(issue_id)` — negotiation only (§8)
 - `submit_final(summary)`
 
 `issue_id` is the agent's own label, used only to link a redline or a markup to the
-agent's earlier issue. The two negotiation actions are **published only on matters
+agent's earlier issue. `revise_issue` requires that label to identify an existing
+issue. `revise_redline` requires an existing redline with the same issue label,
+document, and section. Revision actions remain in the canonical trace for audit and
+consume a step, while scoring, observations, and later label resolution use only the
+latest valid version of each issue or issue/provision redline. Traces containing only
+the original v0.3 actions retain their original replay and scoring behavior.
+
+The two negotiation actions are **published only on matters
 that ship a `counterparty.yaml` with positions**: on every other matter they are
 absent from `observation["action_schemas"]`, from the `protocol` block, and from the
 tool definitions, so an agent is never offered a table that does not exist. The same

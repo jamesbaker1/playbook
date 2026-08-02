@@ -12,6 +12,7 @@
   const UPLOAD_TIMEOUT_MS = 20000;
   const MAX_TRANSIENT_RETRIES = 2;
   const TRANSIENT_STATUSES = new Set([429, 502, 503, 504]);
+  const automaticUploads = new Set();
 
   function delay(ms) {
     return new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -22,6 +23,7 @@
       const controller = new AbortController();
       const timer = window.setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS);
       let response;
+      let failure;
       try {
         response = await fetch(TRACE_ENDPOINT, {
           method: "POST",
@@ -29,13 +31,21 @@
           body,
           signal: controller.signal,
         });
+      } catch (error) {
+        failure = error;
       } finally {
         window.clearTimeout(timer);
       }
 
-      // Retry only when the server explicitly reports a transient failure. A
-      // network error or timeout is ambiguous: the Worker may have stored the
-      // trace before the response was lost, and its API has no idempotency key.
+      if (failure) {
+        if (attempt >= MAX_TRANSIENT_RETRIES) throw failure;
+        onRetry(attempt + 1);
+        await delay(500 * (2 ** attempt));
+        continue;
+      }
+
+      // Every payload has an immutable contribution ID, so retrying the exact
+      // serialized body cannot create a second stored contribution.
       if (!TRANSIENT_STATUSES.has(response.status) || attempt >= MAX_TRANSIENT_RETRIES) {
         return response;
       }
@@ -66,6 +76,51 @@
 
   window.playbookContribute = function (result, actionsRow, getTraceJson) {
     if (!TRACE_ENDPOINT) return;
+
+    const capture = window.playbookCaptureSession;
+    const captureStatus = capture?.status?.();
+    if (captureStatus?.enabled) {
+      const wrap = document.createElement("div");
+      wrap.className = "contribute contribute-automatic";
+      const status = document.createElement("span");
+      status.className = "contribute-status";
+      status.setAttribute("role", "status");
+      status.setAttribute("aria-live", "polite");
+      wrap.append(status);
+      actionsRow.parentNode.insertBefore(wrap, actionsRow);
+      if (automaticUploads.has(captureStatus.session_id)) {
+        status.textContent = "review activity contributed";
+        return;
+      }
+      automaticUploads.add(captureStatus.session_id);
+      status.textContent = "saving consented review activity…";
+      (async () => {
+        try {
+          const policy = await getPolicy();
+          if (!window.playbookAppVersion) throw new Error("engine version unavailable");
+          const payload = window.PlaybookCapture.attachContribution({
+            contribution_id: window.crypto.randomUUID(),
+            app: "web-gym",
+            app_version: window.playbookAppVersion,
+            mode: window.playbookMode === "benchmark" ? "benchmark" : "learn",
+            handle: null,
+            background: null,
+            consent: { version: policy.consent_version, training_and_evaluation: true },
+            trace: JSON.parse(getTraceJson()),
+          }, capture);
+          const response = await postTrace(JSON.stringify(payload), (attempt) => {
+            status.textContent = `saving consented review activity (${attempt})…`;
+          });
+          const body = await responseBody(response);
+          status.textContent = response.ok && body.ok
+            ? "review activity contributed"
+            : "review activity could not be contributed";
+        } catch {
+          status.textContent = "review activity will remain on this device for now";
+        }
+      })();
+      return;
+    }
 
     const wrap = document.createElement("div");
     wrap.className = "contribute";
@@ -144,6 +199,7 @@
         const policy = await getPolicy();
         if (!window.playbookAppVersion) throw new Error("engine version unavailable");
         const payload = {
+          contribution_id: window.crypto.randomUUID(),
           app: "web-gym",
           app_version: window.playbookAppVersion,
           mode: window.playbookMode === "benchmark" ? "benchmark" : "learn",
@@ -155,8 +211,11 @@
           },
           trace: JSON.parse(getTraceJson()),
         };
+        const uploadPayload = window.PlaybookCapture
+          ? window.PlaybookCapture.attachContribution(payload, window.playbookCaptureSession)
+          : payload;
         // Serialize once so every safe retry sends exactly the same trace.
-        const response = await postTrace(JSON.stringify(payload), (attempt) => {
+        const response = await postTrace(JSON.stringify(uploadPayload), (attempt) => {
           status.textContent = `the service is busy. retrying (${attempt}/${MAX_TRANSIENT_RETRIES})…`;
         });
         const body = await responseBody(response);

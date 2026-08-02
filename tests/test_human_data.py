@@ -10,7 +10,7 @@ from conftest import EXAMPLES, MATTERS, ROOT
 
 sys.path.insert(0, str(ROOT / "training"))
 
-from human_data import CONSENT_VERSION, export_verified, verify_record
+from human_data import CONSENT_VERSION, export_interactions, export_verified, verify_record
 
 from playbook_legal import PlaybookEnv
 
@@ -137,3 +137,38 @@ def test_export_tags_human_agent(tmp_path: Path) -> None:
         "contributor_background": "lawyer",
     }
     assert "test-player" not in json.dumps(line)
+
+
+def test_interaction_trace_validates_and_exports_separately(tmp_path: Path) -> None:
+    record = build_genuine_record()
+    contribution_id = "123e4567-e89b-42d3-a456-426614174000"
+    record["contribution_id"] = contribution_id
+    record["interaction_trace"] = {
+        "schema_version": "1",
+        "session_id": "223e4567-e89b-42d3-a456-426614174000",
+        "contribution_id": contribution_id,
+        "matter_id": "ai_saas_001",
+        "engine_version": "0.3",
+        "consent_version": CONSENT_VERSION,
+        "started_at": "2026-08-02T12:00:00Z",
+        "completed_at": "2026-08-02T12:01:00Z",
+        "events": [{
+            "event_id": "323e4567-e89b-42d3-a456-426614174000",
+            "sequence": 1,
+            "occurred_at": "2026-08-02T12:00:01Z",
+            "type": "document.opened",
+            "target": {"document_id": "msa", "section": None, "issue_id": None},
+            "data": {},
+            "duration_ms": None,
+        }],
+    }
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert ok, reason
+    out = tmp_path / "interactions.jsonl"
+    assert export_interactions([record], out) == (1, 0)
+    exported = json.loads(out.read_text(encoding="utf-8"))
+    assert exported["events"][0]["type"] == "document.opened"
+
+    record["interaction_trace"]["events"][0]["sequence"] = 2
+    ok, reason, _ = verify_record(record, MATTERS)
+    assert not ok and "interaction event order" in reason

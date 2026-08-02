@@ -86,6 +86,53 @@ class RewardEngine:
     def reset(self) -> None:
         self.state = RewardState()
 
+    def clear_work_product_scores(self) -> None:
+        """Remove issue/redline scoring so the latest saved versions can be rescored.
+
+        Revision actions are additive in the canonical trace but substitutive for scoring.
+        The environment calls this method before replaying its effective issue and redline
+        work products. Question, escalation, negotiation, and final-submission scoring is
+        deliberately retained.
+        """
+        work_product_events = {
+            "issue",
+            "unsupported_issue",
+            "unread_anchor_issue",
+            "duplicate_issue",
+            "redline",
+            "unsupported_redline",
+            "duplicate_redline",
+            "unscored_redline",
+        }
+        retained = [event for event in self.state.events if event.get("type") not in work_product_events]
+        removed_points = sum(
+            float(event.get("points", 0.0))
+            for event in self.state.events
+            if event.get("type") in work_product_events
+        )
+        self.state.raw_score -= removed_points
+        self.state.events = retained
+        self.state.matched_issues.clear()
+        self.state.matched_redlines.clear()
+        self.state.issue_labels.clear()
+        self.state.valid_citation_count = 0
+        self.state.invalid_citations.clear()
+        self.state.unsupported_issues.clear()
+        self.state.fabricated_quotes.clear()
+        self.state.critical_failure = any(self._event_is_critical(event) for event in retained)
+
+    @staticmethod
+    def _event_is_critical(event: dict[str, Any]) -> bool:
+        if event.get("critical_failure_pattern") or event.get("non_negotiable_missing"):
+            return True
+        if event.get("missed_critical_escalations"):
+            return True
+        return any(
+            quote.get("status") == "fabricated"
+            for quote in event.get("quotes", [])
+            if isinstance(quote, dict)
+        )
+
     def record_document_read(self, document_id: str, section: str | None = None) -> None:
         """Record the sections whose full text the agent has actually received."""
         document = self.documents.get(document_id)

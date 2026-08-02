@@ -17,10 +17,44 @@ const ALLOWED_ORIGINS = new Set([
   "http://127.0.0.1:8000",
 ]);
 
-const MAX_BYTES = 2_000_000;
+const MAX_REQUEST_BYTES = 6_000_000;
+const MAX_CANONICAL_BYTES = 2_000_000;
+const MAX_INTERACTION_BYTES = 4_000_000;
+const MAX_INTERACTION_EVENTS = 2500;
 const CONSENT_VERSION = policy.consent_version;
 const BACKGROUNDS = new Set(["lawyer", "legal_professional", "law_student", "other"]);
 const MODES = new Set(["learn", "benchmark"]);
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const INTERACTION_TYPE = /^(matter|document|search|selection|issue|redline|communication|counterparty|fact|final|capture|validation|transport)\.[a-z0-9_.-]+$/;
+
+function validInteractionTrace(value, contributionId, matter, appVersion) {
+  if (value == null) return true;
+  if (new TextEncoder().encode(JSON.stringify(value)).byteLength > MAX_INTERACTION_BYTES) {
+    return false;
+  }
+  if (
+    typeof value !== "object" || value.schema_version !== "1" ||
+    !UUID.test(value.session_id || "") || value.contribution_id !== contributionId ||
+    value.matter_id !== matter || value.engine_version !== appVersion ||
+    value.consent_version !== CONSENT_VERSION ||
+    typeof value.started_at !== "string" ||
+    (value.completed_at !== null && typeof value.completed_at !== "string") ||
+    !Array.isArray(value.events) || value.events.length > MAX_INTERACTION_EVENTS
+  ) return false;
+  const ids = new Set();
+  return value.events.every((event, index) => {
+    if (!event || typeof event !== "object" || !UUID.test(event.event_id || "") ||
+        ids.has(event.event_id) || event.sequence !== index + 1 ||
+        typeof event.occurred_at !== "string" || !INTERACTION_TYPE.test(event.type || "") ||
+        !event.target || typeof event.target !== "object" ||
+        !event.data || typeof event.data !== "object" || Array.isArray(event.data) ||
+        (event.duration_ms !== null && (!Number.isInteger(event.duration_ms) || event.duration_ms < 0))) {
+      return false;
+    }
+    ids.add(event.event_id);
+    return true;
+  });
+}
 
 function cors(origin) {
   const allowed = ALLOWED_ORIGINS.has(origin) ? origin : "https://jamesbaker1.github.io";
@@ -54,7 +88,9 @@ export default {
 
     if (request.method === "POST" && url.pathname === "/api/traces") {
       const text = await request.text();
-      if (text.length > MAX_BYTES) return json({ error: "too large" }, 413, headers);
+      if (new TextEncoder().encode(text).byteLength > MAX_REQUEST_BYTES) {
+        return json({ error: "too large" }, 413, headers);
+      }
       let payload;
       try {
         payload = JSON.parse(text);
@@ -63,6 +99,7 @@ export default {
       }
       const trace = payload && payload.trace;
       const consent = payload && payload.consent;
+      const contributionId = payload && payload.contribution_id;
       if (
         !trace ||
         typeof trace.matter !== "string" ||
@@ -74,6 +111,12 @@ export default {
       ) {
         return json({ error: "not a playbook trace" }, 400, headers);
       }
+      if (new TextEncoder().encode(JSON.stringify(trace)).byteLength > MAX_CANONICAL_BYTES) {
+        return json({ error: "canonical trace too large" }, 413, headers);
+      }
+      if (!UUID.test(contributionId || "")) {
+        return json({ error: "valid contribution_id is required" }, 400, headers);
+      }
       if (
         !consent ||
         consent.version !== CONSENT_VERSION ||
@@ -83,6 +126,11 @@ export default {
       }
       if (typeof payload.app_version !== "string" || !/^[0-9A-Za-z._-]{1,32}$/.test(payload.app_version)) {
         return json({ error: "valid app_version is required" }, 400, headers);
+      }
+      if (!validInteractionTrace(
+        payload.interaction_trace, contributionId, trace.matter, payload.app_version
+      )) {
+        return json({ error: "invalid interaction trace" }, 400, headers);
       }
       if (payload.app != null && payload.app !== "web-gym") {
         return json({ error: "invalid contribution source" }, 400, headers);
@@ -98,7 +146,9 @@ export default {
       const handle = String(payload.handle || "")
         .replace(/[^\w .-]/g, "")
         .slice(0, 40);
-      const key = `trace:${trace.matter}:${Date.now()}:${crypto.randomUUID()}`;
+      // Deterministic storage makes concurrent same-ID requests idempotent:
+      // they can only overwrite the same record and always return the same key.
+      const key = `trace:contribution:${contributionId}`;
       const record = {
         uploaded_at: new Date().toISOString(),
         agent: "human",
@@ -114,6 +164,8 @@ export default {
         },
         claimed_score: trace.result.normalized_score ?? null,
         trace,
+        contribution_id: contributionId,
+        interaction_trace: payload.interaction_trace || null,
       };
       await env.TRACES.put(key, JSON.stringify(record));
       return json({ ok: true, key }, 200, headers);

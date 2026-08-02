@@ -83,6 +83,13 @@ button.primary:hover:not(:disabled) { background: var(--red); border-color: var(
 .budgets { font-variant-numeric: tabular-nums; }
 .budgets b { color: var(--red); font-weight: 700; }
 .mode-badge { padding: 2px 7px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; white-space: nowrap; }
+.save-status { color: var(--muted); font: 11px/1 var(--mono); white-space: nowrap; }
+.save-status::before { content: "●"; margin-right: 5px; color: var(--green); font-size: 8px; }
+.capture-controls { display: inline-flex; }
+.capture-status { padding: 2px 7px; border-color: var(--line); color: var(--muted); font-size: 11px; white-space: nowrap; }
+.capture-status[aria-pressed="true"]::before { content: "●"; margin-right: 5px; color: var(--green); font-size: 8px; }
+.capture-dialog { max-width: 590px; }
+.capture-dialog p { color: var(--muted); font-size: 15px; }
 
 /* ------------------------------------------------------------------ boot */
 
@@ -157,6 +164,26 @@ main > * { min-height: 0; overflow-y: auto; }
 #current-document { color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #document-view { max-width: 850px; margin: 0 auto; padding: clamp(28px, 5vw, 64px) clamp(12px, 5vw, 54px); min-height: 70vh; background: #fff; border-inline: 1px solid #eeeae3; }
 #document-view pre { font-family: Georgia, "Times New Roman", serif; font-size: 16px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+.document-paper { color: #24211e; font-family: Georgia, "Times New Roman", serif; font-size: 16px; line-height: 1.78; }
+.document-heading { scroll-margin-top: 70px; font-weight: 600; line-height: 1.3; }
+.document-paper h2 { margin: 0 0 34px; padding-bottom: 18px; border-bottom: 1px solid var(--line); font-size: clamp(25px, 3vw, 34px); text-align: center; }
+.document-paper h3 { margin: 34px 0 12px; font-size: 19px; }
+.document-paper h4, .document-paper h5, .document-paper h6 { margin: 26px 0 10px; font-size: 16px; }
+.document-paragraph { margin: 0 0 18px; text-align: left; }
+.document-list { margin: 0 0 20px; padding-left: 28px; }
+.document-list li + li { margin-top: 6px; }
+.document-table { width: 100%; margin: 8px 0 24px; border-collapse: collapse; font-family: "Segoe UI", Arial, sans-serif; font-size: 13px; line-height: 1.45; }
+.document-table th, .document-table td { padding: 9px 10px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+.document-table th { background: var(--paper-2); font-weight: 650; }
+.document-paper code { padding: 1px 3px; background: var(--paper-2); font: .88em/1.4 var(--mono); }
+.document-paragraph::selection, .document-heading::selection { background: #f1d9a9; }
+.citation-target { animation: citation-flash 1.8s ease-out; }
+@keyframes citation-flash { 0%, 35% { background: #fff0b8; } 100% { background: transparent; } }
+
+.selection-tools { position: fixed; z-index: 20; display: flex; align-items: center; gap: 3px; padding: 5px; border: 1px solid #332f2a; background: #332f2a; box-shadow: 0 7px 24px #1c1a1830; color: #fff; }
+.selection-tools span { padding: 0 8px; color: #d7d0c7; font: 10px/1 var(--mono); white-space: nowrap; }
+.selection-tools button { border-color: #5d5750; background: transparent; color: #fff; font-size: 11px; }
+.selection-tools button:hover:not(:disabled) { border-color: #fff; background: #fff; color: var(--ink); }
 .empty-document { max-width: 570px; margin: 12vh auto 0; }
 .empty-document h2 { font-family: Georgia, "Times New Roman", serif; font-size: 38px; font-weight: 400; margin: 8px 0 12px; }
 .empty-document > p:last-child { color: var(--muted); font-size: 15px; }
@@ -189,6 +216,8 @@ main > * { min-height: 0; overflow-y: auto; }
 button.citation-link { padding: 2px 6px; border-color: var(--line); background: transparent; color: var(--muted); font-size: 11px; text-decoration: underline; text-underline-offset: 2px; }
 button.draft-redline { flex: none; border-color: var(--red); color: var(--red); background: transparent; }
 button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(--paper); }
+.issue-card-buttons { display: flex; flex: none; gap: 6px; }
+.edit-issue { background: transparent; }
 
 .pane-label {
   color: var(--muted);
@@ -220,12 +249,21 @@ button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(-
 
 /* documents nav */
 .doc { margin-bottom: 12px; }
-.doc .doc-title { display: block; }
+.doc-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px; }
+.doc .doc-title { display: block; width: 100%; padding: 5px 0; border: 0; background: transparent; font-weight: 650; text-align: left; }
+.doc .doc-title:hover:not(:disabled) { color: var(--red); }
+.doc-id { color: var(--muted); font-size: 9px; }
 .doc .sections { display: flex; flex-wrap: wrap; gap: 2px 10px; padding-left: 1ch; }
 .doc .sections a { color: var(--muted); text-decoration: none; }
 .doc .sections a:hover { color: var(--red); text-decoration: underline; }
 .doc .sections a.read { color: var(--ink); }
 .hint { color: var(--muted); margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; }
+
+.thread-heading { display: flex; justify-content: space-between; gap: 12px; padding: 10px 11px; border-left: 3px solid var(--ink); background: #fff; }
+.thread-heading span { color: var(--muted); font-size: 10px; }
+.search-hit { display: grid; width: 100%; margin: 5px 0; padding: 9px 10px; background: var(--paper); text-align: left; }
+.search-hit strong { color: var(--red); font: 11px/1.3 var(--mono); }
+.search-hit span { margin-top: 3px; color: var(--muted); }
 
 /* ------------------------------------------------------------ transcript */
 
@@ -314,7 +352,7 @@ button.draft-redline:hover:not(:disabled) { background: var(--red); color: var(-
   opacity: 0.45;
 }
 #composer[aria-busy="true"] .tabform.active::after {
-  content: "scoring\2026";
+  content: "saving\2026";
   align-self: flex-end;
   margin-top: -39px;
   margin-right: 12px;

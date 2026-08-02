@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>playbook — the legal agent gym</title>
-<meta name="description" content="Play a synthetic legal matter against the deterministic engine that benchmarks AI legal agents. Every verified episode can become open training data.">
-<meta property="og:title" content="playbook — the legal agent gym">
-<meta property="og:description" content="Play a synthetic legal matter against the deterministic engine that benchmarks AI legal agents. Every verified episode can become open training data.">
+<title>playbook — deal review workspace</title>
+<meta name="description" content="Review a synthetic deal in a practical, document-native legal workspace.">
+<meta property="og:title" content="playbook — deal review workspace">
+<meta property="og:description" content="Review a synthetic deal in a practical, document-native legal workspace.">
 <meta property="og:image" content="https://jamesbaker1.github.io/playbook/og-card.png">
 <meta property="og:url" content="https://jamesbaker1.github.io/playbook/">
 <meta property="og:type" content="website">
@@ -17,58 +17,59 @@
 <body>
 <header>
   <a class="brand" href="./" aria-label="Playbook home"><span class="mark">playbook</span></a>
-  <span class="tag">the legal agent gym</span>
+  <span class="tag">deal review workspace</span>
   <span class="spacer"></span>
   <a class="header-link" href="https://github.com/jamesbaker1/playbook#readme">about</a>
-  <button id="help-btn" class="header-link" type="button">how to play</button>
-  <span id="mode-badge" class="mode-badge" hidden>learn mode</span>
+  <button id="help-btn" class="header-link" type="button">workspace guide</button>
+  <span id="mode-badge" class="mode-badge" hidden>guided review</span>
   <label class="pick">matter
     <select id="matter-select" disabled><option>booting…</option></select>
   </label>
   <button id="start-btn" class="primary" disabled>start matter</button>
+  <span id="save-status" class="save-status" hidden aria-live="polite">saved</span>
   <span id="budgets" class="budgets" hidden></span>
 </header>
 
 <div id="boot" class="boot">
   <section class="welcome">
-    <p class="eyebrow">Open, auditable legal-agent gym</p>
-    <h1>Can you review a deal<br>like a careful lawyer?</h1>
-    <p class="lede">Work a synthetic matter, make the judgment calls, and get a criterion-level score from the same deterministic engine that benchmarks AI legal agents. Every episode produces a complete audit trace — contribute yours, and it becomes verified, open training data.</p>
+    <p class="eyebrow">Synthetic transactional matters</p>
+    <h1>Review the deal.<br>Advise the client.</h1>
+    <p class="lede">Open the matter file, review each agreement in context, flag material issues, draft the language, and keep the deal team informed. The workspace handles the mechanics quietly while you work as you normally would.</p>
     <fieldset class="mode-picker" aria-label="Choose a mode">
       <legend>mode</legend>
       <label class="mode-option selected">
         <input type="radio" name="play-mode" value="learn" checked>
-        <span><strong>learn</strong><small>guided, with a final explanation</small></span>
+        <span><strong>Guided review</strong><small>workflow prompts and a final explanation</small></span>
       </label>
       <label class="mode-option">
         <input type="radio" name="play-mode" value="benchmark">
-        <span><strong>benchmark</strong><small>sealed — no hints until you submit</small></span>
+        <span><strong>Assessment review</strong><small>independent, with feedback after delivery</small></span>
       </label>
     </fieldset>
     <div class="welcome-actions">
-      <button id="welcome-start" class="primary">try the guided matter</button>
+      <button id="welcome-start" class="primary">start guided review</button>
       <span class="time-note">about 15–20 minutes</span>
-      <a href="https://github.com/jamesbaker1/playbook">view the research project →</a>
+      <a href="https://github.com/jamesbaker1/playbook#readme">about playbook →</a>
     </div>
     <div class="steps" aria-label="How Playbook works">
-      <div><b>01</b><strong>Read the record</strong><span>Inspect only the provisions that matter. Every action spends a step.</span></div>
-      <div><b>02</b><strong>Make the calls</strong><span>Ask targeted questions, flag risks, and draft operative redlines.</span></div>
-      <div><b>03</b><strong>See the evidence</strong><span>A criterion-level score and the complete audit trace, every point accounted for.</span></div>
-      <div><b>04</b><strong>Leave a trace</strong><span>Opt in, and your verified episode joins an open training set for legal agents.</span></div>
+      <div><b>01</b><strong>Open the file</strong><span>Read complete agreements with an outline and matter-wide search.</span></div>
+      <div><b>02</b><strong>Mark up the deal</strong><span>Select contract language to create an issue or draft a change.</span></div>
+      <div><b>03</b><strong>Advise the team</strong><span>Ask the client, escalate authority questions, and negotiate open points.</span></div>
+      <div><b>04</b><strong>Deliver the update</strong><span>Send a concise status report with issues, positions, and blockers.</span></div>
     </div>
     <div class="trust-row">
-      <span>10 synthetic matters</span><span>canonical scoring engine</span><span>no client documents</span><span>open source</span>
+      <span>10 synthetic matters</span><span>document-native review</span><span>no client documents</span><span>drafts stay on this device</span>
     </div>
     <details class="boot-details">
-      <summary><span id="boot-status">connecting to the scoring service…</span></summary>
-      <pre id="boot-log">checking service availability…</pre>
+      <summary><span id="boot-status">preparing your matters…</span></summary>
+      <pre id="boot-log">checking workspace availability…</pre>
     </details>
   </section>
 </div>
 
 <main id="main" hidden>
   <aside id="docs">
-    <p class="pane-label">1 · read the record</p>
+    <p class="pane-label">matter file</p>
     <div id="doc-list"></div>
     <section id="learned-facts" class="learned-facts" aria-labelledby="learned-facts-title">
       <div class="learned-facts-heading">
@@ -79,7 +80,7 @@
         <p class="learned-facts-empty">Ask the client or supervising counsel to add verified facts here.</p>
       </div>
     </section>
-    <p class="hint learn-only">Select a section to open it. Reading and searching each cost one step.</p>
+    <p class="hint learn-only">Open a document once, then move through it naturally. Select language to start work.</p>
   </aside>
 
   <section id="file" aria-label="Document workspace">
@@ -87,9 +88,9 @@
       <nav id="workspace-tabs" aria-label="Workspace view">
         <button type="button" data-view="document" class="active">document</button>
         <button type="button" data-view="review">review <span id="review-count" class="tab-count">0</span></button>
-        <button type="button" data-view="activity">activity</button>
+        <button type="button" data-view="activity">history</button>
       </nav>
-      <span id="current-document">no section open</span>
+      <span id="current-document">no document open</span>
     </div>
     <article id="document-view">
       <div class="empty-document">
@@ -98,6 +99,12 @@
         <p>Choose a section from the matter file on the left. The document opens here; questions and work product stay organized in the review pane.</p>
       </div>
     </article>
+    <div id="selection-tools" class="selection-tools" hidden role="toolbar" aria-label="Selected text actions">
+      <span id="selection-citation"></span>
+      <button type="button" data-selection-action="issue">flag issue</button>
+      <button type="button" data-selection-action="redline">draft change</button>
+      <button type="button" data-selection-action="copy">copy citation</button>
+    </div>
     <section id="review-view" hidden aria-label="Submitted work product">
       <div class="review-heading">
         <div><p class="eyebrow">work product</p><h2>your review</h2></div>
@@ -111,7 +118,7 @@
   </section>
 
   <aside id="composer">
-    <p class="pane-label">2 · build your review</p>
+    <p class="pane-label">deal team &amp; work product</p>
     <section id="next-step" class="next-step learn-only" aria-live="polite">
       <p class="eyebrow">recommended next</p>
       <strong id="next-step-title">start with context</strong>
@@ -126,17 +133,18 @@
       <li data-progress="finish">finish the review</li>
     </ol>
     <nav id="tabs" aria-label="Available actions">
-      <button data-tab="ask" class="active">ask client</button>
+      <button data-tab="ask" class="active">client</button>
       <button data-tab="search">search</button>
-      <button data-tab="issue">add issue</button>
-      <button data-tab="redline">redline</button>
-      <button data-tab="escalate">escalate</button>
-      <button data-tab="negotiate">negotiate</button>
-      <button data-tab="finish">finish</button>
+      <button data-tab="issue">issues</button>
+      <button data-tab="redline">drafting</button>
+      <button data-tab="escalate">supervisor</button>
+      <button data-tab="negotiate">counterparty</button>
+      <button data-tab="finish">status report</button>
     </nav>
 
     <form id="form-ask" class="tabform active">
-      <p class="form-help">Ask only facts that could change your advice or negotiating position.</p>
+      <p class="thread-heading"><strong>Client thread</strong><span>matter communications</span></p>
+      <p class="form-help">Send a focused question that could change your advice or negotiating position.</p>
       <label for="ask-question">Question for the client</label>
       <textarea id="ask-question" rows="3" placeholder="Will the service process regulated or sensitive data?" required></textarea>
       <button type="submit">ask the client</button>
@@ -184,6 +192,7 @@
     </form>
 
     <form id="form-escalate" class="tabform">
+      <p class="thread-heading"><strong>Supervising lawyer</strong><span>internal · privileged</span></p>
       <p class="form-help">Raise a decision that exceeds your delegated authority and explain why it needs supervision.</p>
       <label for="escalate-topic">Topic</label>
       <textarea id="escalate-topic" rows="2" placeholder="The decision that needs approval" required></textarea>
@@ -193,7 +202,8 @@
     </form>
 
     <form id="form-negotiate" class="tabform">
-      <p class="form-help">Send operative language on an issue you have opened. Each send or acceptance spends a negotiation round.</p>
+      <p class="thread-heading"><strong>Counterparty</strong><span>external negotiation</span></p>
+      <p class="form-help">Send operative language on an issue you have opened and review any counterproposal here.</p>
       <label for="markup-label">Issue to negotiate</label>
       <select id="markup-label" required><option value="">submit an issue first</option></select>
       <label>Provision</label>
@@ -205,7 +215,7 @@
     </form>
 
     <form id="form-finish" class="tabform">
-      <p class="form-help">Summarize priorities, client facts, and the positions that should block signature.</p>
+      <p class="form-help">A draft is generated from your issue list. Edit it into the concise update you would send to the supervising lawyer.</p>
       <label for="final-summary">Update for the supervising lawyer</label>
       <textarea id="final-summary" rows="7" placeholder="Lead with the highest-risk issues and recommended next steps." required></textarea>
       <button type="submit" class="danger">submit final work product</button>
@@ -216,19 +226,19 @@
     <button type="button" data-mobile-view="document">document</button>
     <button type="button" data-mobile-view="work">work</button>
     <button type="button" data-mobile-view="review">issues</button>
-    <button type="button" data-mobile-view="activity">activity</button>
+    <button type="button" data-mobile-view="activity">history</button>
   </nav>
 </main>
 
 <dialog id="help-dialog">
   <button id="close-help" class="dialog-close" aria-label="Close help">×</button>
-  <p class="eyebrow">how to play</p>
+  <p class="eyebrow">workspace guide</p>
   <h2>work the matter, not the rubric.</h2>
   <p>You are counsel on a synthetic deal. Read the instructions and playbook, inspect the operative contract provisions, and use the action panel to produce your review.</p>
   <div class="help-grid">
     <div><b>Start with context</b><p>Open the supervising-lawyer instructions and negotiation playbook before chasing contract issues.</p></div>
     <div><b>Cite carefully</b><p>Use <code>document §section</code>. Any quotation must be copied exactly from the cited section.</p></div>
-    <div><b>Use judgment</b><p>Questions and steps are limited. Prioritize facts and risks that could change the outcome.</p></div>
+    <div><b>Use judgment</b><p>Some review resources are limited. Prioritize facts and risks that could change the outcome.</p></div>
     <div><b>Close the loop</b><p>Submit issues before linking redlines to them, then finish with a concise lawyer update.</p></div>
   </div>
   <button id="help-start" class="primary" disabled>start the guided matter</button>
@@ -247,24 +257,26 @@
 <dialog id="finish-dialog" aria-labelledby="finish-title">
   <p class="eyebrow">final check</p>
   <h2 id="finish-title">ready to finish this review?</h2>
-  <p>Submitting ends the matter and calculates your score. You will not be able to edit this review afterward.</p>
+  <p>Delivering ends the matter. You will not be able to edit this review afterward.</p>
   <div id="finish-checklist" class="finish-checklist"></div>
   <div id="finish-warnings" class="finish-warnings" role="status"></div>
   <div class="dialog-actions">
     <button id="finish-back" type="button">keep reviewing</button>
-    <button id="finish-confirm" type="button" class="primary">submit and see score</button>
+    <button id="finish-confirm" type="button" class="primary">deliver status report</button>
   </div>
 </dialog>
 
 <footer>
-  <span>Scored by the canonical <a href="https://github.com/jamesbaker1/playbook">playbook_legal</a> service. Your review actions are sent to the service for evaluation.</span>
+  <span>Synthetic matters only. Draft work remains on this device until you send it.</span>
   <span><a href="https://github.com/jamesbaker1/playbook/blob/main/LICENSE">AGPL-3.0</a> · <a href="mailto:jamesbaker2019@gmail.com">commercial licensing</a></span>
-  <span id="engine-line"></span>
+  <span id="engine-line">workspace status</span>
 </footer>
 
 <script src="api-base.js"></script>
 <script src="citation.js"></script>
 <script src="score.js"></script>
+<script src="capture.js"></script>
+<script src="draft-store.js"></script>
 <script src="app.js"></script>
 <script src="contribute.js"></script>
 </body>

@@ -27,9 +27,23 @@ def test_observation_exposes_contract() -> None:
         "ask_client",
         "escalate",
         "submit_issue",
+        "revise_issue",
         "propose_redline",
+        "revise_redline",
         "submit_final",
     }
+
+
+def test_full_document_read_marks_every_section_read(ai_saas_env: PlaybookEnv) -> None:
+    observation, reward, *_ = ai_saas_env.step(
+        {"type": "read_document", "document_id": "msa"}
+    )
+    assert reward == 0.0
+    assert observation["last_result"]["section"] is None
+    read = ai_saas_env.reward_engine.state.read_citations
+    assert len([citation for citation in read if citation.startswith("msa ")]) == len(
+        ai_saas_env.documents["msa"]["sections"]
+    )
 
 
 def test_ask_client_free_text_reveals_only_requested_fact(ai_saas_env: PlaybookEnv) -> None:

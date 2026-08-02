@@ -1,6 +1,6 @@
-# Using the web gym
+# Using the deal review workspace
 
-The [Playbook web gym](https://jamesbaker1.github.io/playbook/) lets a person work
+The [Playbook deal review workspace](https://jamesbaker1.github.io/playbook/) lets a person work
 the same synthetic matters, under the same budgets and deterministic scoring
 rules, as an automated legal agent. It is designed to feel like a compact legal
 workspace: a matter file on the left, a document in the center, and work-product
@@ -13,11 +13,11 @@ are synthetic.
 
 1. Open the web gym and wait briefly for **matters ready** while the page checks the
    scoring service. No Python runtime or matter internals are downloaded.
-2. Choose **Learn** for workflow guidance and a final completeness check, or
-   **Benchmark** for a sealed attempt with no prompts or pre-submit warnings. Then
+2. Choose **Guided review** for workflow guidance and a final completeness check, or
+   **Assessment review** for an independent attempt with no prompts or pre-submit warnings. Then
    open the recommended matter or choose another from the header.
 3. Open the supervising-lawyer instructions and playbook before reviewing the
-   contract. Opening a section is an action and spends one step.
+   contract. A document opens in full and is cached for the rest of the review.
 4. Work the matter using the controls described below. The budget indicator in the
    header shows the steps, client questions, escalations, and (when applicable)
    negotiation rounds that remain.
@@ -27,12 +27,14 @@ are synthetic.
 6. Inspect the criterion-level score. You may download the audit trace, optionally
    contribute it, or choose another matter.
 
-Use **how to play** in the header for a shorter reminder inside the application.
+Use **workspace guide** in the header for a shorter reminder inside the application.
 
 ## Leaving and resuming
 
 While a matter is unfinished, the browser saves its matter ID, seed, mode, and exact
-accepted action sequence in local storage after every step. If you return on the same
+accepted action sequence in local storage after every action. Unsent form drafts are
+saved separately in the browser's IndexedDB after a short pause in typing, with a
+local-storage fallback when IndexedDB is unavailable. If you return on the same
 device, choose **resume review** to replay that sequence through the scoring service and
 reconstruct the workspace deterministically. The browser warns before a page exit or
 before replacing an active review. Final submission and an explicit discard remove the
@@ -45,30 +47,32 @@ to reproduce those products.
 
 | Area | Purpose |
 | --- | --- |
-| **Matter** | The left pane is the matter file. It lists documents and their sections, followed by facts learned from the client or supervising counsel. Select a section to read it. Previously opened sections are marked. |
-| **Document** | The center workspace displays the current provision. Citations in submitted issues can reopen their source text. |
-| **Work** | The right pane contains the actions used to investigate the matter and create work product. |
+| **Matter** | The left pane is the matter file. It lists documents and their outlines, followed by facts learned from the client or supervising counsel. Open a document by title or jump directly to a section. |
+| **Document** | The center workspace displays the complete document. Select clause text to flag an issue, begin a draft change, or copy its citation. Citations reopen and highlight their source. |
+| **Deal team & work product** | The right pane contains client, supervisor, and counterparty communications alongside issue, drafting, search, and status-report tools. |
 | **Issues** | The center **Review** tab collects submitted issues, their priority, analysis, citations, recommendation, and redline status. It is the closest view to a working issues list. |
 | **Activity** | The center **Activity** tab is the chronological audit trail: actions, client responses, search results, errors, and the final score. Questions and searches navigate here automatically. Intermediate rewards are deliberately withheld. |
 
 Submitting an issue or redline navigates to **Review**, so the new work product and its
 status are immediately visible.
 
-The progress checklist in Learn mode is orientation, not a guarantee of a good
-score. Benchmark mode hides this guidance. Legal correctness, grounding,
+The progress checklist in Guided review is orientation, not a guarantee of a good
+score. Assessment review hides this guidance. Legal correctness, grounding,
 prioritization, and drafting quality still matter.
 
 ## Actions
 
-Every action spends a step, including reading and searching. The exact environment
+Canonical actions spend a step, including opening a new document and searching. Moving
+within an already-open document, selecting text, and editing local drafts do not. The exact environment
 contract is documented in [Environment API](environment.md); the web controls map
 to it as follows.
 
-### Read a provision
+### Review a document
 
-Select a document section in **Matter**. Read selectively: opening every section
-can exhaust the step budget. The supervising-lawyer instructions and playbook
-usually provide the best starting context.
+Select a document title in **Matter** to open its complete text. Its outline jumps
+to sections without another request. The supervising-lawyer instructions and playbook
+usually provide the best starting context. `Ctrl/Cmd+Shift+F` opens matter search;
+`Alt+I` and `Alt+R` move to issue and drafting work.
 
 ### Ask the client
 
@@ -84,7 +88,8 @@ appear in Activity; opening a resulting section is a separate action.
 
 ### Add an issue
 
-Use **add issue** to submit:
+Select operative language and choose **flag issue** to prefill its citation and a
+stable internal label, then complete:
 
 - your own short internal label;
 - a clear title and priority;
@@ -102,7 +107,8 @@ failure. See [The scoring contract](scoring.md#quote-verification--the-fabricati
 
 ### Draft a redline
 
-Submit the issue first, then use **redline** or **Draft a redline** on its issue
+Submit the issue first, then select language and choose **draft change**, or use
+**Draft a redline** on its issue
 card. Choose the linked issue, identify the provision, supply complete replacement
 language, and explain how it implements the client position. Merely describing a
 change is not replacement language.
@@ -127,7 +133,8 @@ boundary.
 
 ### Finish the review
 
-Use **finish** for a concise update to the supervising lawyer. Lead with material
+Use **status report** for a concise update to the supervising lawyer. The workspace
+generates an editable first draft from the ordered issue list. Lead with material
 risks, relevant learned facts, recommended positions, and anything that should
 block signature.
 

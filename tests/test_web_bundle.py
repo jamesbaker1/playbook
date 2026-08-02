@@ -29,6 +29,8 @@ def test_site_build_produces_declared_assets(tmp_path: Path) -> None:
         "api-base.js",
         "citation.js",
         "score.js",
+        "capture.js",
+        "draft-store.js",
         "app.js",
         "contribute.js",
         "policy.json",
@@ -70,7 +72,7 @@ def test_step_failures_and_busy_state_are_visible_and_retryable(tmp_path: Path) 
     assert "activeSubmit.disabled = true" in app
     assert 'composer.setAttribute("aria-busy", "true")' in app
     assert '#composer[aria-busy="true"] .tabform.active' in style
-    assert 'content: "scoring\\2026"' in style
+    assert 'content: "saving\\2026"' in style
     assert "pointer-events: none" in style
 
     contribute = (out / "contribute.js").read_text(encoding="utf-8")
@@ -91,7 +93,36 @@ def test_citation_preflight_assets_are_wired() -> None:
     assert '"copy citation"' in app
     assert 'class="insert-section"' in index
     assert '<script src="citation.js"></script>' in index
+    assert '<script src="capture.js"></script>' in index
     assert ".field-error" in style and ".hard-warning" in style
+
+
+def test_semantic_capture_consent_pause_and_attachment() -> None:
+    node = shutil.which("node")
+    if node is None:
+        raise AssertionError("node is required to verify semantic capture")
+    subprocess.run(
+        [node, str(ROOT / "tests" / "capture.test.js")],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_consented_capture_auto_contributes_with_deterministic_idempotency() -> None:
+    contribute = (ROOT / "web" / "contribute.js").read_text(encoding="utf-8")
+    worker = (ROOT / "web" / "worker" / "worker.js").read_text(encoding="utf-8")
+
+    assert "if (captureStatus?.enabled)" in contribute
+    assert "automaticUploads.has(captureStatus.session_id)" in contribute
+    automatic = contribute.index("if (captureStatus?.enabled)")
+    manual_checkbox = contribute.index('consent.type = "checkbox"')
+    assert automatic < manual_checkbox
+    assert "PlaybookCapture.attachContribution" in contribute[automatic:manual_checkbox]
+    assert "trace:contribution:${contributionId}" in worker
+    assert "await env.TRACES.get(idempotencyKey)" not in worker
+    assert "await env.TRACES.put(idempotencyKey, key)" not in worker
 
 
 def test_citation_helpers_match_scorer_preflight_contract() -> None:
@@ -207,3 +238,84 @@ def test_score_screen_diagnoses_failures_and_builds_share_card() -> None:
         capture_output=True,
         text=True,
     )
+
+
+def test_attorney_workspace_uses_full_documents_and_selection_driven_work() -> None:
+    app = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
+    index = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+    style = (ROOT / "web" / "style.css").read_text(encoding="utf-8")
+    guide = (ROOT / "docs" / "web-gym.md").read_text(encoding="utf-8")
+
+    assert 'const action = { type: "read_document", document_id: docId };' in app
+    assert "documentCache.has(docId)" in app
+    assert "cacheDocumentSections(docId, lr.content)" in app
+    assert 'data-selection-action="issue"' in index
+    assert 'data-selection-action="redline"' in index
+    assert "currentSelection = { documentId: currentDocumentId, section" in app
+    assert "buildStatusReport()" in app
+    assert 'const DRAFT_KEY_PREFIX = "playbook.workspace-draft.v1."' in app
+    assert "window.setTimeout(persistWorkspaceDraft, 500)" in app
+    assert "window.PlaybookDraftStore.create" in app
+    assert "await draftStore.set" in app and "await draftStore.get" in app
+    assert "window.PlaybookCapture.create" in app
+    assert "window.PlaybookCapture.mountControls" in app
+    assert "capture_session_id: window.playbookCaptureSession" in app
+    assert "await beginCapture(id, resume?.capture_session_id || null)" in app
+    for event_type in (
+        "document.opened", "search.submitted", "selection.created",
+        "communication.sent", "counterparty.markup_sent",
+        "final.submitted", "validation.failed", "transport.error",
+    ):
+        assert f'capture("{event_type}"' in app
+    assert 'sessionId ? "matter.resumed" : "matter.opened"' in app
+    assert '"issue.revised" : "issue.saved"' in app
+    assert '"redline.revised" : "redline.saved"' in app
+    assert ".document-paper" in style and ".selection-tools" in style
+    assert "appendInlineMarkdown" in app
+    assert 'el("table", "document-table")' in app
+    assert 'el(ordered ? "ol" : "ul", "document-list")' in app
+    assert ".document-table th" in style and ".document-list li" in style
+    assert ".capture-controls" in style and ".capture-status" in style
+    assert "saved separately in the browser's IndexedDB" in guide
+    assert "local-storage fallback when IndexedDB is unavailable" in guide
+
+
+def test_workspace_can_edit_and_resume_latest_issue_and_redline_revisions() -> None:
+    app = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
+
+    assert 'revise_issue: "issue"' in app
+    assert 'revise_redline: "redline"' in app
+    assert 'actionType = e.target.dataset.revising === "true" ? "revise_issue"' in app
+    assert 'actionType = e.target.dataset.revising === "true" ? "revise_redline"' in app
+    assert 'submittedRedlines = new Map();' in app
+    assert '["submit_issue", "revise_issue"].includes(action.type)' in app
+    assert '["propose_redline", "revise_redline"].includes(action.type)' in app
+    assert 'submittedIssues.set(action.issue_id, action)' in app
+    assert 'submittedRedlines.set(`${action.issue_id}|${action.document_id}|${action.section}`, action)' in app
+
+
+def test_workspace_draft_store_has_tested_localstorage_fallback() -> None:
+    node = shutil.which("node")
+    if node is None:
+        raise AssertionError("node is required to verify workspace draft persistence")
+    subprocess.run(
+        [node, str(ROOT / "tests" / "draft_store.test.js")],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_active_workspace_uses_lawyer_facing_language() -> None:
+    app = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
+    index = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+
+    assert "Guided review" in index and "Assessment review" in index
+    assert "canonical scoring engine" not in index
+    assert "Scored by the canonical" not in index
+    assert "connecting to the scoring service" not in index
+    assert 'document.createTextNode("review capacity ")' in app
+    assert '"guided review"' in app and '"assessment review"' in app
+    assert 'addEntry("client reply"' in app
+    assert 'addEntry("supervising lawyer reply"' in app
