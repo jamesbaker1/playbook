@@ -76,7 +76,8 @@ The evidence release: the environment stops being unmeasured.
 
 - [x] Rollout generation and scoring (`training/generate_rollouts.py`).
 - [x] LoRA SFT scaffold (`training/sft_lora.py`, Modal: `modal_app.py::sft`).
-- [ ] Run baselines (API + open models) on dev and held-out splits.
+- [x] Run open-model baselines on the dev split (v0.4, `results/v0.4.0/`);
+      API-reference and held-out baselines still pending.
 - [ ] Legally review high-scoring trajectories; train the first adapter.
 - [ ] Evaluate base vs. SFT on the private held-out matters.
 

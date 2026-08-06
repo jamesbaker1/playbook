@@ -75,8 +75,14 @@ secondary_reporting:
     scope: per_condition
     purpose: detect_tool_calling_regressions
 execution:
-  model_selection_status: pending_owner_approval
-  base_model: null
+  base_model_selection_status: approved
+  base_model: Qwen/Qwen2.5-14B-Instruct
+  base_model_approval: owner, 2026-08-06, after dev-split baselines (results/v0.4.0)
+  teacher_model_selection_status: pending_owner_approval
   teacher_model: null
+  teacher_note: >-
+    Qwen2.5-32B rejected by the 2026-08-06 rollout-yield pilot (0/8 above the
+    0.5 score bar). Next candidate: a 70B-class open-weight teacher behind a
+    hosted API with a scaffolded workflow prompt.
   budget_status: pending_owner_approval
   paid_budget_usd: null

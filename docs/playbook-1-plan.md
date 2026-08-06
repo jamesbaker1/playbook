@@ -20,15 +20,18 @@ search, ask, identify, draft, escalate, negotiate, or finish.
 
 ## Current position
 
-> **Implementation update (2026-08-06):** The immediate no-cost package is
-> implemented and green. The repository now has deterministic final-answer,
-> trajectory-chat, and state-action dataset views; replay verification and
-> prompt/outcome separation checks; a contamination-safe family registry;
-> constrained semantic variant and catalog builders; a frozen experiment
-> contract with critical-failure rate as the primary metric; family-clustered
-> uncertainty reporting; reviewed dataset-freeze gates; and same-state
-> decision-preference pairs. The next repository-side constraint is corpus
-> scale and qualified review, not another training-data representation.
+> **Implementation update (2026-08-06, evening):** v0.4.0 shipped. Measured
+> dev-split baselines are published for Qwen2.5-7B/14B/32B against the 0.985
+> reference-replay ceiling (best model 0.165; critical-failure rate rising
+> with scale; see `results/v0.4.0/` and `docs/baseline-report.md`). The
+> variant catalog holds 12 training families / 42 variants. The rollout-yield
+> pilot validated the generate→filter→dataset pipeline end to end and
+> rejected Qwen2.5-32B as teacher (0/8 above a 0.5 score bar), adding the
+> minimum-score filter to Workstream 4. The owner approved
+> Qwen/Qwen2.5-14B-Instruct as the student base; the teacher choice and paid
+> budget remain open. The sealed private corpus holds six verified held-out
+> families toward the 10-15 target. The binding constraints are now the
+> teacher choice, qualified review capacity, and sealed-corpus completion.
 
 The repository already has the core environment needed for the experiment:
 
@@ -43,15 +46,13 @@ The repository already has the core environment needed for the experiment:
 
 The limiting factors are evidence and data, not the basic environment:
 
-- no measured model or human baselines have been published;
+- model baselines are published for the dev split only; no held-out or human
+  baselines exist yet;
+- no viable teacher has been identified (the 32B pilot failed the score bar);
 - the current human SFT artifact contains only one record;
-- current SFT consumes complete trajectories rather than an explicit
-  state-action dataset;
-- current DPO compares whole episodes rather than competing actions from the
-  same state;
-- there is no final-answer-only SFT control; and
-- six held-out matters do not support the intended 50-100 episode evaluation
-  without additional sealed matter families or variants.
+- qualified legal review capacity has not been named or budgeted; and
+- the sealed corpus holds six families against the 10-15 family, 50-100
+  episode evaluation target.
 
 ## Experiment contract
 

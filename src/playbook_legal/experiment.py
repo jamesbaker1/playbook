@@ -91,8 +91,9 @@ def load_experiment_contract(path: Path) -> dict[str, Any]:
         _require(gate.get("direction") in {"minimize", "maximize"}, f"bad direction for {metric}")
 
     execution = contract.get("execution", {})
-    if execution.get("model_selection_status") != "approved":
+    if execution.get("base_model_selection_status") != "approved":
         _require(execution.get("base_model") is None, "unapproved base model must remain null")
+    if execution.get("teacher_model_selection_status") != "approved":
         _require(execution.get("teacher_model") is None, "unapproved teacher model must remain null")
     if execution.get("budget_status") != "approved":
         _require(execution.get("paid_budget_usd") is None, "unapproved paid budget must remain null")

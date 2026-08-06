@@ -24,7 +24,9 @@ def test_repository_experiment_contract_is_frozen_and_valid() -> None:
     contract = load_experiment_contract(CONTRACT)
     assert contract["primary_metric"]["name"] == "critical_failure_rate"
     assert contract["uncertainty"]["resampling_unit"] == "matter_family"
-    assert contract["execution"]["base_model"] is None
+    assert contract["execution"]["base_model"] == "Qwen/Qwen2.5-14B-Instruct"
+    assert contract["execution"]["base_model_selection_status"] == "approved"
+    assert contract["execution"]["teacher_model"] is None
 
 
 def test_contract_requires_matched_sft_token_budgets(tmp_path: Path) -> None:
@@ -54,7 +56,7 @@ def test_contract_rejects_episode_level_resampling(tmp_path: Path) -> None:
 
 def test_pending_execution_cannot_smuggle_in_model_or_budget(tmp_path: Path) -> None:
     contract = yaml.safe_load(CONTRACT.read_text(encoding="utf-8"))
-    contract["execution"]["base_model"] = "some/model"
+    contract["execution"]["base_model_selection_status"] = "pending_owner_approval"
     with pytest.raises(ValueError, match="must remain null"):
         load_experiment_contract(_write(tmp_path, contract))
 
