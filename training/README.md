@@ -82,8 +82,11 @@ SFT until the review gate and baseline are complete.
 2. Rollouts: `python training/generate_rollouts.py`, then legally review important
    actions and retain high-scoring, critical-free trajectories for SFT.
 3. SFT: `modal run training/modal_app.py::sft`.
-4. Preference pairs: `python training/build_pairs.py`; then DPO with
-   `modal run training/modal_app.py::dpo`.
+4. Decision preferences: collect two reviewed candidate actions from the identical
+   pre-action observation, then run `playbook-decision-pairs`. Verify and freeze the
+   resulting release before DPO. `training/build_pairs.py` remains an episode-level
+   ablation and is not the Playbook-1 decision-level treatment. Launch DPO only with
+   `modal run training/modal_app.py::dpo` after state-action SFT clears its gate.
 5. Run `pytest tests/test_adversarial.py` and add regressions for newly observed
    reward hacking before considering online RL.
 6. GRPO: `modal run training/modal_app.py::grpo`; this is heavier and configured

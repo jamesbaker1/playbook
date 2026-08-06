@@ -50,8 +50,27 @@ decide, and what you give away when someone pushes back.
       Tests false-positive discipline, which no issue-bearing matter can.
 - [x] `nego_saas_010` — the negotiation matter: a scripted counterparty with a genuine
       concession, a trap counter, and a client red line the agent must refuse to trade.
-- [ ] Baseline numbers for escalation recall and settled-issue quality across models;
-      confirm the trap counter is actually trapping.
+- [x] Baseline numbers for escalation recall and settled-issue quality across models;
+      confirm the trap counter is actually trapping. *(v0.4: measured across
+      Qwen2.5-7B/14B/32B — and the 7B accepted the trap counter, so it traps.)*
+
+## Phase 2.75 — Scale and measurement ✅ (v0.4, this release)
+
+The evidence release: the environment stops being unmeasured.
+
+- [x] **First measured model baselines**: Qwen2.5-7B/14B (3 seeds) and 32B (1 seed)
+      on all 12 public matters via native tool calling against vLLM-on-Modal
+      (`training/modal_vllm.py`); reference-replay ceiling 0.985; scorecards in
+      `results/v0.4.0/`, analysis in `docs/baseline-report.md`. Headline: best model
+      0.165, zero useful client questions, critical-failure rate rising with scale.
+- [x] **Family catalog scaled 5 → 12 families / 14 → 42 variants** — every public
+      matter now backs a replay-verified train family; all eight variation dimensions
+      covered; builds byte-deterministic.
+- [x] **Playbook-1 contract hardened**: CI-based preregistered decision rule,
+      state-action-vs-base secondary comparison, per-condition protocol-failure
+      reporting, eval-family contamination rule, reviewer-hours budgeting.
+- [x] Versioned dataset views, freeze gates, same-state decision pairs, and the
+      frozen experiment validator (`playbook-experiment-check`).
 
 ## Phase 3 — Trajectories and SFT (scaffolded, not yet run)
 

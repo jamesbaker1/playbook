@@ -29,6 +29,45 @@ and structured review actions on the right. On mobile, a bottom bar switches amo
 Matter, Document, Work, Issues, and Activity without losing drafts. See the
 [web-gym guide](docs/web-gym.md).
 
+## Why this matters for legal practice
+
+Law firms evaluating AI do not primarily need another essay benchmark — they
+need to know whether a model can be trusted inside a workflow: does it read the
+actual paper, ask the client the right questions, respect authority limits,
+stand firm on non-negotiables, and never invent a quotation? Playbook measures
+exactly that, with deterministic scoring and a complete audit trace for every
+episode. Three uses today:
+
+- **Model evaluation for legal-tech decisions.** Published scorecards measure
+  real models on multi-step transactional review — including the failure modes
+  that matter in practice: fabricated quotes, prohibited concessions, missed
+  escalations, trap counters accepted.
+- **Associate training.** The web workspace is a flight simulator for deal
+  review: synthetic matters, instant rubric feedback, and an audit trail —
+  Learn mode for guidance, Benchmark mode for a sealed attempt.
+- **Post-training research.** Complete trajectories, state-action datasets,
+  and preference pairs exported from the same environment (see
+  [the Playbook-1 plan](docs/playbook-1-plan.md)).
+
+## Measured baselines
+
+Three open-weight models, measured on all 12 public matters through the same
+tool-calling interface a deployed assistant would use (v0.4.0, temperature 0.2;
+full scorecards in [`results/v0.4.0/`](results/v0.4.0/), narrative analysis in
+[the baseline report](docs/baseline-report.md)):
+
+| Model | Episodes | Score | Critical-failure rate | Issue recall | Question recall |
+| --- | --- | --- | --- | --- | --- |
+| Expert reference (replay) | 12 | 0.985 | 0.000 | 0.917 | 0.958 |
+| Qwen2.5-7B-Instruct | 36 | 0.031 | 0.056 | 0.106 | 0.021 |
+| Qwen2.5-14B-Instruct | 36 | 0.165 | 0.139 | 0.312 | 0.000 |
+| Qwen2.5-32B-Instruct | 12 | 0.076 | 0.250 | 0.208 | 0.000 |
+
+The headline: raw models complete their reviews but work shallowly — no model
+asks useful client questions, and the critical-failure rate (fabricated
+quotes, unauthorized concessions, accepted trap counters) **rises** with model
+scale as larger models engage more without better judgment.
+
 ## The v0.3 scoring contract
 
 Credit is earned by **content**, never by guessing rubric internals:
@@ -90,6 +129,15 @@ function calling can play the environment via the baseline runner.
 | `playbook-baseline-sprint --models ...` | Plan or run the budget-gated, split-labeled baseline sprint |
 | `playbook-render <trace> <out.html>` | Render a trace as an HTML audit report |
 | `playbook-export <trace> <out.jsonl>` | Convert a trace to chat-format SFT data |
+| `playbook-dataset <traces...> --registry <families.yaml> --out <dir>` | Build versioned final-answer, trajectory, and state-action views |
+| `playbook-dataset-check <release-dir>` | Verify dataset hashes, records, registry, and prompt/outcome separation |
+| `playbook-dataset-freeze <build> <data-card.yaml> --out <dir>` | Create a reviewed content-addressed dataset release |
+| `playbook-dataset-freeze-check <release-dir>` | Verify a frozen release and its nested dataset |
+| `playbook-decision-pairs <candidates.jsonl> --registry <families.yaml> --out <dir>` | Build reviewed same-state DPO pairs |
+| `playbook-decision-pairs-check <release-dir>` | Verify pair hashes, lineage, and outcome separation |
+| `playbook-experiment-check [contract.yaml]` | Validate the frozen Playbook-1 experiment contract |
+| `playbook-variants <family.yaml> --out <dir>` | Materialize and validate a synthetic matter family |
+| `playbook-variants-build <catalog.yaml> --out <dir>` | Atomically build families, merged registry, and target report |
 
 ## Web gym
 

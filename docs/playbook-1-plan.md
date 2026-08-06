@@ -20,6 +20,16 @@ search, ask, identify, draft, escalate, negotiate, or finish.
 
 ## Current position
 
+> **Implementation update (2026-08-06):** The immediate no-cost package is
+> implemented and green. The repository now has deterministic final-answer,
+> trajectory-chat, and state-action dataset views; replay verification and
+> prompt/outcome separation checks; a contamination-safe family registry;
+> constrained semantic variant and catalog builders; a frozen experiment
+> contract with critical-failure rate as the primary metric; family-clustered
+> uncertainty reporting; reviewed dataset-freeze gates; and same-state
+> decision-preference pairs. The next repository-side constraint is corpus
+> scale and qualified review, not another training-data representation.
+
 The repository already has the core environment needed for the experiment:
 
 - deterministic scoring, traces, and replay;
@@ -50,7 +60,9 @@ Freeze the experiment before generating or reviewing training data.
 ### Scope
 
 - Domain: transactional technology agreements.
-- Base: one open-weight instruct model in the 7B-14B range.
+- Base: one open-weight instruct model in the 7B-14B range, selected for
+  reliable native function calling and at least a 32k context window (the
+  action contract requires structured tool calls over multi-document matters).
 - Initial capabilities: issue spotting, factual-question selection,
   escalation, redline choice, and negotiation under authority constraints.
 - Training: LoRA SFT first, decision-level DPO second.
@@ -61,14 +73,46 @@ Freeze the experiment before generating or reviewing training data.
 ### Required model comparison
 
 1. Unmodified base model.
-2. Final-answer-only SFT using the same base model.
-3. Playbook trajectory/state-action SFT using the same base model.
-4. Trajectory SFT plus DPO, if the SFT result clears its gate.
-5. One strong API model as an external reference, not a training control.
+2. Final-answer-only distillation using outputs from the same open-weight teacher.
+3. Playbook state-action distillation using trajectories from that teacher.
+4. State-action distillation plus decision-level DPO, if the SFT result clears
+   its gate.
+5. The larger open-weight teacher as an external reference.
+6. One strong API model as an optional external reference, not a training
+   control.
 
-The two SFT conditions must use matched training-token budgets and comparable
-hyperparameter selection. This prevents a larger dataset or compute budget from
-being mistaken for evidence that process supervision works.
+The two distilled SFT conditions must use the same teacher, matched
+training-token budgets, and comparable hyperparameter selection. This prevents
+teacher quality, a larger dataset, or a larger compute budget from being
+mistaken for evidence that process supervision works.
+
+State-action SFT must also outperform the unmodified base model on the primary
+metric, and per-condition protocol-failure rates must be reported. Final-answer
+SFT can degrade the base model's tool-calling behavior; without the base
+comparison and protocol-failure reporting, a trajectory-SFT "win" could reflect
+a broken control rather than better process decisions.
+
+### Initial execution strategy: teacher to student
+
+The first Playbook-1 training run should distill a capable, larger open-weight
+instruct model into a smaller open-weight student. The teacher generates
+multiple candidate trajectories inside Playbook; protocol failures,
+non-reproducible traces, and critical failures are rejected; and a qualified
+reviewer approves or corrects the actions selected for positive training data.
+
+This stage tests whether Playbook can generate, validate, and transfer useful
+workflow supervision. It does **not** by itself establish that reinforcement
+learning works: an improved student may simply be imitating a stronger model.
+The first controlled result is therefore state-action distillation versus
+matched final-answer-only distillation. A separate, subsequent comparison of
+the state-action student before and after decision-level DPO or
+environment-guided RL is required to attribute additional gains to environment
+feedback.
+
+The initial model should be described as a **Playbook-distilled workflow
+model** until that post-distillation comparison clears the preregistered gates.
+Online RL remains out of scope for the first result; decision-level DPO is the
+preferred lower-risk test of environment-derived preferences.
 
 ### Metrics
 
@@ -95,6 +139,19 @@ Trajectory SFT must outperform final-answer-only SFT on the preregistered
 primary process metric on sealed matter families without materially degrading
 citation validity, fabricated-evidence rate, or completion. Any regression in a
 critical safety gate blocks release regardless of mean score.
+
+### Preregistered decision rule
+
+The primary comparison is judged on the family-clustered uncertainty interval,
+not the point estimate alone: state-action SFT beats final-answer SFT only if
+the one-sided 95% cluster-bootstrap confidence interval (resampled by matter
+family) for the difference in critical-failure rate excludes zero. Safety-gate
+regressions are judged against the same clustered intervals. Because
+critical-failure rate is a rare-event metric, sealed evaluation families must
+be designed with enough temptation density — traps, prohibited concessions,
+escalation pressure — that the unmodified base model's critical-failure rate is
+well off the floor; a floor-effect metric cannot demonstrate improvement.
+Target 15-20 sealed families and the top of the 50-100 episode range.
 
 ## Workstream 1: dataset representations
 
@@ -152,6 +209,19 @@ Initial target:
 Family-level separation is mandatory. Variants of one latent template must not
 be divided between training and evaluation.
 
+Sealed evaluation families cannot be derived from the twelve public development
+matters: those matters are visible to every model and person during
+development, so any variant of them is contaminated as evaluation content.
+Evaluation families must be authored as new, structurally distinct matter
+content in the private repository; the public catalog tracks training families
+only.
+
+The current transform vocabulary (budgets, roles, hidden facts, public facts,
+document order, issue presence) does not yet reach counterparty behavior:
+resistance profiles, fallback chains, and trap positions are fixed per base
+matter. Negotiation-side transforms are the next required generator capability
+and a precondition for several required pair categories in Workstream 6.
+
 ### Acceptance
 
 - Every variant passes matter lint and reference replay.
@@ -162,9 +232,10 @@ be divided between training and evaluation.
 
 ## Workstream 3: baselines
 
-Before fine-tuning, run the selected base model on public development matters
-and sealed evaluation families. Run one strong API model under the same action
-contract as an external reference.
+Before fine-tuning, run the selected student base model and open-weight teacher
+on public development matters and sealed evaluation families. Optionally run
+one strong API model under the same action contract as an additional external
+reference.
 
 Every run must preserve:
 
@@ -180,13 +251,30 @@ Baseline execution remains gated on an explicit model choice and approved
 budget. Reference trajectories are an engine check and upper-bound aid, not a
 model baseline.
 
+Before authoring new families at scale, run the candidate teacher on the
+existing materialized variants and measure rollout yield: the fraction of
+candidate trajectories that survive protocol, reproducibility, and
+critical-failure filters. A low yield changes the rollout budget and may change
+the teacher choice; measure it while the catalog is still small.
+
 ## Workstream 4: rollout generation and legal review
 
-Generate several candidate trajectories per training variant. Automatically
-reject protocol failures, incomplete episodes, non-reproducible traces, and
-critical failures from positive SFT data. Do not simply select the highest
-scoring path: sample across matter families, decisions, score bands, and failure
-types for qualified legal review.
+Use the larger open-weight teacher to generate several candidate trajectories
+per training variant. Automatically reject protocol failures, incomplete
+episodes, non-reproducible traces, and critical failures from positive SFT
+data — and enforce a preregistered minimum normalized score on top of those
+mechanical filters. Normalization clamps negative raw rewards to zero, so the
+mechanical chain alone cannot distinguish "did nothing" from "actively wrong";
+the 2026-08-06 pilot passed 6 of 8 candidates through the mechanical filters
+while 0 of 8 cleared a 0.5 score bar. Do not simply select the highest scoring
+path: sample across matter families, decisions, score bands, and failure types
+for qualified legal review.
+
+Pilot finding (2026-08-06): Qwen2.5-32B-Instruct at temperature 0.7 with the
+generic baseline prompt scored 0.00-0.19 against 0.97-1.00 references on four
+new-family variants. The teacher for Workstream 4 must therefore be a stronger
+model, a scaffolded/structured prompt, or high-N best-of-N sampling — and the
+rollout budget must be re-estimated after the teacher choice, not before.
 
 Training sources, in priority order:
 
@@ -197,6 +285,11 @@ Training sources, in priority order:
 The reviewer should correct material actions and record why alternatives are
 inferior. This produces both better demonstrations and decision-level
 preference data.
+
+Qualified review is a budgeted resource like GPU time. At roughly one to two
+minutes per state-action record, the 2,000-5,000-record target implies 30-150+
+hours of reviewer time. Name the reviewers, their qualifications, and the
+approved hours in the data card before rollout generation begins.
 
 ### Data freeze gate
 
@@ -217,15 +310,16 @@ Never train automatically from the live human-trace inbox.
 
 Train in this order:
 
-1. final-answer-only LoRA SFT;
-2. trajectory/state-action LoRA SFT;
+1. final-answer-only LoRA distillation from the open-weight teacher;
+2. state-action LoRA distillation from the same teacher;
 3. blind evaluation of both against the unchanged base;
 4. one small, preregistered hyperparameter adjustment if necessary; and
 5. a final frozen comparison.
 
-Keep the base model, train/evaluation families, training-token budget, and
-evaluation settings constant. Save adapters, configurations, logs, checkpoints,
-dataset hashes, and environment versions.
+Keep the teacher, student base model, train/evaluation families, training-token
+budget, and evaluation settings constant. Save teacher and student revisions,
+adapters, configurations, logs, checkpoints, dataset hashes, and environment
+versions.
 
 The state-action format is the main scientific treatment. Complete-trajectory
 SFT may be retained as a secondary ablation if budget permits.
@@ -248,6 +342,12 @@ Required pair categories include:
 Each pair should retain the preference source and structured reason. Train DPO
 only if trajectory SFT first demonstrates a viable policy. Evaluate the DPO
 adapter through full episodes, not only held-out preference accuracy.
+
+This before/after comparison is the first test of whether Playbook environment
+feedback improves the student beyond teacher imitation. Do not describe the
+distillation-only result as evidence for reinforcement learning. Consider
+online RL only after DPO improves sealed full-episode outcomes without weakening
+the critical safety gates.
 
 ## Workstream 7: blind evaluation and adversarial gates
 
@@ -310,10 +410,10 @@ autonomously negotiating.
 experiment specification
   -> state-action and final-answer dataset builders
   -> synthetic family variation and sealed split
-  -> base-model baselines
-  -> reviewed and frozen training corpus
-  -> final-answer SFT
-  -> trajectory/state-action SFT
+  -> student-base and open-weight-teacher baselines
+  -> teacher rollouts, legal review, and frozen training corpus
+  -> matched final-answer distillation
+  -> matched state-action distillation
   -> blind controlled comparison
   -> decision-level DPO
   -> release
@@ -321,13 +421,23 @@ experiment specification
 
 ## Immediate next package
 
-The first implementation package should require no paid API or GPU work:
+The first implementation package required no paid API or GPU work:
 
-1. finalize this experiment contract, including the primary metric;
-2. add the state-action and final-answer dataset views;
-3. add a contamination-safe matter-family registry;
-4. test prompt/outcome separation and family-level split enforcement; and
-5. write the reproducible dataset manifest format.
+1. [x] finalize this experiment contract, including the primary metric;
+2. [x] add the state-action and final-answer dataset views;
+3. [x] add a contamination-safe matter-family registry;
+4. [x] test prompt/outcome separation and family-level split enforcement; and
+5. [x] write the reproducible dataset manifest format.
 
-Once that package is green, choose the base model and approve the baseline and
-rollout budget before incurring external cost.
+The next no-cost repository package is:
+
+1. expand the family catalog from the current 12 training families (42 variants)
+   toward 20-30 training families and at least 10 sealed evaluation families;
+2. materialize 100-200 semantically varied, lint-clean variants with replayed
+   reference trajectories and adversarial gate coverage;
+3. build and verify candidate dataset releases, then measure family, action,
+   failure-type, and review-coverage gaps against the target distribution;
+4. route the candidate records through qualified legal review and freeze only
+   the approved, critical-free positive-SFT subset; and
+5. choose the base model and approve the baseline and rollout budget before
+   incurring external cost.

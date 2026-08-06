@@ -87,6 +87,7 @@ def test_bench_replay_scorecard(tmp_path: Path, monkeypatch) -> None:
     assert payload["split"] == "custom"
     assert payload["aggregate"]["episodes"] >= 1
     assert payload["aggregate"]["critical_failure_free_rate"] == 1.0
+    assert payload["aggregate"]["critical_failure_rate"] == 0.0
     markdown = out.with_suffix(".md").read_text(encoding="utf-8")
     assert markdown.startswith("# Playbook scorecard")
     assert "Split: `custom`" in markdown
@@ -115,6 +116,34 @@ def test_bench_records_explicit_split(tmp_path: Path, monkeypatch) -> None:
     payload = json.loads(out.with_suffix(".json").read_text(encoding="utf-8"))
     assert payload["split"] == "held-out"
     assert "Split: `held-out`" in out.with_suffix(".md").read_text(encoding="utf-8")
+
+
+def test_bench_reports_family_clustered_uncertainty(tmp_path: Path, monkeypatch) -> None:
+    out = tmp_path / "family-scorecard"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "playbook-bench",
+            "--matters",
+            str(ROOT / "matters"),
+            "--examples",
+            str(EXAMPLES),
+            "--runner",
+            "replay",
+            "--split",
+            "dev",
+            "--family-registry",
+            str(ROOT / "datasets" / "matter-families.yaml"),
+            "--out",
+            str(out),
+        ],
+    )
+    bench_main()
+    payload = json.loads(out.with_suffix(".json").read_text(encoding="utf-8"))
+    assert all("matter_family_id" in row for row in payload["episodes"])
+    assert payload["uncertainty"]["metric"] == "critical_failure_rate"
+    assert payload["uncertainty"]["resampling_unit"] == "matter_family"
 
 
 def test_bench_rejects_duplicate_deterministic_replay_seeds(tmp_path: Path, monkeypatch) -> None:
