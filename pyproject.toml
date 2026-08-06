@@ -55,5 +55,10 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 
+[tool.ruff.lint.isort]
+# The repo's datasets/ directory (variant family catalog) must not shadow the
+# HuggingFace `datasets` package in import classification.
+known-third-party = ["datasets"]
+
 [tool.ruff.lint.per-file-ignores]
 "training/*" = ["E402"]
