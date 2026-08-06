@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from playbook_legal.loaders import _parse_sections, load_documents
+from playbook_legal.loaders import load_documents, parse_sections
 
 # `compiler/` sits at the repo root rather than under src/, and pytest only puts
 # tests/ on sys.path. Import it explicitly so this file works under `pytest -q`,
@@ -237,7 +237,7 @@ def render_thread_document() -> str:
 
 
 def test_thread_renders_one_section_per_message() -> None:
-    sections = _parse_sections(render_thread_document())
+    sections = parse_sections(render_thread_document())
 
     assert {"3.1", "3.2", "3.3"} <= set(sections)
     assert sections["3.1"].startswith("## 3.1 From: A. Okafor")
@@ -249,7 +249,7 @@ def test_thread_renders_one_section_per_message() -> None:
 
 
 def test_quoted_markdown_heading_in_a_body_cannot_forge_a_section() -> None:
-    sections = _parse_sections(render_thread_document())
+    sections = parse_sections(render_thread_document())
 
     assert "4.2" not in sections
     assert "\\## 4.2 quoted from their draft" in sections["3.2"]
@@ -276,7 +276,7 @@ def test_multiple_threads_get_distinct_tokens() -> None:
         correspondence.build_thread("Instructions", THREAD[:2]),
         correspondence.build_thread("Counterparty", THREAD[2:]),
     ]
-    sections = _parse_sections(correspondence.render_document(threads, title="Correspondence"))
+    sections = parse_sections(correspondence.render_document(threads, title="Correspondence"))
 
     assert [key for key in sections if key != "full"] == ["1.1", "1.2", "2.1"]
 
@@ -287,7 +287,7 @@ def test_title_and_intro_stay_out_of_the_message_sections() -> None:
         title="Matter Correspondence",
         intro="## not a section — thread filed from the DMS",
     )
-    sections = _parse_sections(document)
+    sections = parse_sections(document)
 
     assert [key for key in sections if key != "full"] == ["1.1"]
     assert "# Matter Correspondence" in sections["full"]

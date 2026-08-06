@@ -5,7 +5,7 @@
 Correspondence is where the *reasoning* of a deal lives: the supervising lawyer's
 instructions, the client's answers, the counterparty's refusals. Playbook already
 has a document format that can carry it with no runtime change, because
-``playbook_legal.loaders._parse_sections`` addresses any ``## <token> <title>``
+``playbook_legal.loaders.parse_sections`` addresses any ``## <token> <title>``
 heading and the reward engine cites sections as ``<document_id> §<token>``.
 
 This module renders a thread so that **one message is one section**::

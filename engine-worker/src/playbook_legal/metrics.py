@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import random
 from typing import Any
 
 
@@ -121,7 +122,63 @@ def aggregate_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     aggregate["critical_failure_free_rate"] = round(
         sum(1 for row in rows if not row.get("critical_failure")) / len(rows), 4
     )
+    aggregate["critical_failure_rate"] = round(
+        sum(1 for row in rows if row.get("critical_failure")) / len(rows), 4
+    )
     aggregate["completion_rate"] = round(
         sum(1 for row in rows if row.get("terminated")) / len(rows), 4
     )
     return aggregate
+
+
+def cluster_bootstrap_interval(
+    rows: list[dict[str, Any]],
+    metric: str,
+    *,
+    family_key: str = "matter_family_id",
+    samples: int = 2000,
+    confidence_level: float = 0.95,
+    seed: int = 0,
+) -> dict[str, Any]:
+    """Bootstrap a mean by resampling matter families as intact clusters."""
+    if samples <= 0:
+        raise ValueError("samples must be positive")
+    if not 0 < confidence_level < 1:
+        raise ValueError("confidence_level must be between zero and one")
+    families: dict[str, list[float]] = {}
+    for row in rows:
+        if family_key not in row:
+            raise ValueError(f"row is missing {family_key}")
+        value = (
+            float(bool(row.get("critical_failure")))
+            if metric == "critical_failure_rate"
+            else float(row[metric])
+        )
+        families.setdefault(str(row[family_key]), []).append(value)
+    if not families:
+        return {}
+
+    family_ids = sorted(families)
+    rng = random.Random(seed)
+    estimates: list[float] = []
+    for _ in range(samples):
+        selected = rng.choices(family_ids, k=len(family_ids))
+        values = [value for family_id in selected for value in families[family_id]]
+        estimates.append(sum(values) / len(values))
+    estimates.sort()
+    tail = (1 - confidence_level) / 2
+    lower_index = max(0, int(tail * samples))
+    upper_index = min(samples - 1, int((1 - tail) * samples) - 1)
+    observed = [value for values in families.values() for value in values]
+    return {
+        "metric": metric,
+        "method": "cluster_bootstrap",
+        "resampling_unit": "matter_family",
+        "families": len(family_ids),
+        "samples": samples,
+        "confidence_level": confidence_level,
+        "estimate": round(sum(observed) / len(observed), 4),
+        "lower": round(estimates[lower_index], 4),
+        "upper": round(estimates[upper_index], 4),
+        "seed": seed,
+    }

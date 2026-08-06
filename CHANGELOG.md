@@ -1,5 +1,41 @@
 # Changelog
 
+## Unreleased
+
+### The critic (v0) — deterministic verification without an answer key
+
+- New `playbook-critic <matter_or_docs_dir> <submission>` and
+  `playbook_legal.critic`: a deterministic verification layer that reviews proposed
+  deal-review work using **only** materials a real client would have. It never opens
+  `rubric.yaml`, `hidden_facts.yaml`, or `counterparty.yaml`, and never constructs
+  `PlaybookEnv` — every read passes through a guard that refuses those filenames, so
+  a matter directory with the three answer-key files deleted verifies identically.
+  Filenames are folded the way the filesystem folds them (`RUBRIC.YAML`,
+  `rubric.yaml.`, and `rubric.yaml:$DATA` all open the same file on Windows), and no
+  YAML file can enter the record as a document, so renaming an answer key does not
+  smuggle it in as evidence. No LLM calls anywhere.
+- Checks: verbatim quotation verification (mirroring the engine's fabricated-quote
+  gate exactly), citation resolution, prohibited concessions in redline/markup/
+  settlement language, and evidence hygiene. Verdicts are `verified`,
+  `FABRICATED_QUOTE`, `UNRESOLVED_CITATION`, `PROHIBITED_CONCESSION`, and the
+  advisory `MISSING_EVIDENCE`; any critical verdict exits nonzero. Everything the
+  engine treats as a critical failure and the critic can see for itself is critical
+  here too — including a quotation that carries no citation at all.
+- Accepts both an actions JSONL trajectory and a structured review JSON, and emits a
+  `playbook.critic-report.v1` JSON report plus a readable Markdown report. A
+  submission in neither shape is refused with an explanation rather than reviewed as
+  an empty one.
+- New `playbook.authority.v1` schema lets a client state its own limits as literal
+  patterns, matched with the engine's semantics (case-insensitive substring on
+  whitespace-normalized text, so `30 days` matches inside `130 days`). Worked example
+  in `examples/authority/ai_saas_001.authority.yaml`, derived solely from that
+  matter's public client playbook.
+- `playbook_legal.text.normalize_text` is now the single shared normalization used by
+  both the reward engine and the critic; `loaders.parse_sections` is public so the
+  critic tokenizes sections identically to the linter. Neither change alters engine
+  behavior.
+- Documentation: `docs/critic.md`; README CLI table and practice section.
+
 ## v0.4.0 — 2026-08-06
 
 The first release with measured model baselines and a scaled variant catalog.

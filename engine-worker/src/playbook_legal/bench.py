@@ -19,10 +19,11 @@ import os
 from pathlib import Path
 from typing import Any
 
+from .dataset import load_family_registry
 from .env import PlaybookEnv
 from .lint import discover_matter_dirs
 from .loaders import load_yaml
-from .metrics import aggregate_metrics, compute_metrics
+from .metrics import aggregate_metrics, cluster_bootstrap_interval, compute_metrics
 
 _COLUMNS = [
     ("matter_id", "Matter"),
@@ -91,6 +92,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the Playbook benchmark scorecard.")
     parser.add_argument("--matters", type=Path, default=Path("matters"), help="Matter root directory")
     parser.add_argument("--examples", type=Path, default=Path("examples"))
+    parser.add_argument(
+        "--family-registry",
+        type=Path,
+        help="Matter-family registry used for family labels and clustered uncertainty",
+    )
     parser.add_argument("--runner", choices=["replay", "baseline"], default="replay")
     parser.add_argument(
         "--split",
@@ -107,6 +113,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=Path("artifacts/scorecard"))
     args = parser.parse_args()
     split = args.split or ("dev" if args.matters == Path("matters") else "custom")
+    family_registry = load_family_registry(args.family_registry) if args.family_registry else None
     if args.runner == "replay" and len(args.seeds) != 1:
         parser.error(
             "reference replay is deterministic; pass exactly one seed instead of "
@@ -132,10 +139,25 @@ def main() -> None:
             else:
                 result = run_baseline(matter_dir, seed, args)
             metrics = compute_metrics(result, rubric, counterparty)
+            if family_registry is not None:
+                matter_id = str(metrics["matter_id"])
+                if matter_id not in family_registry:
+                    raise SystemExit(f"Matter {matter_id!r} is absent from {args.family_registry}")
+                family = family_registry[matter_id]
+                if split != "custom" and family["split"] != split:
+                    raise SystemExit(
+                        f"Matter {matter_id!r} is registered as {family['split']!r}, not {split!r}"
+                    )
+                metrics["matter_family_id"] = family["matter_family_id"]
             metrics["seed"] = seed
             rows.append(metrics)
 
     aggregate = aggregate_metrics(rows)
+    uncertainty = (
+        cluster_bootstrap_interval(rows, "critical_failure_rate")
+        if family_registry is not None
+        else None
+    )
     label = args.model if args.runner == "baseline" else "reference replay"
     payload = {
         "runner": args.runner,
@@ -143,6 +165,7 @@ def main() -> None:
         "split": split,
         "episodes": rows,
         "aggregate": aggregate,
+        "uncertainty": uncertainty,
         "skipped": skipped,
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)

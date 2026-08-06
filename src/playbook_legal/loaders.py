@@ -29,12 +29,12 @@ def load_documents(matter_dir: Path, manifest: list[dict[str, Any]]) -> dict[str
             "title": entry.get("title", document_id),
             "path": str(path),
             "text": text,
-            "sections": _parse_sections(text),
+            "sections": parse_sections(text),
         }
     return documents
 
 
-def _parse_sections(text: str) -> dict[str, str]:
+def parse_sections(text: str) -> dict[str, str]:
     """Parse Markdown headings like '## 4.2 Use of Data' into section-addressable chunks."""
     lines = text.splitlines()
     sections: dict[str, list[str]] = {}

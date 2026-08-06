@@ -49,6 +49,15 @@ episode. Three uses today:
   and preference pairs exported from the same environment (see
   [the Playbook-1 plan](docs/playbook-1-plan.md)).
 
+The benchmark's gates only work because it holds an answer key; a firm reviewing an
+AI's markup of a live deal never will. **The critic** (`playbook-critic`) is the half
+of those gates that needs no answer key — it verifies every quotation against the
+cited provision, resolves every citation, and scans proposed language against the
+client's own stated limits, using nothing but the deal documents and a client-authored
+authority file. It is deterministic, makes no LLM calls, and provably never opens a
+rubric, hidden facts, or a counterparty script; it verifies, it does not lawyer. See
+[docs/critic.md](docs/critic.md).
+
 ## Measured baselines
 
 Three open-weight models, measured on all 12 public matters through the same
@@ -124,6 +133,7 @@ function calling can play the environment via the baseline runner.
 | `playbook-demo` | Run the scripted reference episode |
 | `playbook-eval <matter> <actions.jsonl>` | Replay an action file and print the score |
 | `playbook-lint --all matters` | Validate matter packages (anchors, citations, canary) |
+| `playbook-critic <matter\|docs-dir> <submission>` | Verify proposed work from client materials only — no rubric, no answer key |
 | `playbook-baseline <matter> --model <m>` | Let an OpenAI-compatible model play a matter |
 | `playbook-bench --runner replay\|baseline` | Score a runner across all matters → scorecard |
 | `playbook-baseline-sprint --models ...` | Plan or run the budget-gated, split-labeled baseline sprint |
@@ -215,7 +225,8 @@ ROADMAP.md                Build plan and status
 
 Deeper reading: [web gym](docs/web-gym.md) · [architecture](docs/architecture.md) ·
 [environment API](docs/environment.md) · [scoring in depth](docs/scoring.md) ·
-[evaluation](docs/evaluation.md) · [contributing](CONTRIBUTING.md)
+[the critic](docs/critic.md) · [evaluation](docs/evaluation.md) ·
+[contributing](CONTRIBUTING.md)
 
 ## Design principles
 

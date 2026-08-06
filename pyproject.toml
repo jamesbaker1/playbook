@@ -29,6 +29,7 @@ train = ["datasets>=3", "transformers>=4.50", "trl>=0.17", "peft>=0.14", "accele
 playbook-demo = "playbook_legal.demo:main"
 playbook-eval = "playbook_legal.cli:main"
 playbook-lint = "playbook_legal.lint:main"
+playbook-critic = "playbook_legal.critic:main"
 playbook-export = "playbook_legal.export:main"
 playbook-dataset = "playbook_legal.dataset:main"
 playbook-dataset-check = "playbook_legal.dataset:verify_main"

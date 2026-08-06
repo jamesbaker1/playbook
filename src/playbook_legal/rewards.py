@@ -36,11 +36,9 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from .text import normalize_text as _normalize
+
 MINIMUM_QUOTE_CHARACTERS = 15
-
-
-def _normalize(text: str) -> str:
-    return " ".join(str(text).lower().split())
 
 
 @dataclass

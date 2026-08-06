@@ -101,6 +101,7 @@ class PlaybookEnv:
 
     def reset(self, *, seed: int | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
         self._rng.seed(seed)
+        self._seed = seed
         self._has_reset = True
         self._terminated = False
         self._truncated = False
@@ -184,6 +185,7 @@ class PlaybookEnv:
         destination.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "matter": self.matter["matter_id"],
+            "seed": self._seed,
             "initial_observation": self._initial_observation,
             "events": [
                 {
