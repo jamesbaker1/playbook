@@ -188,8 +188,10 @@ string), varied by document architecture, role, leverage, and hidden-fact pivots
 | `public_merger_target_011` | Public-target merger markup, target side | MAE carveouts, board matching rights, ordinary-course control, fee-tail traps |
 | `private_acquisition_buyer_012` | Private-target acquisition, buyer side | Knowledge inquiry plus deductible, cap, and survival allocation |
 
-Private held-out evaluation matters live in a separate private repository so
-published models can be scored on unseen work. Every matter ships a validated
+A sealed held-out evaluation corpus is being authored in a separate private
+repository so published models can be scored on unseen work; until it lands,
+every number published here is measured on this public development split and
+should be read as such. Every matter ships a validated
 reference trajectory and adversarial bad trajectories in `examples/<matter_id>/`,
 enforced by CI (reference ≥ 0.7 with no critical failure; fabricated-quote and
 reversed-redline trajectories must trip the critical gate).
