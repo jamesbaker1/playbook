@@ -48,8 +48,14 @@ def run_episode(
     seed: int = 0,
     temperature: float = 0.2,
     max_protocol_retries: int = 2,
+    max_tokens: int | None = None,
 ) -> dict[str, Any]:
-    """Run one full episode with a chat model driving the environment."""
+    """Run one full episode with a chat model driving the environment.
+
+    ``max_tokens`` caps each completion. Metered gateways pre-authorize the
+    model's full output window per request when no cap is set, which can fail a
+    request as unaffordable long before the balance is actually spent.
+    """
     observation, _ = env.reset(seed=seed)
     tools = tool_definitions(env.action_schemas())
     messages: list[dict[str, Any]] = [
@@ -62,14 +68,17 @@ def run_episode(
     protocol_failures = 0
     terminated = truncated = False
 
+    request: dict[str, Any] = {
+        "model": model,
+        "tools": tools,
+        "temperature": temperature,
+        "seed": seed,
+    }
+    if max_tokens is not None:
+        request["max_tokens"] = max_tokens
+
     while not (terminated or truncated):
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            tools=tools,
-            temperature=temperature,
-            seed=seed,
-        )
+        response = client.chat.completions.create(messages=messages, **request)
         message = response.choices[0].message
         tool_calls = getattr(message, "tool_calls", None) or []
 

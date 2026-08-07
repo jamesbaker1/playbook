@@ -58,7 +58,14 @@ def run_baseline(matter_dir: Path, seed: int, args: argparse.Namespace) -> dict[
 
     client = build_client(args.base_url, os.environ.get("OPENAI_API_KEY"))
     env = PlaybookEnv.from_directory(matter_dir)
-    return run_episode(env, client, model=args.model, seed=seed, temperature=args.temperature)
+    return run_episode(
+        env,
+        client,
+        model=args.model,
+        seed=seed,
+        temperature=args.temperature,
+        max_tokens=args.max_tokens,
+    )
 
 
 def to_markdown(
@@ -110,6 +117,12 @@ def main() -> None:
         default=os.environ.get("PLAYBOOK_BASE_URL") or os.environ.get("OPENAI_BASE_URL"),
     )
     parser.add_argument("--temperature", type=float, default=0.2)
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        help="Per-completion output cap; metered gateways pre-authorize the model's "
+        "full output window per request when unset",
+    )
     parser.add_argument("--out", type=Path, default=Path("artifacts/scorecard"))
     args = parser.parse_args()
     split = args.split or ("dev" if args.matters == Path("matters") else "custom")
