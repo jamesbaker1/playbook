@@ -124,13 +124,24 @@ def main() -> None:
     if not matter_dirs:
         raise SystemExit(f"No matters found under {args.matters}")
 
+    # Live runs bill per episode whether or not results ever reach disk, so every
+    # completed episode is checkpointed immediately and an interrupted sweep resumes
+    # instead of repaying for finished work.
+    partial_path = args.out.with_suffix(".partial.json")
     rows: list[dict[str, Any]] = []
+    if partial_path.exists():
+        rows = json.loads(partial_path.read_text(encoding="utf-8"))
+        print(f"Resuming: {len(rows)} episode(s) restored from {partial_path}")
+    completed = {(str(row["matter_id"]), int(row["seed"])) for row in rows}
+
     skipped: list[str] = []
     for matter_dir in matter_dirs:
         rubric = load_yaml(matter_dir / "rubric.yaml")
         counterparty_path = matter_dir / "counterparty.yaml"
         counterparty = load_yaml(counterparty_path) if counterparty_path.exists() else {}
         for seed in args.seeds:
+            if (matter_dir.name, seed) in completed:
+                continue
             if args.runner == "replay":
                 result = run_replay(matter_dir, args.examples, seed)
                 if result is None:
@@ -151,6 +162,8 @@ def main() -> None:
                 metrics["matter_family_id"] = family["matter_family_id"]
             metrics["seed"] = seed
             rows.append(metrics)
+            partial_path.parent.mkdir(parents=True, exist_ok=True)
+            partial_path.write_text(json.dumps(rows, indent=2), encoding="utf-8")
 
     aggregate = aggregate_metrics(rows)
     uncertainty = (
@@ -176,6 +189,7 @@ def main() -> None:
         to_markdown(rows, aggregate, f"Playbook scorecard — {label}", split),
         encoding="utf-8",
     )
+    partial_path.unlink(missing_ok=True)
     if skipped:
         print(f"Skipped (no reference trajectory): {', '.join(skipped)}")
     print(json.dumps(aggregate, indent=2))

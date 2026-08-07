@@ -21,9 +21,11 @@ from playbook_legal.metrics import cluster_bootstrap_interval
 SCORECARDS = Path("artifacts/scorecards")
 
 MODELS = [
-    ("Qwen2.5-7B-Instruct", "qwen2_5-7b-seed", [0, 1, 2]),
-    ("Qwen2.5-14B-Instruct", "qwen2_5-14b-seed", [0, 1, 2]),
+    ("Claude Opus 5", "claude-opus-5-seed", [0]),
+    ("GPT-5.6-sol", "gpt-5_6-sol-seed", [0]),
     ("Qwen2.5-32B-Instruct", "qwen2_5-32b-seed", [0]),
+    ("Qwen2.5-14B-Instruct", "qwen2_5-14b-seed", [0, 1, 2]),
+    ("Qwen2.5-7B-Instruct", "qwen2_5-7b-seed", [0, 1, 2]),
 ]
 
 COLUMNS = [

@@ -93,6 +93,38 @@ def test_bench_replay_scorecard(tmp_path: Path, monkeypatch) -> None:
     assert "Split: `custom`" in markdown
 
 
+def test_bench_checkpoints_every_episode_and_resumes(tmp_path: Path, monkeypatch) -> None:
+    out = tmp_path / "scorecard"
+    argv = [
+        "playbook-bench",
+        "--matters",
+        str(ROOT / "matters"),
+        "--examples",
+        str(EXAMPLES),
+        "--runner",
+        "replay",
+        "--out",
+        str(out),
+    ]
+    monkeypatch.setattr(sys, "argv", argv)
+    bench_main()
+    payload = json.loads(out.with_suffix(".json").read_text(encoding="utf-8"))
+    # A completed run leaves no partial behind.
+    assert not out.with_suffix(".partial.json").exists()
+
+    # Simulate an interrupted sweep: the partial holds every episode already paid
+    # for. A resumed run must keep those rows instead of re-running them.
+    poisoned = [dict(row, normalized_score=-99.0) for row in payload["episodes"]]
+    out2 = tmp_path / "resumed"
+    out2.with_suffix(".partial.json").write_text(json.dumps(poisoned), encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", argv[:-1] + [str(out2)])
+    bench_main()
+    resumed = json.loads(out2.with_suffix(".json").read_text(encoding="utf-8"))
+    scores = {row["normalized_score"] for row in resumed["episodes"]}
+    assert scores == {-99.0}, "resumed run re-executed episodes it should have skipped"
+    assert not out2.with_suffix(".partial.json").exists()
+
+
 def test_bench_records_explicit_split(tmp_path: Path, monkeypatch) -> None:
     out = tmp_path / "held-out-scorecard"
     monkeypatch.setattr(
