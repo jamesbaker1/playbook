@@ -8,7 +8,7 @@ from types import SimpleNamespace
 from conftest import EXAMPLES, MATTERS, replay
 
 from playbook_legal import PlaybookEnv
-from playbook_legal.baseline import run_episode
+from playbook_legal.baseline import SYSTEM_PROMPT, run_episode
 
 MATTER = MATTERS / "ai_saas_001"
 
@@ -71,6 +71,24 @@ def test_seed_is_forwarded_to_every_model_request() -> None:
     run_episode(env, client, model="fake", seed=42)
     assert client.requests
     assert all(request["seed"] == 42 for request in client.requests)
+
+
+def test_system_prompt_defaults_to_the_baseline_prompt() -> None:
+    actions = load_good_actions()
+    client = FakeClient([tool_call_message(action) for action in actions])
+    env = PlaybookEnv.from_directory(MATTER)
+    run_episode(env, client, model="fake", seed=0)
+    assert client.requests[0]["messages"][0] == {"role": "system", "content": SYSTEM_PROMPT}
+
+
+def test_system_prompt_override_replaces_the_baseline_prompt() -> None:
+    actions = load_good_actions()
+    client = FakeClient([tool_call_message(action) for action in actions])
+    env = PlaybookEnv.from_directory(MATTER)
+    run_episode(env, client, model="fake", seed=0, system_prompt="scaffolded workflow")
+    systems = {request["messages"][0]["content"] for request in client.requests}
+    assert systems == {"scaffolded workflow"}
+    assert SYSTEM_PROMPT not in systems
 
 
 def test_missing_tool_call_is_nudged_then_recovers() -> None:

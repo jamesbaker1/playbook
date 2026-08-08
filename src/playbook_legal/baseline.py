@@ -49,17 +49,22 @@ def run_episode(
     temperature: float = 0.2,
     max_protocol_retries: int = 2,
     max_tokens: int | None = None,
+    system_prompt: str | None = None,
 ) -> dict[str, Any]:
     """Run one full episode with a chat model driving the environment.
 
     ``max_tokens`` caps each completion. Metered gateways pre-authorize the
     model's full output window per request when no cap is set, which can fail a
     request as unaffordable long before the balance is actually spent.
+
+    ``system_prompt`` replaces :data:`SYSTEM_PROMPT` for prompt-scaffolding
+    experiments; leaving it ``None`` keeps the baseline prompt unchanged so
+    scorecard rows stay comparable.
     """
     observation, _ = env.reset(seed=seed)
     tools = tool_definitions(env.action_schemas())
     messages: list[dict[str, Any]] = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": SYSTEM_PROMPT if system_prompt is None else system_prompt},
         {
             "role": "user",
             "content": json.dumps(_slim(observation, keep_static=True), ensure_ascii=False),
