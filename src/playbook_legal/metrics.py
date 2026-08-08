@@ -91,6 +91,7 @@ def compute_metrics(
         "critical_failure": bool(result.get("critical_failure", False)),
         "terminated": bool(result.get("terminated", False)),
         "steps": int(result.get("steps", 0)),
+        "protocol_failures": int(result.get("protocol_failures", 0)),
     }
 
 
