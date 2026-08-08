@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+### Frontier reference rows (Claude Haiku 4.5, GPT-5.6-terra)
+
+- Two frontier models measured on all 12 public matters under the v0.4.0 protocol
+  (seed 0, native tool calling, temperature 0.2, generic system prompt, output capped
+  at 4,096 tokens per completion), served through an OpenAI-compatible commercial
+  gateway instead of self-hosted vLLM. Per-model scorecards and the refreshed pooled
+  comparison are in `results/v0.4.0/`.
+- **GPT-5.6-terra: 0.474** — the best model score measured — with **zero critical
+  failures** across twelve matters, citation validity 1.000, zero unsupported issues,
+  and 30.2 steps per episode: *more* than the expert reference's 22.6, against 8–11
+  for the open-weight rows. It is the first measured model to break the
+  critical-failure-rate-rises-with-scale pattern.
+- **Claude Haiku 4.5: 0.336** with a **25% critical-failure rate** (3 of 12 matters),
+  citation validity 0.688, and 1.67 unsupported issues per episode. The open-model
+  failure archetypes persist at the frontier-lite tier alongside a much higher average.
+- Unchanged by capability: question recall is 0.083 (Haiku) and 0.056 (terra) against
+  the expert reference's 0.958. No measured model, at any scale, asks useful client
+  questions — the client-interaction gap is universal.
+- `docs/baseline-report.md` gains a frontier-references section and its conclusions are
+  revised where the new rows change them; the README comparison table is refreshed.
+
+### Two-teacher scaffolded rollout pilot (Workstream 4)
+
+- Repeated the 2026-08-06 rollout-yield pilot design exactly — same four train-split
+  variants, seeds 0 and 1, temperature 0.7, same `run_episode` code path, same four
+  filter stages (completed → critical-free → bit-exact replay-verified → ≥ 0.5 score
+  bar) — with two changes: API teachers behind an OpenAI-compatible gateway, and the
+  new `training/scaffold_prompt.txt` system prompt.
+- Yield above the 0.5 bar: `deepseek/deepseek-v3.2` **6 of 8** (mean normalized 0.509),
+  `qwen/qwen3-235b-a22b-2507` **2 of 8** (mean 0.378), against **0 of 8** for the
+  unscaffolded Qwen2.5-32B. DeepSeek cleared both seeds of
+  `ml_development_ip_distribution_003`, the fabrication-trap variant that critically
+  failed both 32B seeds and both Qwen3-235B seeds.
+- The scaffold demonstrably changed process behavior: all 16 episodes read every
+  available document and ran 13–30 steps (32B: 4–18), and client questions appear in
+  5 of 8 Qwen3-235B episodes and all 8 DeepSeek episodes (32B: none).
+- Residual failures are genuine rather than scoring artifacts: all four critical
+  failures across the two teachers are verbatim-verifier catches on invented
+  quotations, and the largest score losses are unsupported-issue bursts that drive raw
+  reward negative before normalization clamps it to 0.0.
+- Cost: $0.235 (Qwen3-235B) and $0.523 (DeepSeek) for 8 episodes each — roughly $0.087
+  per surviving trajectory at DeepSeek's yield. Summaries, per-episode diagnostics, and
+  the comparison against the first pilot are in `results/rollout-pilot-2/`.
+- Teacher selection remains `pending_owner_approval` in `docs/playbook-1-experiment.yaml`.
+  This pilot is the evidence for that decision, not the decision.
+
 ### Structured critical-failure gates (opt-in)
 
 - Entries in `critical_failure_patterns`, `redline_critical_failure_patterns`, and

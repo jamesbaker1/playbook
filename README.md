@@ -60,22 +60,32 @@ rubric, hidden facts, or a counterparty script; it verifies, it does not lawyer.
 
 ## Measured baselines
 
-Three open-weight models, measured on all 12 public matters through the same
-tool-calling interface a deployed assistant would use (v0.4.0, temperature 0.2;
-full scorecards in [`results/v0.4.0/`](results/v0.4.0/), narrative analysis in
+Five models — three open-weight, two frontier — measured on all 12 public matters
+through the same tool-calling interface a deployed assistant would use
+(temperature 0.2, generic system prompt; full scorecards in
+[`results/v0.4.0/`](results/v0.4.0/), narrative analysis in
 [the baseline report](docs/baseline-report.md)):
 
-| Model | Episodes | Score | Critical-failure rate | Issue recall | Question recall |
-| --- | --- | --- | --- | --- | --- |
-| Expert reference (replay) | 12 | 0.985 | 0.000 | 0.917 | 0.958 |
-| Qwen2.5-7B-Instruct | 36 | 0.031 | 0.056 | 0.106 | 0.021 |
-| Qwen2.5-14B-Instruct | 36 | 0.165 | 0.139 | 0.312 | 0.000 |
-| Qwen2.5-32B-Instruct | 12 | 0.076 | 0.250 | 0.208 | 0.000 |
+| Model | Episodes | Score | Critical-failure rate | Citation validity | Issue recall | Question recall |
+| --- | --- | --- | --- | --- | --- | --- |
+| Expert reference (replay) | 12 | 0.985 | 0.000 | 1.000 | 0.917 | 0.958 |
+| GPT-5.6-terra | 12 | 0.474 | 0.000 | 1.000 | 0.583 | 0.056 |
+| Claude Haiku 4.5 | 12 | 0.336 | 0.250 | 0.688 | 0.583 | 0.083 |
+| Qwen2.5-32B-Instruct | 12 | 0.076 | 0.250 | 1.000 | 0.208 | 0.000 |
+| Qwen2.5-14B-Instruct | 36 | 0.165 | 0.139 | 1.000 | 0.312 | 0.000 |
+| Qwen2.5-7B-Instruct | 36 | 0.031 | 0.056 | 0.972 | 0.106 | 0.021 |
 
-The headline: raw models complete their reviews but work shallowly — no model
-asks useful client questions, and the critical-failure rate (fabricated
-quotes, unauthorized concessions, accepted trap counters) **rises** with model
-scale as larger models engage more without better judgment.
+The headline: **no model measured, at any scale, asks useful client questions**
+(question recall ≤ 0.083 against the expert reference's 0.958) — fact gathering
+is not treated as part of the job. Across the open-weight models the
+critical-failure rate (fabricated quotes, unauthorized concessions, accepted trap
+counters) *rose* with scale as larger models engaged more without better
+judgment, and Claude Haiku 4.5 carries that pattern into the frontier tier at
+25%. GPT-5.6-terra is the first exception on record: it works the file at
+reference depth (30.2 actions per matter against the reference's 22.6), with zero
+critical failures, perfect citation validity, and no unsupported issues — and
+still scores 0.474 against the reference's 0.985. The single-seed frontier rows
+are indicative, not settled.
 
 ## The v0.3 scoring contract
 

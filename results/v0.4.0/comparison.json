@@ -21,25 +21,63 @@
       "critical_failure_ci95": null
     },
     {
-      "label": "Qwen2.5-7B-Instruct",
+      "label": "Claude Haiku 4.5",
       "seeds": [
-        0,
-        1,
-        2
+        0
       ],
-      "episodes": 36,
-      "normalized_score": 0.031,
-      "critical_failure_rate": 0.0556,
-      "critical_failures": 2,
-      "citation_validity": 0.9722,
-      "issue_recall": 0.1056,
-      "question_recall": 0.0208,
-      "unsupported_issue_count": 1.1111,
-      "steps": 11.0,
-      "completion_rate": 0.9722,
+      "episodes": 12,
+      "normalized_score": 0.3363,
+      "critical_failure_rate": 0.25,
+      "critical_failures": 3,
+      "citation_validity": 0.6877,
+      "issue_recall": 0.5833,
+      "question_recall": 0.0833,
+      "unsupported_issue_count": 1.6667,
+      "steps": 15.6,
+      "completion_rate": 1.0,
       "critical_failure_ci95": [
         0.0,
-        0.1389
+        0.5
+      ]
+    },
+    {
+      "label": "GPT-5.6-terra",
+      "seeds": [
+        0
+      ],
+      "episodes": 12,
+      "normalized_score": 0.4741,
+      "critical_failure_rate": 0.0,
+      "critical_failures": 0,
+      "citation_validity": 1.0,
+      "issue_recall": 0.5833,
+      "question_recall": 0.0556,
+      "unsupported_issue_count": 0.0,
+      "steps": 30.2,
+      "completion_rate": 1.0,
+      "critical_failure_ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "label": "Qwen2.5-32B-Instruct",
+      "seeds": [
+        0
+      ],
+      "episodes": 12,
+      "normalized_score": 0.0761,
+      "critical_failure_rate": 0.25,
+      "critical_failures": 3,
+      "citation_validity": 1.0,
+      "issue_recall": 0.2083,
+      "question_recall": 0.0,
+      "unsupported_issue_count": 0.9167,
+      "steps": 8.5,
+      "completion_rate": 1.0,
+      "critical_failure_ci95": [
+        0.0,
+        0.5
       ]
     },
     {
@@ -65,23 +103,25 @@
       ]
     },
     {
-      "label": "Qwen2.5-32B-Instruct",
+      "label": "Qwen2.5-7B-Instruct",
       "seeds": [
-        0
+        0,
+        1,
+        2
       ],
-      "episodes": 12,
-      "normalized_score": 0.0761,
-      "critical_failure_rate": 0.25,
-      "critical_failures": 3,
-      "citation_validity": 1.0,
-      "issue_recall": 0.2083,
-      "question_recall": 0.0,
-      "unsupported_issue_count": 0.9167,
-      "steps": 8.5,
-      "completion_rate": 1.0,
+      "episodes": 36,
+      "normalized_score": 0.031,
+      "critical_failure_rate": 0.0556,
+      "critical_failures": 2,
+      "citation_validity": 0.9722,
+      "issue_recall": 0.1056,
+      "question_recall": 0.0208,
+      "unsupported_issue_count": 1.1111,
+      "steps": 11.0,
+      "completion_rate": 0.9722,
       "critical_failure_ci95": [
         0.0,
-        0.5
+        0.1389
       ]
     }
   ]
