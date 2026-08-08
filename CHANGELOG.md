@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Structured critical-failure gates (opt-in)
+
+- Entries in `critical_failure_patterns`, `redline_critical_failure_patterns`, and
+  `settlement_critical_failure_patterns` may now be a mapping instead of a plain
+  string: `pattern` (required) plus optional `negation_guard`, `require_context`, and
+  `exclude_context`. Adversarial probing replay-confirmed 84 false-positive blockers
+  across the 12 public matters — bare substring gates firing on the sentence the
+  instructions actually ask for ("**no** law prohibits all model training", "**neither**
+  Provider **nor** Customer may use Provider Data", "is **not** conclusive and binding
+  on", "**nothing** in this Section restricts..."). One engine mechanism a rubric author
+  opts into per pattern replaces tempering 136 regexes by hand.
+- `negation_guard` drops a match when a negator (`no`, `not`, `never`, `nothing`,
+  `none`, `neither`, `nor`, `cannot`, `without`, `n't`) falls between the start of the
+  match's sentence and the end of the matched span. Sentences break on `.`/`?`/`!` +
+  whitespace or a newline; a period before a digit never breaks one, so `§10.2` and
+  `R.3` stay intact. All three sites share one `gate_match` helper, so the semantics
+  cannot diverge, and trace attribution still reports the `pattern` string.
+- Plain-string patterns are byte-identical to before — proven by replaying the public
+  references and `bad_critical_*` trajectories against frozen scores, critical flags,
+  and fired-gate attributions. No shipped rubric opts in yet; the mechanism is dormant.
+- The linter validates the mapping form per matter: `pattern` present and compilable,
+  guard regexes compilable, and **unknown keys rejected** rather than silently ignored.
+
 ### The critic (v0) — deterministic verification without an answer key
 
 - New `playbook-critic <matter_or_docs_dir> <submission>` and

@@ -136,6 +136,76 @@ def test_invalid_regex_fails(tmp_path: Path) -> None:
     assert any("invalid regex" in error for error in report.errors)
 
 
+def test_structured_gate_mapping_passes(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].__setitem__(
+            "critical_failure_patterns",
+            [
+                {
+                    "pattern": "provider bears no responsibility",
+                    "negation_guard": True,
+                    "require_context": r"\b(as drafted|already)\b",
+                    "exclude_context": r"\bfor clarity\b",
+                }
+            ],
+        ),
+    )
+    report = lint_matter(matter_dir)
+    assert report.ok, report.errors
+
+
+def test_unknown_gate_key_fails(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].__setitem__(
+            "redline_critical_failure_patterns",
+            [{"pattern": "customer may use provider data", "negation": True}],
+        ),
+    )
+    report = lint_matter(matter_dir)
+    assert any("unknown gate key(s): negation" in error for error in report.errors)
+
+
+def test_gate_mapping_without_pattern_fails(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].__setitem__(
+            "critical_failure_patterns", [{"negation_guard": True}]
+        ),
+    )
+    report = lint_matter(matter_dir)
+    assert any("non-empty 'pattern' string" in error for error in report.errors)
+
+
+def test_gate_guard_regex_must_compile(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].__setitem__(
+            "settlement_critical_failure_patterns",
+            [{"pattern": "30 days", "exclude_context": "(unclosed"}],
+        ),
+    )
+    report = lint_matter(matter_dir)
+    assert any("invalid regex in 'exclude_context'" in error for error in report.errors)
+
+
+def test_gate_error_names_the_field_and_index(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].__setitem__(
+            "critical_failure_patterns", ["fine", "(unclosed"]
+        ),
+    )
+    report = lint_matter(matter_dir)
+    assert any("critical_failure_patterns[1]" in error for error in report.errors)
+
+
 def test_dead_non_negotiable_gate_fails(tmp_path: Path) -> None:
     matter_dir = _write_minimal_matter(tmp_path)
     _mutate_rubric(

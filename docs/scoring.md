@@ -125,6 +125,52 @@ plausible-but-wrong claims: `"law prohibits all model training"`, GPL
 law". These encode the professional rule that a confident wrong legal claim is
 worse than silence.
 
+### Structured gates (opt-in)
+
+A bare regex is polarity-blind. `"law prohibits all model training"` fires on the
+overclaim *and* on "**No** law prohibits all model training; the objection is
+contractual" — the disclaimer the instructions actually ask for. The same blindness
+hits belt-and-braces prohibitions ("Neither Provider **nor** Customer may use
+Provider Data"), negations that reuse the document's operative words ("is **not**
+conclusive and binding on"), and savings clauses ("**nothing** in this Section
+restricts...").
+
+Any entry in `critical_failure_patterns`, `redline_critical_failure_patterns`, or
+`settlement_critical_failure_patterns` may therefore be written either as a plain
+string — unchanged behaviour, and still the default — or as a mapping:
+
+```yaml
+critical_failure_patterns:
+  - "law prohibits all model training"              # plain string: no guards
+  - pattern: "law prohibits all model training"     # same regex, guarded
+    negation_guard: true
+  - pattern: "the agreement permits termination"
+    require_context: '\b(as drafted|as returned|already|currently)\b'
+    exclude_context: '\bfor the avoidance of doubt\b'
+```
+
+| Key | Type | Default | Effect |
+| --- | --- | --- | --- |
+| `pattern` | string | required | The regex. Identical semantics to the plain-string form. |
+| `negation_guard` | bool | `false` | Drop a match when a negator falls between the start of its sentence and the **end of the matched span**. |
+| `require_context` | regex | — | Fire only when this also matches somewhere in the match's sentence. |
+| `exclude_context` | regex | — | Drop the match when this matches somewhere in the match's sentence. |
+
+Unknown keys are a lint error, not a silent no-op. The gate fires if **any**
+occurrence in the text survives its guards, and trace attribution still reports the
+`pattern` string, so a rubric can be migrated without changing any downstream report.
+
+- **Negators**: `no`, `not`, `never`, `nothing`, `none`, `neither`, `nor`, `cannot`,
+  `without`, and the `n't` suffix. The list is closed — "nobody" and "fails to" are
+  not negators.
+- **Sentences** end at `.`, `?` or `!` followed by whitespace or end of text, or at a
+  newline. A period before a digit never splits, so `§10.2` and `R.3` keep their
+  sentence whole. A negator in the *previous* sentence does not suppress.
+- **The guard window is deliberately narrow.** `negation_guard` looks only *backwards*
+  from the end of the match, because a negator later in the sentence usually governs a
+  different clause: "Provider's records are binding on Provider but are **not**
+  binding on Customer" still fires. Use `exclude_context` for those.
+
 ## Settlements — scoring the text a point closed on
 
 On matters with a `counterparty.yaml`, what is scored is neither the opening ask nor

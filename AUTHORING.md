@@ -160,6 +160,16 @@ trajectory that closes correctly (the gate must stay silent). A pattern like `30
 is a substring, not a word boundary — confirm it cannot fire on your own good
 language. Ship both trajectories as `bad_critical_*.jsonl` and `good.jsonl`.
 
+**A substring gate cannot see polarity.** The commonest authoring bug is a gate that
+fires on the correct sentence: state-then-negate analysis ("no law prohibits all model
+training"), belt-and-braces prohibitions ("neither Provider nor Customer may use..."),
+negations reusing the document's own words ("is not conclusive and binding on..."), and
+savings clauses ("nothing in this Section restricts..."). Any of the three pattern
+lists accepts a mapping instead of a string to guard against this — `negation_guard`,
+`require_context`, `exclude_context`. See
+[docs/scoring.md](docs/scoring.md#structured-gates-opt-in) for the exact syntax and the
+negator and sentence-boundary rules.
+
 ## Clean matters
 
 Not every matter should have issues. A matter whose correct answer is "the paper is

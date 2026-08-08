@@ -28,6 +28,16 @@ v0.3 additions
   when the counterparty accepted it, the counterparty's language when the agent
   accepted theirs. Closing a ``non_negotiable`` issue without its settlement concepts,
   or on text matching a settlement critical-failure pattern, is a critical failure.
+
+v0.4 additions — structured gate patterns
+-----------------------------------------
+
+Critical-failure patterns are bare, polarity-blind regexes: a gate written to punish
+"the law prohibits all model training" also fires on "no law prohibits all model
+training", which is the sentence the instructions actually ask for. Rather than
+hand-temper every regex, a rubric author may opt a single pattern into structured
+form and let the engine read the polarity and scope around the match. A plain-string
+pattern keeps exactly its historical behaviour; see ``gate_match``.
 """
 
 from __future__ import annotations
@@ -39,6 +49,125 @@ from typing import Any
 from .text import normalize_text as _normalize
 
 MINIMUM_QUOTE_CHARACTERS = 15
+
+# ---------------------------------------------------------------- gate patterns
+
+GATE_SPEC_KEYS = ("pattern", "negation_guard", "require_context", "exclude_context")
+
+# Words that reverse the polarity of the clause they govern, plus the "n't" suffix
+# ("cannot" is listed because it is one token; "can't" is caught by the suffix).
+_NEGATOR = re.compile(
+    r"\b(?:no|not|never|nothing|none|neither|nor|cannot|without)\b|n['’]t",
+    flags=re.IGNORECASE,
+)
+
+# A sentence ends at ``.``, ``?`` or ``!`` followed by whitespace or end of text, or
+# at a newline. A period directly followed by a digit is never a boundary, so section
+# numbers ("R.3", "§10.2 continues") keep their sentence intact.
+_SENTENCE_BOUNDARY = re.compile(r"(?:\.(?!\d)|[?!])(?=\s|\Z)|[\r\n]")
+
+
+def gate_spec_errors(spec: Any) -> list[str]:
+    """Return human-readable problems with one critical-failure gate entry.
+
+    An empty list means the entry is usable. Both the linter and the engine call
+    this, so an authoring mistake is reported the same way whether it is caught
+    before shipping or at scoring time.
+    """
+    if isinstance(spec, str):
+        try:
+            re.compile(spec)
+        except re.error as exc:
+            return [f"invalid regex {spec!r}: {exc}"]
+        return []
+    if not isinstance(spec, dict):
+        return [f"must be a regex string or a mapping, got {type(spec).__name__}"]
+
+    errors: list[str] = []
+    unknown = sorted(str(key) for key in spec if key not in GATE_SPEC_KEYS)
+    if unknown:
+        errors.append(
+            f"unknown gate key(s): {', '.join(unknown)}; allowed keys are "
+            f"{', '.join(GATE_SPEC_KEYS)}"
+        )
+    pattern = spec.get("pattern")
+    if not isinstance(pattern, str) or not pattern:
+        errors.append("a gate mapping requires a non-empty 'pattern' string")
+    else:
+        try:
+            re.compile(pattern)
+        except re.error as exc:
+            errors.append(f"invalid regex {pattern!r}: {exc}")
+    if not isinstance(spec.get("negation_guard", False), bool):
+        errors.append("'negation_guard' must be true or false")
+    for key in ("require_context", "exclude_context"):
+        if key not in spec:
+            continue
+        value = spec[key]
+        if not isinstance(value, str) or not value:
+            errors.append(f"'{key}' must be a non-empty regex string")
+            continue
+        try:
+            re.compile(value)
+        except re.error as exc:
+            errors.append(f"invalid regex in '{key}' {value!r}: {exc}")
+    return errors
+
+
+def _sentence_span(text: str, start: int, end: int) -> tuple[int, int]:
+    """Return the span of the sentence(s) the ``[start, end)`` match sits in."""
+    sentence_start = 0
+    sentence_end = len(text)
+    for boundary in _SENTENCE_BOUNDARY.finditer(text):
+        if boundary.end() <= start:
+            sentence_start = boundary.end()
+        elif boundary.start() >= end:
+            sentence_end = boundary.start()
+            break
+    return sentence_start, sentence_end
+
+
+def gate_match(spec: Any, text: str) -> str | None:
+    """Apply one critical-failure gate to ``text``; return its pattern, or ``None``.
+
+    ``spec`` is either a plain regex string — matched case-insensitively exactly as
+    every gate always has been — or a mapping opting into polarity and scope checks:
+
+    - ``pattern`` (required): the regex, unchanged in meaning.
+    - ``negation_guard``: drop a match when a negator sits between the start of its
+      sentence and the end of the matched span. That window is deliberately narrow;
+      a negator *after* the match usually governs a different clause.
+    - ``require_context``: fire only when this regex also matches in the sentence.
+    - ``exclude_context``: drop the match when this regex matches in the sentence.
+
+    A gate fires if *any* occurrence survives its guards. The returned value is the
+    ``pattern`` string itself, so trace attribution never changes shape.
+    """
+    if not isinstance(spec, dict):
+        return spec if re.search(spec, text, flags=re.IGNORECASE) else None
+
+    errors = gate_spec_errors(spec)
+    if errors:
+        raise ValueError(f"invalid critical-failure gate: {'; '.join(errors)}")
+
+    pattern = str(spec["pattern"])
+    negation_guard = bool(spec.get("negation_guard", False))
+    require_context = spec.get("require_context")
+    exclude_context = spec.get("exclude_context")
+    if not (negation_guard or require_context or exclude_context):
+        return pattern if re.search(pattern, text, flags=re.IGNORECASE) else None
+
+    for match in re.finditer(pattern, text, flags=re.IGNORECASE):
+        sentence_start, sentence_end = _sentence_span(text, match.start(), match.end())
+        if negation_guard and _NEGATOR.search(text[sentence_start : match.end()]):
+            continue
+        sentence = text[sentence_start:sentence_end]
+        if require_context and not re.search(require_context, sentence, flags=re.IGNORECASE):
+            continue
+        if exclude_context and re.search(exclude_context, sentence, flags=re.IGNORECASE):
+            continue
+        return pattern
+    return None
 
 
 @dataclass
@@ -291,10 +420,11 @@ class RewardEngine:
         if quote_details:
             details["quotes"] = quote_details
 
-        for pattern in criterion.get("critical_failure_patterns", []):
-            if re.search(pattern, combined_text, flags=re.IGNORECASE):
+        for spec in criterion.get("critical_failure_patterns", []):
+            matched = gate_match(spec, combined_text)
+            if matched is not None:
                 self.state.critical_failure = True
-                details["critical_failure_pattern"] = pattern
+                details["critical_failure_pattern"] = matched
 
         return self._record(points, "issue", rubric_id, details)
 
@@ -354,10 +484,11 @@ class RewardEngine:
 
         redline = _normalize(action.get("replacement_text", ""))
         details: dict[str, Any] = {"criterion": rubric_id}
-        for pattern in criterion.get("redline_critical_failure_patterns", []):
-            if re.search(pattern, redline, flags=re.IGNORECASE):
+        for spec in criterion.get("redline_critical_failure_patterns", []):
+            matched = gate_match(spec, redline)
+            if matched is not None:
                 self.state.critical_failure = True
-                details["critical_failure_pattern"] = pattern
+                details["critical_failure_pattern"] = matched
 
         required = [_normalize(item) for item in criterion.get("redline_concepts", [])]
         redline_points = float(criterion.get("redline_points", 1.0))
@@ -398,10 +529,11 @@ class RewardEngine:
             "matched_concepts": matched,
             "missing_concepts": missing,
         }
-        for pattern in criterion.get("settlement_critical_failure_patterns", []):
-            if re.search(pattern, text, flags=re.IGNORECASE):
+        for spec in criterion.get("settlement_critical_failure_patterns", []):
+            matched = gate_match(spec, text)
+            if matched is not None:
                 self.state.critical_failure = True
-                details["critical_failure_pattern"] = pattern
+                details["critical_failure_pattern"] = matched
         if criterion.get("non_negotiable", False) and missing:
             self.state.critical_failure = True
             details["non_negotiable_missing"] = missing

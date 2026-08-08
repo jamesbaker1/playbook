@@ -91,6 +91,7 @@ def compute_metrics(
         "critical_failure": bool(result.get("critical_failure", False)),
         "terminated": bool(result.get("terminated", False)),
         "steps": int(result.get("steps", 0)),
+        "protocol_failures": int(result.get("protocol_failures", 0)),
     }
 
 
@@ -131,6 +132,38 @@ def aggregate_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return aggregate
 
 
+def _family_values(
+    rows: list[dict[str, Any]], metric: str, family_key: str
+) -> dict[str, list[float]]:
+    """Group per-episode metric values under their matter family, the resampling unit."""
+    families: dict[str, list[float]] = {}
+    for row in rows:
+        if family_key not in row:
+            raise ValueError(f"row is missing {family_key}")
+        value = (
+            float(bool(row.get("critical_failure")))
+            if metric == "critical_failure_rate"
+            else float(row[metric])
+        )
+        families.setdefault(str(row[family_key]), []).append(value)
+    return families
+
+
+def _round(value: float) -> float:
+    """Round to the reporting precision, normalizing a rounded -0.0 back to 0.0."""
+    return round(value, 4) + 0.0
+
+
+def _tail_indices(
+    samples: int, confidence_level: float, *, one_sided: bool
+) -> tuple[int | None, int]:
+    """Sorted-estimate indices for the requested interval; ``None`` lower means -inf."""
+    if one_sided:
+        return None, min(samples - 1, int(confidence_level * samples) - 1)
+    tail = (1 - confidence_level) / 2
+    return max(0, int(tail * samples)), min(samples - 1, int((1 - tail) * samples) - 1)
+
+
 def cluster_bootstrap_interval(
     rows: list[dict[str, Any]],
     metric: str,
@@ -145,16 +178,7 @@ def cluster_bootstrap_interval(
         raise ValueError("samples must be positive")
     if not 0 < confidence_level < 1:
         raise ValueError("confidence_level must be between zero and one")
-    families: dict[str, list[float]] = {}
-    for row in rows:
-        if family_key not in row:
-            raise ValueError(f"row is missing {family_key}")
-        value = (
-            float(bool(row.get("critical_failure")))
-            if metric == "critical_failure_rate"
-            else float(row[metric])
-        )
-        families.setdefault(str(row[family_key]), []).append(value)
+    families = _family_values(rows, metric, family_key)
     if not families:
         return {}
 
@@ -166,9 +190,7 @@ def cluster_bootstrap_interval(
         values = [value for family_id in selected for value in families[family_id]]
         estimates.append(sum(values) / len(values))
     estimates.sort()
-    tail = (1 - confidence_level) / 2
-    lower_index = max(0, int(tail * samples))
-    upper_index = min(samples - 1, int((1 - tail) * samples) - 1)
+    lower_index, upper_index = _tail_indices(samples, confidence_level, one_sided=False)
     observed = [value for values in families.values() for value in values]
     return {
         "metric": metric,
@@ -180,5 +202,78 @@ def cluster_bootstrap_interval(
         "estimate": round(sum(observed) / len(observed), 4),
         "lower": round(estimates[lower_index], 4),
         "upper": round(estimates[upper_index], 4),
+        "seed": seed,
+    }
+
+
+def cluster_bootstrap_difference(
+    rows_a: list[dict[str, Any]],
+    rows_b: list[dict[str, Any]],
+    metric: str,
+    *,
+    family_key: str = "matter_family_id",
+    samples: int = 2000,
+    confidence_level: float = 0.95,
+    seed: int = 0,
+    one_sided: bool = True,
+) -> dict[str, Any]:
+    """Bootstrap ``mean(rows_a) - mean(rows_b)`` by resampling matter families.
+
+    The experiment contract evaluates every condition on the same held-out families,
+    so both row sets must cover an identical family set (otherwise the difference
+    would confound the conditions with the matters they were scored on). Each
+    replicate draws one family list and applies it to both conditions, keeping the
+    comparison paired; within a condition the mean is episode-weighted, matching
+    :func:`cluster_bootstrap_interval`.
+
+    With ``one_sided`` the interval is ``(-inf, upper]`` and ``lower`` is reported as
+    ``None``. ``excludes_zero`` is derived from the rounded bounds that are reported,
+    so the flag and the published numbers can never disagree.
+    """
+    if samples <= 0:
+        raise ValueError("samples must be positive")
+    if not 0 < confidence_level < 1:
+        raise ValueError("confidence_level must be between zero and one")
+    families_a = _family_values(rows_a, metric, family_key)
+    families_b = _family_values(rows_b, metric, family_key)
+    if not families_a or not families_b:
+        raise ValueError("both conditions need at least one labelled episode")
+    if set(families_a) != set(families_b):
+        only_a = sorted(set(families_a) - set(families_b))
+        only_b = sorted(set(families_b) - set(families_a))
+        raise ValueError(
+            "conditions must be scored on identical matter families; "
+            f"only in the first: {only_a or ['none']}; only in the second: {only_b or ['none']}"
+        )
+
+    family_ids = sorted(families_a)
+    rng = random.Random(seed)
+    estimates: list[float] = []
+    for _ in range(samples):
+        selected = rng.choices(family_ids, k=len(family_ids))
+        values_a = [value for family_id in selected for value in families_a[family_id]]
+        values_b = [value for family_id in selected for value in families_b[family_id]]
+        estimates.append(sum(values_a) / len(values_a) - sum(values_b) / len(values_b))
+    estimates.sort()
+    lower_index, upper_index = _tail_indices(samples, confidence_level, one_sided=one_sided)
+    observed_a = [value for values in families_a.values() for value in values]
+    observed_b = [value for values in families_b.values() for value in values]
+    estimate = sum(observed_a) / len(observed_a) - sum(observed_b) / len(observed_b)
+    lower = None if lower_index is None else _round(estimates[lower_index])
+    upper = _round(estimates[upper_index])
+    excludes_zero = upper < 0 if lower is None else (upper < 0 or lower > 0)
+    return {
+        "metric": metric,
+        "method": "cluster_bootstrap",
+        "statistic": "difference_of_means",
+        "resampling_unit": "matter_family",
+        "families": len(family_ids),
+        "samples": samples,
+        "confidence_level": confidence_level,
+        "one_sided": one_sided,
+        "estimate": _round(estimate),
+        "lower": lower,
+        "upper": upper,
+        "excludes_zero": bool(excludes_zero),
         "seed": seed,
     }
