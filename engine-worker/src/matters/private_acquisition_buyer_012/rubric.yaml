@@ -29,9 +29,20 @@ issues:
     required_citations: ["purchase §4.8", "mandate §1"]
     required_concepts: ["actual", "reasonable inquiry", "direct reports"]
     redline_concepts: ["reasonable inquiry", "direct reports"]
-    redline_critical_failure_patterns: ["without inquiry"]
+    # The sin is preserving purchase §4.8's no-inquiry knowledge qualifier. Because the
+    # pattern contains its own negator ("without"), negation_guard would suppress every
+    # match, so the leading-negator case is written out longhand in exclude_context.
+    redline_critical_failure_patterns:
+      - pattern: "without inquiry"
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\b(?:no|not|never|nothing|none|neither|nor|cannot)\b[^.]*without inquiry'
+      - pattern: 'no duty to (?:make )?inquir\w*|no inquiry obligation'
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b'
     settlement_concepts: ["reasonable inquiry", "direct reports"]
-    settlement_critical_failure_patterns: ["without inquiry"]
+    settlement_critical_failure_patterns:
+      - pattern: "without inquiry"
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\b(?:no|not|never|nothing|none|neither|nor|cannot)\b[^.]*without inquiry'
+      - pattern: 'no duty to (?:make )?inquir\w*|no inquiry obligation'
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b'
   - id: basket_form
     anchor: "purchase §10.2"
     severity: high
@@ -45,10 +56,26 @@ issues:
     required_citations: ["purchase §10.2", "mandate §2"]
     required_concepts: ["first dollar", "deductible", "$1.5 million"]
     redline_concepts: ["above", "$1.5 million"]
-    redline_critical_failure_patterns: ["all losses from the first dollar"]
+    # The sin is the prohibited first-dollar tipping basket. Correct work negates it
+    # ("no losses are recoverable from the first dollar") or quotes the struck words of
+    # §10.2, so both guards apply; the second entry closes the hyphen / "dollar one" /
+    # "initial $1.5 million layer" restatements of the same sin.
+    redline_critical_failure_patterns:
+      - pattern: "all losses from the first dollar"
+        negation_guard: true
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b'
+      - pattern: 'first-dollar|dollar one|all losses,? including the (?:initial|first) \$1\.5 million'
+        negation_guard: true
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b'
     non_negotiable: true
     settlement_concepts: ["above", "$1.5 million"]
-    settlement_critical_failure_patterns: ["first dollar"]
+    settlement_critical_failure_patterns:
+      - pattern: "first dollar"
+        negation_guard: true
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b'
+      - pattern: 'first-dollar|dollar one|all losses,? including the (?:initial|first) \$1\.5 million'
+        negation_guard: true
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b'
   - id: indemnity_cap
     anchor: "purchase §10.3"
     severity: high
@@ -62,9 +89,22 @@ issues:
     required_citations: ["purchase §10.3", "mandate §3"]
     required_concepts: ["five percent", "7.5%", "special billing"]
     redline_concepts: ["7.5%", "special billing"]
-    redline_critical_failure_patterns: ["five percent"]
+    # The sin is closing at the sub-floor cap. negation_guard is deliberately NOT used:
+    # §10.3 states the cap as "will not exceed five percent", so a negator before the
+    # number is the sin's own phrasing. Only an express rejection ("not five percent")
+    # or a quoted-and-replaced mention is excluded. The second entry closes the numeric
+    # spellings of the same figure; the lookbehind keeps "7.5%" out of the match.
+    redline_critical_failure_patterns:
+      - pattern: "five percent"
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\b(?:not|rather than|instead of) (?:five|5)\b'
+      - pattern: '(?<![\d.])5\s*(?:%|percent)|five \(5\) percent'
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\b(?:not|rather than|instead of) (?:five|5)\b'
     settlement_concepts: ["7.5%", "special billing"]
-    settlement_critical_failure_patterns: ["five percent"]
+    settlement_critical_failure_patterns:
+      - pattern: "five percent"
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\b(?:not|rather than|instead of) (?:five|5)\b'
+      - pattern: '(?<![\d.])5\s*(?:%|percent)|five \(5\) percent'
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\b(?:not|rather than|instead of) (?:five|5)\b'
   - id: survival_period
     anchor: "purchase §10.4"
     severity: high
@@ -78,9 +118,22 @@ issues:
     required_citations: ["purchase §10.4", "mandate §4"]
     required_concepts: ["nine months", "fifteen months", "twenty-four months"]
     redline_concepts: ["fifteen months", "twenty-four months"]
-    redline_critical_failure_patterns: ["nine months|twelve months"]
+    # The sin is closing on Seller's sub-mandate survival period. Correct work names the
+    # replaced words of §10.4 or cites mandate §4's own reason ("nine months does not
+    # cover the payer audit cycle") — a trailing negator, so exclude_context, not
+    # negation_guard. The second entry closes the numeric / hyphenated / "one year"
+    # spellings of the same two periods.
+    redline_critical_failure_patterns:
+      - pattern: "nine months|twelve months"
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\bmonths? (?:does|do|would) not\b'
+      - pattern: '(?<![\d.])(?:9|12) months?|(?:nine|twelve)-month|(?:nine|twelve) \(\d+\) months?|\bone[- ]year\b'
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\bmonths? (?:does|do|would) not\b'
     settlement_concepts: ["fifteen months", "twenty-four months"]
-    settlement_critical_failure_patterns: ["nine months|twelve months"]
+    settlement_critical_failure_patterns:
+      - pattern: "nine months|twelve months"
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\bmonths? (?:does|do|would) not\b'
+      - pattern: '(?<![\d.])(?:9|12) months?|(?:nine|twelve)-month|(?:nine|twelve) \(\d+\) months?|\bone[- ]year\b'
+        exclude_context: '["“][^"”]*["”][^.]{0,24}\b(?:struck|stricken|deleted|removed|replaced)\b|\bmonths? (?:does|do|would) not\b'
 final_submission:
   points: 0.75
   minimum_characters: 220

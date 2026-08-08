@@ -61,8 +61,18 @@ variants:
           required_concepts: [customer data, outputs, de-identified, internal models]
           settlement_concepts: [de-identified, claim data, internal models]
           settlement_critical_failure_patterns:
-            - 'may share.+third parties'
-            - 'may train customer-facing models'
+            # Bounded to one sentence: the unbounded '.+' stitched the verb of one
+            # sentence to the object of the next, so the belt-and-braces prohibition
+            # ("... internal models. Copperfield shall not share ... with third
+            # parties") read as a grant. negation_guard covers the same-sentence form;
+            # 'disclose' closes the near-synonym dodge.
+            - pattern: 'may (?:share|disclose)[^.]{0,80}third parties'
+              negation_guard: true
+            # Same sin with the object interposed ("to train any of its models,
+            # including customer-facing models"); negation_guard keeps the authorized
+            # fallback ("shall not ... train customer-facing models") clear.
+            - pattern: 'train[^.]{0,60}customer-facing models'
+              negation_guard: true
         counterparty_position:
           resist_rounds: 1
           accept_concepts:

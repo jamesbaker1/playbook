@@ -41,14 +41,32 @@ issues:
     required_concepts: ["work product", "model weights", "license back", "assign"]
     redline_concepts: ["work product", "assigns", "model weights", "sole and exclusive"]
     critical_failure_patterns:
-      - "california law[^.]{0,120}work(s)? made for hire"
-      - "(automatically|by operation of law) vest[s]?[^.]{0,60}(client|customer)"
-      - "work(s)? made for hire[^.]{0,80}(automatically|by default|regardless of)"
+      # The sin is asserting California doctrine (not the contract) gives Harvest
+      # ownership. Sentence-scoped so the two halves may appear in either order and
+      # a section number between them ("Section 2.1") no longer truncates the window.
+      - pattern: '\bworks?([ -]made)?[ -]for[ -]hire\b'
+        require_context: "california law"
+        negation_guard: true
+      # Asserting title already vests without an assignment. Order-free via
+      # require_context; the exclusion keeps the playbook's own drafting
+      # instruction ("the replacement clause must provide that ... vest in Client").
+      - pattern: "vest[s]?[^.]{0,60}(client|customer)"
+        require_context: "(automatically|by operation of law)"
+        exclude_context: '\b(replacement clause|must provide)\b'
+        negation_guard: true
+      - pattern: '\bworks?([ -]made)?[ -]for[ -]hire\b[^.]{0,80}(automatically|by default|regardless of)'
+        negation_guard: true
     redline_critical_failure_patterns:
-      - "client (hereby )?(irrevocably )?assigns[^.]{0,80}consultant"
+      # Assigning the Work Product to Consultant — not a benign feedback assignment.
+      - pattern: "client (hereby )?(irrevocably )?assigns[^.]{0,80}consultant"
+        require_context: "(work product|model weights|deliverable|client materials)"
+        exclude_context: '\bno (right|ownership|title|interest)\b'
+        negation_guard: true
       - "consultant (is|shall be|will be) the (sole |exclusive )?owner of (the )?(client data|client materials)"
-      - "(client data|client materials)[^.]{0,60}(owned by|the property of) consultant"
-      - "client (hereby )?grants consultant[^.]{0,80}(ownership|all right, title)"
+      - pattern: "(client data|client materials)[^.]{0,60}(owned by|the property of) consultant"
+        negation_guard: true
+      - pattern: "client (hereby )?grants consultant[^.]{0,80}(ownership|all right, title)"
+        negation_guard: true
   - id: background_technology
     anchor: "psa §7.2"
     severity: high
@@ -74,11 +92,20 @@ issues:
     required_concepts: ["client data", "derived", "perpetual", "other clients"]
     redline_concepts: ["solely to perform", "shall not", "derived", "delete"]
     critical_failure_patterns:
-      - "(ccpa|california consumer privacy act)[^.]{0,100}(prohibits|bars|forbids|makes it unlawful)"
-      - "(is|are) (illegal|unlawful) under (the )?(ccpa|california law)"
+      # Inventing a statutory prohibition. Second branch catches the reversed
+      # "... violates the CCPA" phrasing of the same claim.
+      - pattern: "(ccpa|california consumer privacy act)[^.]{0,100}(prohibits|bars|forbids|makes it unlawful)|violates[^.]{0,40}(the )?(ccpa|california consumer privacy act)"
+        negation_guard: true
+      - pattern: "(is|are) (illegal|unlawful) under (the )?(ccpa|california consumer privacy act|california law)"
+        negation_guard: true
     redline_critical_failure_patterns:
-      - "(perpetual|irrevocable)[^.]{0,80}(other client|other customer|its other)"
-      - "consultant may (use|retain)[^.]{0,120}(other client|other customer)"
+      - pattern: "(perpetual|irrevocable)[^.]{0,80}(other client|other customer|its other)"
+        negation_guard: true
+      # Conceding the reuse right. "consultant retains" is the same concession as
+      # "consultant may retain"; a period inside a section number no longer ends
+      # the window (mirrors the engine's own sentence rule).
+      - pattern: 'consultant (may (continue to )?)?(use|retain)s?(?:[^.]|\.(?=\d)){0,140}(other client|other customer)'
+        negation_guard: true
   - id: acceptance_gate
     anchor: "sow §5.1"
     severity: high

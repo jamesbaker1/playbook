@@ -46,12 +46,20 @@ issues:
       - "corresponding source"
       - "statically linked"
       - "copyleft"
+    # Guarded gates: the overstatement is the sin, but naming and rejecting it is
+    # the duty instructions.md §3 imposes, so every gate here reads polarity.
     critical_failure_patterns:
-      - "infects (the entire|all of|every part of|the whole)"
-      - "(entire|whole) firmware (image )?(is|becomes|enters|falls into|must be released into) (the )?public domain"
-      - "(all|every line) of copperline's (source code|source|firmware) must be (released|published|disclosed|open-sourced)"
-      - "copperline (loses|forfeits|gives up|surrenders) (all )?(its )?(ownership|copyright|rights) (in|of|over) the firmware"
-      - "must (release|publish|open-source) (all of |all |the entirety of )(its|copperline's|the) (source code|firmware source|firmware)"
+      - pattern: "(infects|contaminates) (the entire|all of|every part of|the whole)"
+        negation_guard: true
+      - pattern: "(entire|whole) firmware (image )?(is|becomes|enters|falls into|must be released into) (the )?(public domain|freely available to the public)"
+        negation_guard: true
+        exclude_context: '\b(wrong|incorrect|inaccurate|untrue) to (say|suggest|claim)\b'
+      - pattern: "(all|every line) of (copperline's|the halyard-2) (source code|source|firmware) must be (released|published|disclosed|open-sourced)"
+        negation_guard: true
+      - pattern: "copperline (loses|forfeits|gives up|surrenders) (all )?(its )?(ownership|copyright|rights) (in|of|over) the firmware"
+        negation_guard: true
+      - pattern: "(must|is obliged to) (release|publish|open-source) ((all of |all |the entirety of )(its|copperline's|the)|(its|copperline's|the) entire) (source code|firmware source|firmware|codebase|source tree)"
+        negation_guard: true
   - id: attribution_notices
     anchor: "license §5.2"
     severity: medium
@@ -108,10 +116,16 @@ issues:
       - "defend"
       - "uncapped"
       - "copyleft"
+    # The sin is a reverse indemnity running from the client to the vendor.
+    # Expressly refusing one, and indemnity-procedure mechanics that shift cost
+    # back to the vendor when it defaults on the defense, are the opposite.
     redline_critical_failure_patterns:
-      - "licensee (shall|will|agrees to) (defend|indemnify)"
-      - "copperline (shall|will|agrees to) (defend|indemnify)"
-      - "(customer|licensee|copperline)[^.]{0,60}indemnif[a-z]* (licensor|kestrel|vendor)"
+      - pattern: "licensee (shall|will|agrees to|undertakes to) (defend|indemnify|hold (harmless )?(licensor|kestrel|vendor))"
+        exclude_context: '\bfails to assume the defen[cs]e\b'
+      - pattern: "copperline (shall|will|agrees to|undertakes to) (defend|indemnify|hold (harmless )?(licensor|kestrel|vendor))"
+        exclude_context: '\bfails to assume the defen[cs]e\b'
+      - pattern: "(customer|licensee|copperline)[^.]{0,60}(indemnif[a-z]* (licensor|kestrel|vendor)|make (licensor|kestrel|vendor) whole)"
+        negation_guard: true
   - id: device_telemetry
     anchor: "license §8.3"
     severity: medium

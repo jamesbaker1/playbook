@@ -169,6 +169,32 @@ def test_unknown_gate_key_fails(tmp_path: Path) -> None:
     assert any("unknown gate key(s): negation" in error for error in report.errors)
 
 
+def test_negation_scope_value_is_checked(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].__setitem__(
+            "settlement_critical_failure_patterns",
+            [{"pattern": "30 days", "negation_guard": True, "negation_scope": "sentence"}],
+        ),
+    )
+    report = lint_matter(matter_dir)
+    assert any("'negation_scope' must be one of" in error for error in report.errors)
+
+
+def test_negation_scope_before_passes(tmp_path: Path) -> None:
+    matter_dir = _write_minimal_matter(tmp_path)
+    _mutate_rubric(
+        matter_dir,
+        lambda r: r["issues"][0].__setitem__(
+            "critical_failure_patterns",
+            [{"pattern": "in no event later than", "negation_guard": True, "negation_scope": "before"}],
+        ),
+    )
+    report = lint_matter(matter_dir)
+    assert report.ok, report.errors
+
+
 def test_gate_mapping_without_pattern_fails(tmp_path: Path) -> None:
     matter_dir = _write_minimal_matter(tmp_path)
     _mutate_rubric(

@@ -107,7 +107,13 @@ variants:
           required_concepts: [industry, disproportionate, comparable robotics]
           settlement_concepts: [disproportionately, comparable robotics]
           settlement_critical_failure_patterns:
-            - 'whether or not.+disproportion'
+            # Bounded to one sentence: the unbounded '.+' reached from a war /
+            # public-health carve-out in one sentence to "disproportionately" in the
+            # next, gating the split definition the delegated fallback authorizes.
+            # No negation_guard here - "whether or not" carries its own negator, so a
+            # guard would disable the gate outright. 'even if' / 'regardless of
+            # whether' close the near-synonym dodges of the same sin.
+            - pattern: '(?:whether or not|even if|regardless of whether)[^.]{0,80}disproportion'
         counterparty_position:
           resist_rounds: 1
           accept_concepts:

@@ -151,6 +151,13 @@ Three things the frontier rows change:
 
 ## Honest caveats
 
+- All rows in this report were measured under the pre-revision critical-failure
+  gates. An adversarial audit subsequently found and fixed regex false-positive
+  and false-negative surfaces in those gates (see the instrument-revision entry
+  in the CHANGELOG); the audit could not determine whether any *measured*
+  critical failure was a phrasing artifact, only that the instrument could not
+  rule it out. Critical rates measured after the revision are not numerically
+  comparable to this table without a re-run.
 - These are **raw models**, not legal products. Deployed tools add retrieval,
   guardrails, and domain tuning; this baseline measures what the underlying
   model class does with the workflow itself. It is a floor, not a verdict on any

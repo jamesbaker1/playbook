@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Instrument revision: public-corpus critical-failure gates migrated to structured guards
+
+- An adversarial probe of every gate pattern in the public corpus replay-confirmed
+  **84 false-positive blockers and 52 majors** across all eleven gated matters and the
+  training-family specs: bare regexes firing on *correct* work (state-then-negate
+  analysis, belt-and-braces prohibitions, negations reusing a document's own operative
+  words, savings clauses), while paraphrases of the sins they exist to catch slipped
+  through. All 106 gate patterns are now structured-guard entries (`negation_guard`,
+  `negation_scope`, `require_context`, `exclude_context`) and 88 trivial same-sin
+  dodges (word-order, near-synonym, typographic-apostrophe variants) are closed.
+- Every probe sentence ships as a regression test: `tests/gate_probes/*.yaml`
+  (384 entries — 240 must-fire, 144 must-stay-silent) driven by
+  `tests/test_gate_probes.py` against the live rubrics.
+- Verified with zero behavior drift outside the gates: every reference and adversarial
+  trajectory in `examples/` replays byte-identical (scores and gate attributions)
+  against the pre-migration rubrics; `bad_critical_*` files all still trip their named
+  gates. The verification pass also caught and fixed two defects the migration itself
+  introduced (a self-suppressing gate and an over-narrowed `require_context` in
+  `nego_saas_010`), which motivated the new `negation_scope: before` option.
+- **Comparability note:** all published rows in `results/v0.4.0/` — including the
+  frontier rows — were measured under the pre-revision gates. Critical-failure rates
+  measured after this revision are not numerically comparable to those rows without a
+  re-run; the revision removes instrument error in both directions.
+- Known remaining gaps are cataloged, not hidden: dodges that need genuinely new gate
+  concepts (including fabricated attributions in analysis prose, which only `quotes[]`
+  is checked for), guard edge cases knowingly traded, and ~40 concept-list circularity
+  notes. See the migration verification report referenced in
+  `docs/progress-2026-08-08.md`.
+
 ### Frontier reference rows (Claude Haiku 4.5, GPT-5.6-terra)
 
 - Two frontier models measured on all 12 public matters under the v0.4.0 protocol

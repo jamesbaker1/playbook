@@ -148,3 +148,23 @@ def test_negotiation_reference_replays_like_browser_and_matches_cli_exactly():
     assert {"escalate", "send_markup", "accept_counterparty"} <= {
         action["type"] for action in actions
     }
+
+
+def test_vendor_bundle_matches_canonical_source_and_matters():
+    """Same check CI runs, so an unvendored engine or rubric edit fails locally too.
+
+    Every test above scores against `matters/` and `src/playbook_legal` through the
+    Worker's own `core.py`, which imports the *vendored* copies; a stale bundle
+    therefore ships a Worker that grades differently from the CLI. Run
+    `python engine-worker/vendor.py` to fix.
+    """
+    spec = importlib.util.spec_from_file_location("worker_vendor", ROOT / "engine-worker/vendor.py")
+    assert spec and spec.loader
+    vendor = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(vendor)
+    differences = [
+        difference
+        for source, destination in vendor.DESTINATIONS.items()
+        for difference in vendor.verify(source, destination)
+    ]
+    assert not differences, "run python engine-worker/vendor.py: " + "; ".join(differences)

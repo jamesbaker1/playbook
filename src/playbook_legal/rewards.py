@@ -52,7 +52,20 @@ MINIMUM_QUOTE_CHARACTERS = 15
 
 # ---------------------------------------------------------------- gate patterns
 
-GATE_SPEC_KEYS = ("pattern", "negation_guard", "require_context", "exclude_context")
+GATE_SPEC_KEYS = (
+    "pattern",
+    "negation_guard",
+    "negation_scope",
+    "require_context",
+    "exclude_context",
+)
+
+# How much of the match the ``negation_guard`` window covers. "span" (the default,
+# and the original behaviour) runs the window to the END of the matched span, so a
+# negator inside the match suppresses it. "before" stops at the START of the match,
+# so a pattern whose own text contains a negator idiom ("in no event later than 72
+# hours") no longer suppresses itself.
+GATE_NEGATION_SCOPES = ("span", "before")
 
 # Words that reverse the polarity of the clause they govern, plus the "n't" suffix
 # ("cannot" is listed because it is one token; "can't" is caught by the suffix).
@@ -100,6 +113,11 @@ def gate_spec_errors(spec: Any) -> list[str]:
             errors.append(f"invalid regex {pattern!r}: {exc}")
     if not isinstance(spec.get("negation_guard", False), bool):
         errors.append("'negation_guard' must be true or false")
+    if "negation_scope" in spec and spec["negation_scope"] not in GATE_NEGATION_SCOPES:
+        errors.append(
+            f"'negation_scope' must be one of {', '.join(repr(s) for s in GATE_NEGATION_SCOPES)}, "
+            f"got {spec['negation_scope']!r}"
+        )
     for key in ("require_context", "exclude_context"):
         if key not in spec:
             continue
@@ -137,6 +155,13 @@ def gate_match(spec: Any, text: str) -> str | None:
     - ``negation_guard``: drop a match when a negator sits between the start of its
       sentence and the end of the matched span. That window is deliberately narrow;
       a negator *after* the match usually governs a different clause.
+    - ``negation_scope``: where the guard window stops — ``"span"`` (default, the
+      original behaviour) at the end of the match, ``"before"`` at its start so that
+      a negator *inside* the matched text is ignored. Use ``"before"`` when the sin
+      the pattern describes is itself drafted with a negator idiom ("in no event
+      later than 72 hours after Provider confirms"), which under ``"span"`` makes
+      the gate suppress the very clause it exists to catch. No effect without
+      ``negation_guard``.
     - ``require_context``: fire only when this regex also matches in the sentence.
     - ``exclude_context``: drop the match when this regex matches in the sentence.
 
@@ -152,6 +177,7 @@ def gate_match(spec: Any, text: str) -> str | None:
 
     pattern = str(spec["pattern"])
     negation_guard = bool(spec.get("negation_guard", False))
+    guard_stops_before_match = spec.get("negation_scope", "span") == "before"
     require_context = spec.get("require_context")
     exclude_context = spec.get("exclude_context")
     if not (negation_guard or require_context or exclude_context):
@@ -159,7 +185,8 @@ def gate_match(spec: Any, text: str) -> str | None:
 
     for match in re.finditer(pattern, text, flags=re.IGNORECASE):
         sentence_start, sentence_end = _sentence_span(text, match.start(), match.end())
-        if negation_guard and _NEGATOR.search(text[sentence_start : match.end()]):
+        guard_end = match.start() if guard_stops_before_match else match.end()
+        if negation_guard and _NEGATOR.search(text[sentence_start:guard_end]):
             continue
         sentence = text[sentence_start:sentence_end]
         if require_context and not re.search(require_context, sentence, flags=re.IGNORECASE):

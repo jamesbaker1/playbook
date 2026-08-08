@@ -334,6 +334,64 @@ def test_guards_combine() -> None:
     )
 
 
+# ------------------------------------------------------------------ negation scope
+
+# The sin drafted in its own standard negator idiom. DPA §5.2 of nego_saas_010 reads
+# "without undue delay and in no event later than 72 hours after Copperfield confirms",
+# so under the default "span" window the negator inside the match suppresses the gate
+# that exists to catch exactly this clause. "before" stops the window at the start of
+# the match and lets the idiom through, while a real disclaimer ahead of it still wins.
+IDIOM = (
+    r"\b(?:without undue delay|in no event)\b[^.]{0,60}\bafter\s+"
+    r"(?:[\w'’-]+\s+){0,3}confirm(?:s|ed|ing|ation)\b"
+)
+IDIOM_SPAN = {"pattern": IDIOM, "negation_guard": True}
+IDIOM_BEFORE = {"pattern": IDIOM, "negation_guard": True, "negation_scope": "before"}
+
+DPA_5_2 = (
+    "Copperfield will notify Customer of a Security Incident without undue delay and in "
+    "no event later than 72 hours after Copperfield confirms that the incident has "
+    "materially affected Customer Personal Data."
+)
+DPA_5_2_DISCLAIMED = (
+    "Copperfield shall notify Customer within 24 hours after Copperfield discovers a "
+    "Security Incident. It is not sufficient for Copperfield to give notice without undue "
+    "delay and in no event later than 72 hours after Copperfield confirms the incident."
+)
+
+
+def test_span_scope_lets_the_idiom_suppress_its_own_gate() -> None:
+    """The defect the scope key exists for: the sin's own negator silences the gate."""
+    assert gate_match(IDIOM_SPAN, normalize_text(DPA_5_2)) is None
+
+
+def test_before_scope_fires_on_the_idiom() -> None:
+    assert gate_match(IDIOM_BEFORE, normalize_text(DPA_5_2)) == IDIOM
+
+
+def test_before_scope_still_honours_a_negator_ahead_of_the_match() -> None:
+    """Only negators *inside* the match are ignored; the guard is not switched off."""
+    assert gate_match(IDIOM_BEFORE, normalize_text(DPA_5_2_DISCLAIMED)) is None
+    assert gate_match(IDIOM_SPAN, normalize_text(DPA_5_2_DISCLAIMED)) is None
+
+
+def test_negation_scope_defaults_to_span() -> None:
+    text = normalize_text("Provider may not retain Customer Data after expiration.")
+    explicit = {**RETAIN_DATA, "negation_scope": "span"}
+    assert gate_match(RETAIN_DATA, text) is None
+    assert gate_match(explicit, text) is None
+    assert gate_match({**RETAIN_DATA, "negation_scope": "before"}, text) is None, (
+        "'may not' sits ahead of the match, so 'before' must not re-open it"
+    )
+
+
+def test_negation_scope_is_inert_without_the_guard() -> None:
+    """A scope on an unguarded gate changes nothing: the gate was never suppressing."""
+    text = normalize_text(DPA_5_2_DISCLAIMED)
+    assert gate_match({"pattern": IDIOM}, text) == IDIOM
+    assert gate_match({"pattern": IDIOM, "negation_scope": "before"}, text) == IDIOM
+
+
 def test_the_negator_list_is_closed() -> None:
     """Only the listed negators suppress: 'nobody' is not one of them."""
     assert gate_match(RETAIN_DATA, normalize_text("Nobody may retain Customer Data.")) is not None
@@ -351,6 +409,14 @@ def test_the_negator_list_is_closed() -> None:
         pytest.param({"pattern": "x", "require_context": "(unclosed"}, id="bad_require_context"),
         pytest.param({"pattern": "x", "exclude_context": "(unclosed"}, id="bad_exclude_context"),
         pytest.param({"pattern": "x", "negation_guard": "yes"}, id="non_boolean_guard"),
+        pytest.param(
+            {"pattern": "x", "negation_guard": True, "negation_scope": "sentence"},
+            id="unknown_negation_scope",
+        ),
+        pytest.param(
+            {"pattern": "x", "negation_guard": True, "negation_scope": True},
+            id="non_string_negation_scope",
+        ),
     ],
 )
 def test_malformed_gate_specs_are_rejected_not_ignored(spec: dict) -> None:
