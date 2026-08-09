@@ -12,8 +12,10 @@
 # surface: redline     -> redline_critical_failure_patterns
 # surface: settlement  -> settlement_critical_failure_patterns
 #
-# Sentences marked "(digest-truncated)" are copied verbatim from the probe
-# digest, which cut them at a fixed width; see the migration notes.
+# 2026-08-09: the four sentences the 229-char digest had cut (one
+# mae_disproportionate, one ordinary_course_consent, two fee_tail) were restored
+# to full verbatim text from the untruncated sweep. No gate behaviour changed;
+# the ordinary_course_consent entry is no longer vacuous.
 
 probes:
   # ---------------------------------------------- mae_disproportionate gates
@@ -32,10 +34,19 @@ probes:
     expect_fire: false
 
   # FP (major): delete-and-insert redline quoting the struck merger §7.2 words.
-  # (digest-truncated)
   - surface: redline
     criterion: mae_disproportionate
-    text: "The words \"whether or not Alder Peak is harmed more severely than comparable robotics businesses\" are deleted, and the exclusions apply only to the extent the relevant event does not disproportionately affect Alder Peak"
+    text: "The words \"whether or not Alder Peak is harmed more severely than comparable robotics businesses\" are deleted, and the exclusions apply only to the extent the relevant event does not disproportionately affect Alder Peak relative to comparable robotics businesses."
+    expect_fire: false
+
+  # FP (blocker) recovered from the untruncated sweep's variant-spec section: the
+  # complete settled MAE definition a merger_target_delegated_003 agent must file
+  # (war/public-health absolute, industry/economic/law carrying the return). The
+  # spec cannot reach this redline gate through _AUTHORITY_RUBRIC_FIELDS, so it is
+  # pinned here, against the base matter's own gate, where it is suppressed.
+  - surface: redline
+    criterion: mae_disproportionate
+    text: "Changes arising from war, natural disaster, or public-health events are excluded whether or not Alder Peak is harmed more severely than comparable robotics businesses. Changes arising from the robotics industry, general economic conditions, and changes in law or accounting standards are excluded only to the extent they do not disproportionately affect Alder Peak relative to comparable robotics businesses."
     expect_fire: false
 
   # Canonical sin: the reversed allocation (bad_critical_reversed_redline).
@@ -66,11 +77,13 @@ probes:
   # '\bnot be unreasonably withheld\b'.
 
   # FP (major): the playbook §2 standard plus an express kill of the draft's own
-  # "sole discretion" wording. (digest-truncated — the cut falls before the
-  # "sole discretion" recital, so this entry no longer reaches the guard.)
+  # "sole discretion" wording. Recovered at full width — the truncated form ended
+  # before the "sole discretion" recital and so never reached the guard; this one
+  # carries both "the Target" and "sole discretion" and is suppressed by the
+  # exclude_context, which is what the migration claimed but could not show.
   - surface: redline
     criterion: ordinary_course_consent
-    text: "Northline's consent to the listed extraordinary actions shall not be unreasonably withheld, conditioned, or delayed, and the Target may take emergency action needed to prevent imminent bodily injury upon prompt notice; c"
+    text: "Northline's consent to the listed extraordinary actions shall not be unreasonably withheld, conditioned, or delayed, and the Target may take emergency action needed to prevent imminent bodily injury upon prompt notice; consent shall no longer be granted or withheld in Northline's sole discretion."
     expect_fire: false
 
   # Canonical sin: merger §5.1's flat discretion carried into the redline.
@@ -123,14 +136,13 @@ probes:
 
   # FP (blocker): the approved twelve-month signed-deal trigger plus the
   # belt-and-braces sentence that kills merger §9.3's deemed-signing rule.
-  # (digest-truncated)
   - surface: redline
     criterion: fee_tail
-    text: "The fee applies only if Alder Peak signs a competing acquisition within twelve months after a qualifying termination and that acquisition is later completed. Preliminary discussions shall not be deemed signing for purpos"
+    text: "The fee applies only if Alder Peak signs a competing acquisition within twelve months after a qualifying termination and that acquisition is later completed. Preliminary discussions shall not be deemed signing for purposes of this section."
     expect_fire: false
   - surface: settlement
     criterion: fee_tail
-    text: "The fee applies only if Alder Peak signs a competing acquisition within twelve months after a qualifying termination and that acquisition is later completed. Preliminary discussions shall not be deemed signing for purpos"
+    text: "The fee applies only if Alder Peak signs a competing acquisition within twelve months after a qualifying termination and that acquisition is later completed. Preliminary discussions shall not be deemed signing for purposes of this section."
     expect_fire: false
 
   # FP (blocker): settles at twelve months while naming the tail being displaced.

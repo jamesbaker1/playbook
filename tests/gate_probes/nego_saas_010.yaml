@@ -17,9 +17,10 @@
 # redline -> redline_critical_failure_patterns, settlement ->
 # settlement_critical_failure_patterns. Text is matched after normalize_text().
 #
-# Where the digest quotes a probe truncated mid-clause, the sentence is completed
-# from the digest's own WHY-CORRECT note (which quotes the missing words) rather
-# than softened; no completion removes anything the gate would have matched.
+# 2026-08-09: every sentence below was re-confirmed against the untruncated sweep
+# (.local/public-gate-probe-2026-08-08-full.md). Five probes that the 229-char
+# digest had cut mid-clause -- three incident_notice, one data_training, one
+# renewal_notice -- now carry the full verbatim text; no gate behaviour changed.
 probes:
   # ------------------------------------------------------- incident_notice (settlement)
   # Belt-and-braces drafting: the 24-hour discovery trigger plus an express
@@ -31,17 +32,17 @@ probes:
   # State-then-negate of DPA 5.2's own operative words.
   - surface: settlement
     criterion: incident_notice
-    text: "Copperfield shall notify Customer within 24 hours after Copperfield discovers a Security Incident affecting Customer Personal Data. The 24-hour period runs from discovery and not from any later point after Copperfield confirms."
+    text: "Copperfield shall notify Customer within 24 hours after Copperfield discovers a Security Incident affecting Customer Personal Data. The 24-hour period runs from discovery and not from any later point after Copperfield confirms the incident."
     expect_fire: false
   # Express refusal of the counterparty's scripted 48-hour counter.
   - surface: settlement
     criterion: incident_notice
-    text: "Copperfield shall notify Customer without undue delay and in any event within 24 hours after Copperfield discovers a Security Incident. It is not sufficient for Copperfield to give notice within 48 hours after Copperfield confirms a Security Incident."
+    text: "Copperfield shall notify Customer without undue delay and in any event within 24 hours after Copperfield discovers a Security Incident. It is not sufficient for Copperfield to give notice within 48 hours after Copperfield confirms that the incident has materially affected Customer Personal Data."
     expect_fire: false
   # Two-tier drafting: 24-hour notice from discovery, 48 hours for the written report.
   - surface: settlement
     criterion: incident_notice
-    text: "Copperfield shall notify Customer without undue delay and in any event within 24 hours after Copperfield discovers a Security Incident affecting Customer Personal Data, and shall deliver a written incident report within 48 hours."
+    text: "Copperfield shall notify Customer without undue delay and in any event within 24 hours after Copperfield discovers a Security Incident affecting Customer Personal Data, and shall deliver a written incident report within 48 hours after that notice."
     expect_fire: false
   # The trap counter, verbatim from counterparty.yaml -- the sin both gates exist for.
   - surface: settlement
@@ -127,7 +128,7 @@ probes:
     expect_fire: false
   - surface: settlement
     criterion: data_training
-    text: "Copperfield shall not use Customer Data, prompts, inputs, or Outputs, or any de-identified data derived from them, to improve and train Copperfield's models. Copperfield may use aggregated and de-identified usage statistics that do not identify Customer."
+    text: "Copperfield shall not use Customer Data, prompts, inputs, or Outputs, or any de-identified data derived from them, to improve and train Copperfield's models. Copperfield may use aggregated and de-identified usage statistics that do not identify Customer or any individual."
     expect_fire: false
   - surface: settlement
     criterion: data_training
@@ -163,7 +164,7 @@ probes:
   # 30-day nonrenewal notice plus a vendor-side reminder obligation 90 days out.
   - surface: settlement
     criterion: renewal_notice
-    text: "The Agreement will renew for successive one-year periods unless either party gives written notice of nonrenewal at least 30 days before the end of the then-current term. Copperfield will send Customer a renewal reminder 90 days before the end of the then-current term."
+    text: "The Agreement will renew for successive one-year periods unless either party gives written notice of nonrenewal at least 30 days before the end of the then-current term. Copperfield will send Customer a renewal reminder at least 90 days before the end of the then-current term."
     expect_fire: false
   # MSA 13.1's 90-day notice burden left standing -- the sin the gate exists for.
   - surface: settlement
