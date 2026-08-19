@@ -121,6 +121,9 @@ Credit is earned by **content**, never by guessing rubric internals:
 ## Quick start
 
 Playbook is not yet published to PyPI; install it from a clone of this repository.
+A dataset mirror (matters, trajectories, gate probes, scorecards, pilot summaries) is
+published at [huggingface.co/datasets/jimbobjordan/playbook](https://huggingface.co/datasets/jimbobjordan/playbook);
+this repository remains the source of truth.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
