@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 500" preserveAspectRatio="xMidYMid meet" role="img" style="width:100%;height:auto;display:block">
+<title>Family-clustered bootstrap distribution of the terra minus Haiku critical-failure-rate difference</title>
+<desc>Histogram of 2,000 cluster-bootstrap resamples of the difference in critical-failure rate between gpt-5.6-terra and claude-haiku-4.5 over 12 dev matter families. Every resampled difference falls at or below 0: 3 at -0.75, 8 at -0.6667, 29 at -0.5833, 65 at -0.50, 199 at -0.4167, 420 at -0.3333, 503 at -0.25, 459 at -0.1667, 250 at -0.0833 and 64 at exactly 0. Bins are centred on the attainable values and clipped to the observed range -0.75 to 0, so the histogram stops at the zero line. The point estimate is -0.25 and the one-sided 95% upper bound is -0.0833, which sits clear of zero. Machinery demonstration only, not the Playbook-1 experiment.</desc>
+<rect x="0" y="0" width="860" height="500" fill="#f7f5f0"/>
+<g font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace">
+
+<!-- header -->
+<text x="90" y="32" fill="#1a1916" font-size="15">terra &#8722; Haiku critical-failure-rate difference: 2,000 bootstrap resamples</text>
+<text x="90" y="53" fill="#8a857a" font-size="12">machinery demonstration - not the experiment: 2,000 resamples over 12 dev families</text>
+<text x="90" y="72" fill="#8a857a" font-size="11">bar height = resample count; the resamples span &#8722;0.75 to 0, and 1,936 of 2,000 fall strictly below 0</text>
+
+<!-- histogram bars: one bin per attainable value, k/12 for k = -9 .. 0,
+     bins centred on the value and clipped to the observed range -0.75 .. 0 -->
+<g fill="#b5b3af">
+<rect x="126" y="388.57" width="35" height="1.43"/>
+<rect x="163" y="386.18" width="70" height="3.82"/>
+<path d="M235 390 L235 379.16 Q235 376.16 238 376.16 L302 376.16 Q305 376.16 305 379.16 L305 390 Z"/>
+<path d="M307 390 L307 361.99 Q307 358.99 310 358.99 L374 358.99 Q377 358.99 377 361.99 L377 390 Z"/>
+<path d="M379 390 L379 298.05 Q379 295.05 382 295.05 L446 295.05 Q449 295.05 449 298.05 L449 390 Z"/>
+<path d="M451 390 L451 192.60 Q451 189.60 454 189.60 L518 189.60 Q521 189.60 521 192.60 L521 390 Z"/>
+<path d="M523 390 L523 153.00 Q523 150.00 526 150.00 L590 150.00 Q593 150.00 593 153.00 L593 390 Z"/>
+<path d="M595 390 L595 174.00 Q595 171.00 598 171.00 L662 171.00 Q665 171.00 665 174.00 L665 390 Z"/>
+<path d="M667 390 L667 273.72 Q667 270.72 670 270.72 L734 270.72 Q737 270.72 737 273.72 L737 390 Z"/>
+<path d="M739 390 L739 362.46 Q739 359.46 742 359.46 L771 359.46 Q774 359.46 774 362.46 L774 390 Z"/>
+</g>
+
+<!-- selective bin labels -->
+<text x="558" y="142" fill="#1a1916" font-size="12" text-anchor="middle">503</text>
+<text x="757" y="351" fill="#1a1916" font-size="12" text-anchor="middle">64</text>
+
+<!-- zero reference -->
+<line x1="774" y1="136" x2="774" y2="390" stroke="#d8d4ca" stroke-width="1"/>
+<text x="774" y="128" fill="#8a857a" font-size="11" text-anchor="middle">0</text>
+
+<!-- one-sided 95% upper bound -->
+<line x1="702" y1="136" x2="702" y2="398" stroke="#b3372c" stroke-width="2"/>
+<circle cx="702" cy="136" r="3" fill="#b3372c"/>
+<text x="692" y="112" fill="#8a857a" font-size="11" text-anchor="end">one-sided 95% upper bound</text>
+<text x="692" y="128" fill="#1a1916" font-size="13" text-anchor="end">&#8722;0.0833</text>
+
+<!-- value axis -->
+<line x1="118" y1="390" x2="790" y2="390" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="126" y1="390" x2="126" y2="396" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="342" y1="390" x2="342" y2="396" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="774" y1="390" x2="774" y2="396" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="558" y1="390" x2="558" y2="402" stroke="#1a1916" stroke-width="2"/>
+<text x="126" y="414" fill="#8a857a" font-size="11" text-anchor="middle">&#8722;0.75</text>
+<text x="342" y="414" fill="#8a857a" font-size="11" text-anchor="middle">&#8722;0.50</text>
+<text x="558" y="414" fill="#1a1916" font-size="11" text-anchor="middle">&#8722;0.25</text>
+<text x="774" y="414" fill="#8a857a" font-size="11" text-anchor="middle">0</text>
+<text x="558" y="430" fill="#8a857a" font-size="11" text-anchor="middle">point estimate</text>
+<text x="450" y="456" fill="#8a857a" font-size="11" text-anchor="middle">difference in critical-failure rate (gpt-5.6-terra &#8722; claude-haiku-4.5)</text>
+
+<text x="90" y="480" fill="#8a857a" font-size="11">estimator playbook_legal.metrics.cluster_bootstrap_difference &#183; unit matter_family &#183; seed 0</text>
+</g>
+</svg>

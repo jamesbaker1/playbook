@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 396" preserveAspectRatio="xMidYMid meet" role="img" style="width:100%;height:auto;display:block">
+<title>Critical-failure rate by model with 95% cluster-bootstrap intervals, v0.4.0 dev split</title>
+<desc>Dot-and-whisker chart of critical-failure rate per model. Point estimates range from 0.0000 to 0.2500, but the 95% intervals, resampled by matter family, are so wide that all four non-degenerate intervals share the range 0.0000 to 0.1389. GPT-5.6-terra's interval is degenerate: no failures were observed.</desc>
+<rect x="0" y="0" width="880" height="396" fill="#f7f5f0"/>
+<g font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace" font-size="12">
+<text x="48" y="34" fill="#8a857a" font-size="12">critical-failure rate by model, 95% cluster-bootstrap CI, v0.4.0 dev split</text>
+<rect x="240.00" y="96.00" width="101.02" height="210.00" fill="#b3372c" fill-opacity="0.13"/>
+<text x="240.00" y="84" fill="#8a857a" font-size="11">all 4 non-degenerate intervals overlap on 0.0000 to 0.1389</text>
+<line x1="312.73" y1="96.00" x2="312.73" y2="306.00" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="385.45" y1="96.00" x2="385.45" y2="306.00" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="458.18" y1="96.00" x2="458.18" y2="306.00" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="530.91" y1="96.00" x2="530.91" y2="306.00" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="603.64" y1="96.00" x2="603.64" y2="306.00" stroke="#d8d4ca" stroke-width="1"/>
+<text x="222" y="121.00" fill="#1a1916" text-anchor="end">GPT-5.6-terra</text>
+<text x="254.00" y="121.00" fill="#8a857a" font-size="11">degenerate: no failures observed in 12 families</text>
+<circle cx="240.00" cy="117.00" r="5" fill="#1a1916" stroke="#f7f5f0" stroke-width="2"/>
+<text x="660" y="121.00" fill="#1a1916" font-size="11">0.0000</text>
+<text x="710" y="121.00" fill="#8a857a" font-size="11">[0.0000, 0.0000]  12 ep</text>
+<text x="222" y="163.00" fill="#1a1916" text-anchor="end">Claude Haiku 4.5</text>
+<line x1="240.00" y1="159.00" x2="603.64" y2="159.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="240.00" y1="154.00" x2="240.00" y2="164.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="603.64" y1="154.00" x2="603.64" y2="164.00" stroke="#1a1916" stroke-width="1"/>
+<circle cx="421.82" cy="159.00" r="5" fill="#1a1916" stroke="#f7f5f0" stroke-width="2"/>
+<text x="660" y="163.00" fill="#1a1916" font-size="11">0.2500</text>
+<text x="710" y="163.00" fill="#8a857a" font-size="11">[0.0000, 0.5000]  12 ep</text>
+<text x="222" y="205.00" fill="#1a1916" text-anchor="end">Qwen2.5-32B-Instruct</text>
+<line x1="240.00" y1="201.00" x2="603.64" y2="201.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="240.00" y1="196.00" x2="240.00" y2="206.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="603.64" y1="196.00" x2="603.64" y2="206.00" stroke="#1a1916" stroke-width="1"/>
+<circle cx="421.82" cy="201.00" r="5" fill="#1a1916" stroke="#f7f5f0" stroke-width="2"/>
+<text x="660" y="205.00" fill="#1a1916" font-size="11">0.2500</text>
+<text x="710" y="205.00" fill="#8a857a" font-size="11">[0.0000, 0.5000]  12 ep</text>
+<text x="222" y="247.00" fill="#1a1916" text-anchor="end">Qwen2.5-14B-Instruct</text>
+<line x1="240.00" y1="243.00" x2="482.40" y2="243.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="240.00" y1="238.00" x2="240.00" y2="248.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="482.40" y1="238.00" x2="482.40" y2="248.00" stroke="#1a1916" stroke-width="1"/>
+<circle cx="341.02" cy="243.00" r="5" fill="#1a1916" stroke="#f7f5f0" stroke-width="2"/>
+<text x="660" y="247.00" fill="#1a1916" font-size="11">0.1389</text>
+<text x="710" y="247.00" fill="#8a857a" font-size="11">[0.0000, 0.3333]  36 ep</text>
+<text x="222" y="289.00" fill="#1a1916" text-anchor="end">Qwen2.5-7B-Instruct</text>
+<line x1="240.00" y1="285.00" x2="341.02" y2="285.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="240.00" y1="280.00" x2="240.00" y2="290.00" stroke="#1a1916" stroke-width="1"/>
+<line x1="341.02" y1="280.00" x2="341.02" y2="290.00" stroke="#1a1916" stroke-width="1"/>
+<circle cx="280.44" cy="285.00" r="5" fill="#1a1916" stroke="#f7f5f0" stroke-width="2"/>
+<text x="660" y="289.00" fill="#1a1916" font-size="11">0.0556</text>
+<text x="710" y="289.00" fill="#8a857a" font-size="11">[0.0000, 0.1389]  36 ep</text>
+<line x1="240.00" y1="306.00" x2="640.00" y2="306.00" stroke="#d8d4ca" stroke-width="1"/>
+<text x="240.00" y="326" fill="#8a857a" font-size="11" text-anchor="middle">0.0</text>
+<text x="312.73" y="326" fill="#8a857a" font-size="11" text-anchor="middle">0.1</text>
+<text x="385.45" y="326" fill="#8a857a" font-size="11" text-anchor="middle">0.2</text>
+<text x="458.18" y="326" fill="#8a857a" font-size="11" text-anchor="middle">0.3</text>
+<text x="530.91" y="326" fill="#8a857a" font-size="11" text-anchor="middle">0.4</text>
+<text x="603.64" y="326" fill="#8a857a" font-size="11" text-anchor="middle">0.5</text>
+<text x="240.00" y="344" fill="#8a857a" font-size="11">critical-failure rate (share of episodes)</text>
+<text x="48" y="364" fill="#8a857a" font-size="11">pre-revision instrument; single seed for terra/Haiku/32B</text>
+<text x="48" y="382" fill="#8a857a" font-size="11">95% CI: cluster bootstrap resampled by matter family, 2,000 samples</text>
+</g></svg>

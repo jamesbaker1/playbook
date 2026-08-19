@@ -1,0 +1,156 @@
+/* playbook — writing. Loaded after style.css, which owns the palette, the
+ * header, and the footer. Nothing here touches a workspace selector: this file
+ * only adds the reading measure and long-form typography the gym never needed. */
+
+body.post-page {
+  height: auto;
+  min-height: 100%;
+  background: var(--paper);
+}
+
+/* style.css lays the gym out as a three-column app shell:
+ *   main       { display: grid; grid-template-columns: 250px minmax(0,1fr) 360px; min-height: 0 }
+ *   main > *   { min-height: 0; overflow-y: auto }
+ * A post is a document, not an app, so both rules are neutralised here. These
+ * selectors outrank the bare element selectors on specificity (0,1,1) vs (0,0,1)
+ * and (0,1,2) vs (0,0,1), and posts.css is linked after style.css, so the
+ * override wins on both counts. grid-template-columns is left alone: it is inert
+ * once the container is no longer a grid. */
+.post-page main {
+  display: block;
+  overflow: visible;
+  flex: 1;
+  width: min(74ch, 100%);
+  min-height: auto;
+  margin: 0 auto;
+  padding: clamp(34px, 6vw, 74px) 20px 64px;
+}
+
+.post-page main > * {
+  min-height: auto;
+  overflow-y: visible;
+}
+
+.post-page .eyebrow { margin-bottom: 14px; }
+
+.post-page h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4.4vw, 48px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  margin: 0 0 14px;
+}
+
+.post-meta {
+  color: var(--muted);
+  font: 11px/1.5 var(--mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ------------------------------------------------------------- post body */
+
+.post-body {
+  max-width: 68ch;
+  margin-top: 30px;
+  font-size: 16px;
+  line-height: 1.72;
+}
+
+.post-body > * + * { margin-top: 1.15em; }
+
+.post-body h2, .post-body h3, .post-body h4 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -.01em;
+  line-height: 1.2;
+  margin-top: 1.9em;
+}
+
+.post-body h2 { font-size: 27px; }
+.post-body h3 { font-size: 21px; }
+.post-body h4 { font-size: 17px; font-family: "Segoe UI", Arial, sans-serif; font-weight: 700; }
+
+.post-body a { text-decoration: underline; }
+.post-body strong { font-weight: 650; }
+
+.post-body ul, .post-body ol { padding-left: 22px; }
+.post-body li + li { margin-top: .4em; }
+
+.post-body blockquote {
+  border-left: 2px solid var(--red);
+  padding: 2px 0 2px 16px;
+  color: var(--muted);
+}
+
+.post-body code { padding: 1px 4px; background: var(--paper-2); font: .87em/1.4 var(--mono); }
+
+.post-body pre {
+  overflow-x: auto;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  font: 12.5px/1.6 var(--mono);
+}
+
+.post-body pre code { padding: 0; background: transparent; font-size: inherit; }
+
+.post-body .table-scroll { overflow-x: auto; }
+
+.post-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.post-body th, .post-body td {
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.post-body th { background: var(--paper-2); font-weight: 650; }
+
+.post-body hr { height: 0; margin: 2em 0; border: 0; border-top: 1px solid var(--line); }
+
+.post-body img { display: block; max-width: 100%; height: auto; }
+
+.post-body figure { margin: 0; }
+.post-body figcaption { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+/* KaTeX renders client-side; until it does, the raw delimiters are the fallback.
+   A wide formula scrolls inside its own box rather than widening the measure. */
+.post-body .katex { font-size: 1.04em; }
+.post-body .katex-display { overflow-x: auto; overflow-y: hidden; padding: 3px 0; }
+
+.post-back { margin-top: 46px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); }
+
+/* ------------------------------------------------------------ post index */
+
+.post-intro { max-width: 62ch; margin: 0 0 8px; color: #514c47; font-size: clamp(15px, 2vw, 18px); }
+
+.post-list { margin-top: 34px; border-top: 1px solid var(--line); }
+
+.post-list article { padding: 22px 0; border-bottom: 1px solid var(--line); }
+
+.post-list time { display: block; color: var(--muted); font: 11px/1.5 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+
+.post-list h2 { font-family: Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 400; letter-spacing: -.01em; margin: 5px 0 6px; }
+
+.post-list h2 a { text-decoration: none; }
+.post-list h2 a:hover { color: var(--red); }
+
+.post-list p { max-width: 64ch; color: var(--muted); }
+
+.post-empty { margin-top: 34px; padding: 26px 0; border-top: 1px solid var(--line); color: var(--muted); }
+
+@media (max-width: 980px) {
+  /* the gym hides its header links on narrow screens; a post still needs its
+     way back to the index and the workspace. */
+  .post-page header .header-link { display: inline; }
+}

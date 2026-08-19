@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 520" preserveAspectRatio="xMidYMid meet" role="img" style="width:100%;height:auto;display:block">
+<title>Four-stage rollout filter funnel for three teacher pilots</title>
+<desc>Three columns of descending bars, one per teacher, over the four filter stages applied to 8 candidate episodes each. Qwen2.5-32B unscaffolded: 8 candidates, 8 completed, 6 critical-free, 6 replay-verified, 0 above the 0.5 score bar, a 0% yield. Qwen3-235B scaffolded: 8, 8, 5, 5, 2, a 25% yield. DeepSeek-V3.2 scaffolded: 8, 7, 7, 7, 6, a 75% yield. The unscaffolded teacher survives every mechanical filter and then loses all six survivors at the score bar; the two scaffolded teachers lose candidates at different earlier stages. Pipeline validation only, not training data.</desc>
+<rect x="0" y="0" width="880" height="520" fill="#f7f5f0"/>
+<g font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace">
+
+<!-- header -->
+<text x="40" y="30" fill="#1a1916" font-size="15">Where each teacher loses its 8 candidate episodes</text>
+<text x="40" y="51" fill="#8a857a" font-size="12">pipeline validation only - not training data; teacher selection still pending owner approval</text>
+
+<!-- column headers: swatch + name, so identity is never colour alone -->
+<rect x="246" y="82" width="10" height="10" fill="#b3372c"/>
+<text x="262" y="91" fill="#1a1916" font-size="12">Qwen2.5-32B</text>
+<text x="262" y="107" fill="#8a857a" font-size="11">unscaffolded</text>
+
+<rect x="452" y="82" width="10" height="10" fill="#28588c"/>
+<text x="468" y="91" fill="#1a1916" font-size="12">Qwen3-235B</text>
+<text x="468" y="107" fill="#8a857a" font-size="11">scaffolded</text>
+
+<rect x="658" y="82" width="10" height="10" fill="#79913a"/>
+<text x="674" y="91" fill="#1a1916" font-size="12">DeepSeek-V3.2</text>
+<text x="674" y="107" fill="#8a857a" font-size="11">scaffolded</text>
+
+<line x1="40" y1="120" x2="840" y2="120" stroke="#d8d4ca" stroke-width="1"/>
+
+<!-- per-column baselines (0) and full-cohort reference (8 candidates) -->
+<g stroke="#d8d4ca" stroke-width="1">
+<line x1="246" y1="134" x2="246" y2="392"/><line x1="406" y1="134" x2="406" y2="392"/>
+<line x1="452" y1="134" x2="452" y2="392"/><line x1="612" y1="134" x2="612" y2="392"/>
+<line x1="658" y1="134" x2="658" y2="392"/><line x1="818" y1="134" x2="818" y2="392"/>
+</g>
+
+<!-- stage labels -->
+<g fill="#8a857a" font-size="11" text-anchor="end">
+<text x="206" y="154">candidates</text>
+<text x="206" y="210">completed</text>
+<text x="206" y="266">critical-free</text>
+<text x="206" y="322">replay-verified</text>
+</g>
+<text x="206" y="386" fill="#1a1916" font-size="12" text-anchor="end">score &#8805; 0.5</text>
+
+<!-- stage 1: candidates generated (8 / 8 / 8) -->
+<g>
+<path d="M246 143 L403 143 Q406 143 406 146 L406 154 Q406 157 403 157 L246 157 Z" fill="#b3372c"/>
+<path d="M452 143 L609 143 Q612 143 612 146 L612 154 Q612 157 609 157 L452 157 Z" fill="#28588c"/>
+<path d="M658 143 L815 143 Q818 143 818 146 L818 154 Q818 157 815 157 L658 157 Z" fill="#79913a"/>
+</g>
+<g fill="#1a1916" font-size="12">
+<text x="414" y="154">8</text><text x="620" y="154">8</text><text x="826" y="154">8</text>
+</g>
+
+<!-- stage 2: completed (8 / 8 / 7) -->
+<g>
+<path d="M246 199 L403 199 Q406 199 406 202 L406 210 Q406 213 403 213 L246 213 Z" fill="#b3372c"/>
+<path d="M452 199 L609 199 Q612 199 612 202 L612 210 Q612 213 609 213 L452 213 Z" fill="#28588c"/>
+<path d="M658 199 L795 199 Q798 199 798 202 L798 210 Q798 213 795 213 L658 213 Z" fill="#79913a"/>
+</g>
+<g fill="#1a1916" font-size="12">
+<text x="414" y="210">8</text><text x="620" y="210">8</text><text x="806" y="210">7</text>
+</g>
+
+<!-- stage 3: critical-free (6 / 5 / 7) -->
+<g>
+<path d="M246 255 L363 255 Q366 255 366 258 L366 266 Q366 269 363 269 L246 269 Z" fill="#b3372c"/>
+<path d="M452 255 L549 255 Q552 255 552 258 L552 266 Q552 269 549 269 L452 269 Z" fill="#28588c"/>
+<path d="M658 255 L795 255 Q798 255 798 258 L798 266 Q798 269 795 269 L658 269 Z" fill="#79913a"/>
+</g>
+<g fill="#1a1916" font-size="12">
+<text x="374" y="266">6</text><text x="560" y="266">5</text><text x="806" y="266">7</text>
+</g>
+
+<!-- stage 4: replay-verified (6 / 5 / 7) -->
+<g>
+<path d="M246 311 L363 311 Q366 311 366 314 L366 322 Q366 325 363 325 L246 325 Z" fill="#b3372c"/>
+<path d="M452 311 L549 311 Q552 311 552 314 L552 322 Q552 325 549 325 L452 325 Z" fill="#28588c"/>
+<path d="M658 311 L795 311 Q798 311 798 314 L798 322 Q798 325 795 325 L658 325 Z" fill="#79913a"/>
+</g>
+<g fill="#1a1916" font-size="12">
+<text x="374" y="322">6</text><text x="560" y="322">5</text><text x="806" y="322">7</text>
+</g>
+
+<!-- last gate: the 0.5 normalized-score bar (0 / 2 / 6) -->
+<line x1="40" y1="350" x2="840" y2="350" stroke="#d8d4ca" stroke-width="1"/>
+<rect x="246" y="373" width="3" height="14" fill="#b3372c"/>
+<path d="M452 373 L489 373 Q492 373 492 376 L492 384 Q492 387 489 387 L452 387 Z" fill="#28588c"/>
+<path d="M658 373 L775 373 Q778 373 778 376 L778 384 Q778 387 775 387 L658 387 Z" fill="#79913a"/>
+<g fill="#1a1916" font-size="18">
+<text x="258" y="387">0</text><text x="504" y="387">2</text><text x="790" y="387">6</text>
+</g>
+<g fill="#8a857a" font-size="11">
+<text x="258" y="405">0% yield</text><text x="504" y="405">25% yield</text><text x="790" y="405">75% yield</text>
+</g>
+
+<!-- caption -->
+<text x="40" y="440" fill="#8a857a" font-size="11">n=8 candidate episodes per teacher; four variants x two seeds</text>
+<text x="40" y="458" fill="#8a857a" font-size="11">stage tests: terminated and not truncated &#183; no critical failure &#183; bit-exact trace replay &#183; normalized_score &#8805; 0.5</text>
+<text x="40" y="476" fill="#8a857a" font-size="11">sources: results/v0.4.0/rollout-pilot.json &#183; results/rollout-pilot-2/{qwen3-235b,deepseek-v3.2}-summary.json</text>
+<text x="40" y="494" fill="#8a857a" font-size="11">the Qwen2.5-32B pilot predates the 0.5 bar; stage 4 recomputed from per-candidate scores (max 0.1923)</text>
+</g>
+</svg>

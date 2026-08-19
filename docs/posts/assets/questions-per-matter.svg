@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 430" preserveAspectRatio="xMidYMid meet" role="img" style="width:100%;height:auto;display:block">
+<title>Client questions asked per matter, v0.4.0 dev split</title>
+<desc>Horizontal bar chart of mean client questions asked per matter. The expert reference replay asks 2.67; every measured model asks between 0.25 and 1.47, all far short of the 3 to 4 question budget marked on the axis.</desc>
+<rect x="0" y="0" width="880" height="430" fill="#f7f5f0"/>
+<g font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace" font-size="12">
+<text x="48" y="34" fill="#8a857a" font-size="12">client questions asked per matter, v0.4.0 dev split</text>
+<rect x="642.00" y="96.00" width="130.67" height="264.00" fill="#d8d4ca" fill-opacity="0.70"/>
+<text x="707.33" y="84" fill="#8a857a" font-size="11" text-anchor="middle">question budget (3-4 per matter)</text>
+<line x1="380.67" y1="96.00" x2="380.67" y2="360.00" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="511.33" y1="96.00" x2="511.33" y2="360.00" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="642.00" y1="96.00" x2="642.00" y2="360.00" stroke="#d8d4ca" stroke-width="1"/>
+<line x1="772.67" y1="96.00" x2="772.67" y2="360.00" stroke="#d8d4ca" stroke-width="1"/>
+<text x="228" y="122.00" fill="#1a1916" text-anchor="end">Expert reference (replay)</text>
+<path d="M250.00 109.00 H594.44 Q598.44 109.00 598.44 113.00 V123.00 Q598.44 127.00 594.44 127.00 H250.00 Z" fill="#b3372c"/>
+<text x="608.44" y="122.00" fill="#1a1916">2.67</text>
+<text x="228" y="166.00" fill="#1a1916" text-anchor="end">GPT-5.6-terra</text>
+<path d="M250.00 153.00 H300.44 Q304.44 153.00 304.44 157.00 V167.00 Q304.44 171.00 300.44 171.00 H250.00 Z" fill="#1a1916"/>
+<text x="314.44" y="166.00" fill="#1a1916">0.42</text>
+<text x="228" y="210.00" fill="#1a1916" text-anchor="end">Claude Haiku 4.5</text>
+<path d="M250.00 197.00 H322.22 Q326.22 197.00 326.22 201.00 V211.00 Q326.22 215.00 322.22 215.00 H250.00 Z" fill="#1a1916"/>
+<text x="336.22" y="210.00" fill="#1a1916">0.58</text>
+<text x="228" y="254.00" fill="#1a1916" text-anchor="end">Qwen2.5-32B-Instruct</text>
+<path d="M250.00 241.00 H278.67 Q282.67 241.00 282.67 245.00 V255.00 Q282.67 259.00 278.67 259.00 H250.00 Z" fill="#1a1916"/>
+<text x="292.67" y="254.00" fill="#1a1916">0.25</text>
+<text x="228" y="298.00" fill="#1a1916" text-anchor="end">Qwen2.5-14B-Instruct</text>
+<path d="M250.00 285.00 H278.67 Q282.67 285.00 282.67 289.00 V299.00 Q282.67 303.00 278.67 303.00 H250.00 Z" fill="#1a1916"/>
+<text x="292.67" y="298.00" fill="#1a1916">0.25</text>
+<text x="228" y="342.00" fill="#1a1916" text-anchor="end">Qwen2.5-7B-Instruct</text>
+<path d="M250.00 329.00 H438.37 Q442.37 329.00 442.37 333.00 V343.00 Q442.37 347.00 438.37 347.00 H250.00 Z" fill="#1a1916"/>
+<text x="452.37" y="342.00" fill="#1a1916">1.47</text>
+<line x1="250.00" y1="360.00" x2="838.00" y2="360.00" stroke="#d8d4ca" stroke-width="1"/>
+<text x="250.00" y="380" fill="#8a857a" font-size="11" text-anchor="middle">0</text>
+<text x="380.67" y="380" fill="#8a857a" font-size="11" text-anchor="middle">1</text>
+<text x="511.33" y="380" fill="#8a857a" font-size="11" text-anchor="middle">2</text>
+<text x="642.00" y="380" fill="#8a857a" font-size="11" text-anchor="middle">3</text>
+<text x="772.67" y="380" fill="#8a857a" font-size="11" text-anchor="middle">4</text>
+<text x="48" y="398" fill="#8a857a" font-size="11">pooled over 12 matters; Qwen2.5-14B and 7B pool 3 seeds (36 episodes each), 12 episodes for the rest</text>
+<text x="48" y="416" fill="#8a857a" font-size="11">the expert reference is a replay of expert traces, not a model under test</text>
+</g></svg>

@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 720" role="img" aria-labelledby="fig2-title fig2-desc" font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace">
+  <title id="fig2-title">One must-stay-silent probe traced through both evaluations: the bare regex fires and caps the episode at 0.25; the structured guard suppresses the match and the episode is scored normally.</title>
+  <desc id="fig2-desc">A probe sentence from tests/gate_probes/ai_saas_001.yaml — "No law prohibits all model training; the objection here is contractual, resting on playbook section 3" — contains the matched span "law prohibits all model training" preceded by the negator "No". Top path: the gate as a bare regex string, re.search finds the match, the gate fires, the episode is capped at 0.25 with critical set true. Bottom path: the gate as a mapping with negation_guard true, re.finditer finds the same match, _sentence_span builds the window from the sentence start to the match end, _NEGATOR finds "No" and the match is skipped, so no gate fires and the episode is scored normally.</desc>
+
+  <defs>
+    <marker id="ink-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a1916"/>
+    </marker>
+    <marker id="faint-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L9,5 L0,9 z" fill="#8a857a"/>
+    </marker>
+    <marker id="accent-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L9,5 L0,9 z" fill="#b3372c"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1240" height="720" fill="#f7f5f0"/>
+
+  <!-- ============================================================= header -->
+  <text x="40" y="38" font-size="15" fill="#1a1916">One probe sentence, two evaluations</text>
+  <text x="40" y="60" font-size="11" fill="#8a857a">tests/gate_probes/ai_saas_001.yaml  ·  src/playbook_legal/rewards.py gate_match</text>
+
+  <!-- ======================================================== probe box -->
+  <text x="40" y="84" font-size="11" fill="#8a857a" letter-spacing="0.08em">MUST-STAY-SILENT PROBE</text>
+  <rect x="40" y="96" width="1160" height="104" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="64" y="117" font-size="11" fill="#8a857a">surface: issue  ·  criterion: data_training  ·  expect_fire: false</text>
+
+  <text x="64" y="133" font-size="11" fill="#1a1916">negator</text>
+  <line x1="64" y1="141" x2="79.6" y2="141" stroke="#1a1916" stroke-width="1"/>
+
+  <text y="158" font-size="13" fill="#1a1916" xml:space="preserve"><tspan x="64" textLength="23.4" lengthAdjust="spacing">No </tspan><tspan x="87.4" textLength="249.6" lengthAdjust="spacing">law prohibits all model training</tspan><tspan x="337" textLength="475.8" lengthAdjust="spacing">; the objection here is contractual, resting on playbook §3 …</tspan></text>
+
+  <line x1="87.4" y1="165" x2="337" y2="165" stroke="#1a1916" stroke-width="1.5"/>
+  <text x="87.4" y="182" font-size="11" fill="#1a1916">pattern match — both paths find it here</text>
+
+  <!-- spine -->
+  <path d="M72,200 L72,288 L136,288" fill="none" stroke="#8a857a" stroke-width="1" marker-end="url(#faint-arrow)"/>
+  <path d="M72,288 L72,444 L136,444" fill="none" stroke="#8a857a" stroke-width="1" marker-end="url(#faint-arrow)"/>
+
+  <!-- ================================================ lane A: bare regex -->
+  <text x="140" y="232" font-size="11" fill="#8a857a" letter-spacing="0.08em">PRE-REVISION — THE GATE AS A BARE REGEX STRING</text>
+
+  <rect x="140" y="240" width="204" height="96" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="154" y="264" font-size="12" fill="#1a1916">spec: str</text>
+  <text x="154" y="286" font-size="11" fill="#8a857a">the same pattern, as a</text>
+  <text x="154" y="302" font-size="11" fill="#8a857a">bare regex string</text>
+  <text x="154" y="322" font-size="11" fill="#8a857a">no guard keys</text>
+
+  <line x1="346" y1="288" x2="366" y2="288" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="368" y="240" width="214" height="96" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="382" y="264" font-size="12" fill="#1a1916">gate_match()</text>
+  <text x="382" y="286" font-size="11" fill="#8a857a">not isinstance(spec, dict)</text>
+  <text x="382" y="302" font-size="11" fill="#8a857a">→ re.search(spec, text,</text>
+  <text x="382" y="318" font-size="11" fill="#8a857a">    flags=re.IGNORECASE)</text>
+
+  <line x1="584" y1="288" x2="604" y2="288" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="606" y="240" width="238" height="96" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="620" y="264" font-size="12" fill="#1a1916">match returned</text>
+  <text x="620" y="286" font-size="11" fill="#8a857a">the string form takes no</text>
+  <text x="620" y="302" font-size="11" fill="#8a857a">guards — the sentence is</text>
+  <text x="620" y="318" font-size="11" fill="#8a857a">never read</text>
+
+  <line x1="846" y1="288" x2="866" y2="288" stroke="#b3372c" stroke-width="1" marker-end="url(#accent-arrow)"/>
+
+  <rect x="868" y="240" width="116" height="96" fill="#f7f5f0" stroke="#b3372c" stroke-width="2"/>
+  <text x="926" y="294" font-size="14" fill="#b3372c" text-anchor="middle">FIRES</text>
+
+  <line x1="986" y1="288" x2="1006" y2="288" stroke="#b3372c" stroke-width="1" marker-end="url(#accent-arrow)"/>
+
+  <rect x="1008" y="240" width="192" height="96" fill="#f7f5f0" stroke="#b3372c" stroke-width="2"/>
+  <text x="1022" y="278" font-size="11" fill="#1a1916">episode capped at</text>
+  <text x="1022" y="300" font-size="13" fill="#b3372c">min(·, 0.25)</text>
+  <text x="1022" y="322" font-size="11" fill="#b3372c">critical = true</text>
+
+  <!-- ========================================== lane B: structured guard -->
+  <text x="140" y="372" font-size="11" fill="#8a857a" letter-spacing="0.08em">AFTER — THE STRUCTURED GUARD</text>
+
+  <rect x="140" y="380" width="204" height="128" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="154" y="404" font-size="12" fill="#1a1916">spec: dict</text>
+  <text x="154" y="424" font-size="11" fill="#8a857a">pattern: "law (?:prohibits</text>
+  <text x="154" y="440" font-size="11" fill="#8a857a">|bars|forbids) …"</text>
+  <text x="154" y="462" font-size="11" fill="#1a1916">negation_guard: true</text>
+  <text x="154" y="484" font-size="11" fill="#8a857a">negation_scope: span</text>
+  <text x="154" y="500" font-size="11" fill="#8a857a">(default, unset here)</text>
+
+  <line x1="346" y1="444" x2="366" y2="444" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="368" y="380" width="214" height="128" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="382" y="404" font-size="12" fill="#1a1916">gate_match()</text>
+  <text x="382" y="424" font-size="11" fill="#8a857a">isinstance(spec, dict)</text>
+  <text x="382" y="440" font-size="11" fill="#8a857a">→ re.finditer(pattern,</text>
+  <text x="382" y="456" font-size="11" fill="#8a857a">    text, IGNORECASE)</text>
+  <text x="382" y="478" font-size="11" fill="#8a857a">same match, same span</text>
+
+  <line x1="584" y1="444" x2="604" y2="444" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="606" y="380" width="238" height="128" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="620" y="404" font-size="12" fill="#1a1916">_sentence_span()</text>
+  <text x="620" y="424" font-size="11" fill="#8a857a" xml:space="preserve">window = text[sentence_start</text>
+  <text x="620" y="440" font-size="11" fill="#8a857a" xml:space="preserve">               : match.end()]</text>
+  <text x="620" y="462" font-size="11" fill="#1a1916">_NEGATOR.search(window)</text>
+  <text x="620" y="484" font-size="11" fill="#8a857a">finds "No" → continue</text>
+
+  <line x1="846" y1="444" x2="866" y2="444" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="868" y="380" width="116" height="128" fill="#f7f5f0" stroke="#1a1916" stroke-width="1.5"/>
+  <text x="926" y="450" font-size="14" fill="#1a1916" text-anchor="middle">SUPPRESSED</text>
+
+  <line x1="986" y1="444" x2="1006" y2="444" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="1008" y="380" width="192" height="128" fill="#f7f5f0" stroke="#1a1916" stroke-width="1.5"/>
+  <text x="1022" y="424" font-size="11" fill="#8a857a">gate_match → None</text>
+  <text x="1022" y="448" font-size="13" fill="#1a1916">no gate fires</text>
+  <text x="1022" y="472" font-size="11" fill="#8a857a">scored normally</text>
+
+  <!-- ==================================================== gate spec keys -->
+  <rect x="40" y="536" width="1160" height="124" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="56" y="560" font-size="11" fill="#8a857a" letter-spacing="0.08em">GATE SPEC KEYS</text>
+
+  <text x="56" y="586" font-size="12" fill="#1a1916">negation_guard</text>
+  <text x="232" y="586" font-size="11" fill="#8a857a">drop a match when a negator sits between the start of its sentence and the end of the matched span</text>
+
+  <text x="56" y="608" font-size="12" fill="#1a1916">negation_scope</text>
+  <text x="232" y="608" font-size="11" fill="#8a857a">where the guard window stops — "span" (default) at the end of the match, "before" at its start</text>
+
+  <text x="56" y="630" font-size="12" fill="#1a1916">require_context</text>
+  <text x="232" y="630" font-size="11" fill="#8a857a">fire only when this regex also matches in the sentence</text>
+
+  <text x="56" y="652" font-size="12" fill="#1a1916">exclude_context</text>
+  <text x="232" y="652" font-size="11" fill="#8a857a">drop the match when this regex matches in the sentence</text>
+
+  <text x="40" y="692" font-size="12" fill="#8a857a">a bare regex is polarity-blind; the guard reads the sentence</text>
+</svg>

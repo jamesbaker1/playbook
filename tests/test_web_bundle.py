@@ -8,12 +8,53 @@ is covered by the environment and driver-independent test suites.
 
 from __future__ import annotations
 
+import html
+import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 from conftest import ROOT
+
+POSTS_SRC = ROOT / "docs" / "posts"
+
+
+def _build_site(out: Path) -> Path:
+    subprocess.run(
+        [sys.executable, str(ROOT / "web" / "build_site.py"), str(out)],
+        check=True,
+        capture_output=True,
+    )
+    return out
+
+
+def _build_site_module():
+    """The renderer itself, for tests that need to build a synthetic corpus."""
+    sys.path.insert(0, str(ROOT / "web"))
+    try:
+        import build_site
+    finally:
+        sys.path.pop(0)
+    return build_site
+
+
+def _front_matter(path: Path) -> dict[str, str]:
+    """The post's front matter, as raw ``key: value`` strings.
+
+    Deliberately re-parsed here rather than imported: the assertions below are
+    checking that the renderer moved the author's metadata onto the page, so the
+    test reads that metadata a different way than the code under test does.
+    """
+    raw = path.read_text(encoding="utf-8-sig")
+    assert raw.startswith("---"), f"{path.name}: post must open with '---' front matter"
+    _, front_matter, _ = raw.split("---", 2)
+    fields = {}
+    for line in front_matter.strip().splitlines():
+        if ":" in line:
+            key, _, value = line.partition(":")
+            fields[key.strip()] = value.strip().strip("'\"")
+    return fields
 
 
 def test_site_build_produces_declared_assets(tmp_path: Path) -> None:
@@ -53,6 +94,209 @@ def test_site_build_produces_declared_assets(tmp_path: Path) -> None:
     assert 'property="og:image"' in index
     assert 'name="twitter:card"' in index
     assert 'rel="icon"' in index
+
+
+def test_markdown_posts_render_to_static_pages(tmp_path: Path) -> None:
+    """Every post in docs/posts gets a page, driven by what is actually there.
+
+    Nothing here names a slug: the placeholder post is expected to be deleted the
+    moment real writing lands, and this suite has to keep passing when it is.
+    """
+    out = _build_site(tmp_path / "dist")
+
+    sources = sorted(POSTS_SRC.glob("*.md"))
+    assert sources, "expected at least one markdown post in docs/posts"
+    index = (out / "posts" / "index.html").read_text(encoding="utf-8")
+
+    for source in sources:
+        page = out / "posts" / f"{source.stem}.html"
+        assert page.exists(), f"unrendered post: {source.name}"
+        post = page.read_text(encoding="utf-8")
+        meta = _front_matter(source)
+        title = html.escape(meta["title"])
+
+        assert f"<h1>{title}</h1>" in post, f"{source.name}: title missing from the page"
+        assert f"<title>{title} — playbook</title>" in post
+        assert 'property="og:type" content="article"' in post
+        assert (
+            'property="og:image" content="https://jamesbaker1.github.io/playbook/og-card.png"'
+            in post
+        )
+        # A post that was published elsewhere first names that home in front
+        # matter; the rest point at their own page.
+        canonical = (
+            meta.get("canonical")
+            or f"https://jamesbaker1.github.io/playbook/posts/{source.stem}.html"
+        )
+        assert f'rel="canonical" href="{canonical}"' in post
+        assert f'property="og:url" content="{canonical}"' in post
+        assert 'rel="icon"' in post and 'href="../style.css"' in post
+
+        # Front matter is metadata, never body copy — in the page or the index.
+        assert not post.lstrip().startswith("---")
+        for key, value in meta.items():
+            assert f"{key}: {value}" not in post, f"{source.name}: front matter leaked into page"
+            assert f"{key}: {value}" not in index, f"{source.name}: front matter leaked into index"
+
+        # The index lists this post, by title, linking to its page.
+        assert f'<a href="{source.stem}.html">{title}</a>' in index, (
+            f"{source.name}: missing from the writing index"
+        )
+        assert html.escape(meta["description"]) in index
+
+    landing = (out / "index.html").read_text(encoding="utf-8")
+    assert 'href="posts/"' in landing
+    assert (out / "posts.css").exists()
+
+
+def test_renderer_supports_the_markdown_elements_posts_rely_on(tmp_path: Path) -> None:
+    """Element coverage lives on a synthetic post, so real posts stay free to
+    use whatever subset of markdown they need."""
+    build_site = _build_site_module()
+    posts_dir = tmp_path / "posts-src"
+    posts_dir.mkdir()
+    (posts_dir / "sample.md").write_text(
+        "---\ntitle: Sample\ndate: 2026-01-02\ndescription: Elements.\n---\n\n"
+        "| a | b |\n| --- | --- |\n| 1 | 2 |\n\n"
+        "```python\nprint(1)\n```\n\n"
+        "> quoted\n\n"
+        "[a link](../)\n",
+        encoding="utf-8",
+    )
+
+    out = tmp_path / "dist"
+    build_site.build_posts(out, posts_dir)
+    post = (out / "posts" / "sample.html").read_text(encoding="utf-8")
+
+    assert "<table>" in post and "<pre>" in post and "<blockquote>" in post
+    assert 'class="table-scroll"' in post
+
+
+def test_canonical_front_matter_overrides_the_self_url(tmp_path: Path) -> None:
+    """``canonical:`` moves the canonical link and og:url; everything else stays local."""
+    build_site = _build_site_module()
+    posts_dir = tmp_path / "posts-src"
+    posts_dir.mkdir()
+    (posts_dir / "syndicated.md").write_text(
+        "---\ntitle: Syndicated\ndate: 2026-01-02\ndescription: Published elsewhere first.\n"
+        "canonical: https://example.com/blog/syndicated/\n---\n\nBody.\n",
+        encoding="utf-8",
+    )
+    (posts_dir / "local.md").write_text(
+        "---\ntitle: Local\ndate: 2026-01-03\ndescription: Published only here.\n---\n\nBody.\n",
+        encoding="utf-8",
+    )
+
+    out = tmp_path / "dist"
+    build_site.build_posts(out, posts_dir)
+
+    syndicated = (out / "posts" / "syndicated.html").read_text(encoding="utf-8")
+    assert 'rel="canonical" href="https://example.com/blog/syndicated/"' in syndicated
+    assert 'property="og:url" content="https://example.com/blog/syndicated/"' in syndicated
+    assert "<title>Syndicated — playbook</title>" in syndicated
+    assert 'name="description" content="Published elsewhere first."' in syndicated
+
+    local = (out / "posts" / "local.html").read_text(encoding="utf-8")
+    self_url = f"{build_site.SITE_URL}posts/local.html"
+    assert f'rel="canonical" href="{self_url}"' in local
+    assert f'property="og:url" content="{self_url}"' in local
+
+    # The writing index links the page built here, never the canonical host.
+    index = (out / "posts" / "index.html").read_text(encoding="utf-8")
+    assert '<a href="syndicated.html">Syndicated</a>' in index
+    assert "example.com" not in index
+
+
+def test_post_pages_load_katex_and_leave_math_delimiters_intact(tmp_path: Path) -> None:
+    """Math is rendered client-side, so the build's job is to ship the loader and
+    hand KaTeX its delimiters unmangled."""
+    build_site = _build_site_module()
+    posts_dir = tmp_path / "posts-src"
+    posts_dir.mkdir()
+    (posts_dir / "math.md").write_text(
+        "---\ntitle: Math\ndate: 2026-01-02\ndescription: Formulas.\n---\n\n"
+        "Display:\n\n$$x = \\frac{a}{b}$$\n\n"
+        "Inline \\(s = \\sum_{i=1}^{n} w_i c_i\\) mid-sentence.\n\n"
+        "Prose naming the delimiter, `$$`, is not math.\n",
+        encoding="utf-8",
+    )
+
+    out = tmp_path / "dist"
+    build_site.build_posts(out, posts_dir)
+    post = (out / "posts" / "math.html").read_text(encoding="utf-8")
+
+    version = build_site.KATEX_VERSION
+    assert f"katex@{version}/dist/katex.min.css" in post
+    assert f"katex@{version}/dist/katex.min.js" in post
+    assert f"katex@{version}/dist/contrib/auto-render.min.js" in post
+    assert "renderMathInElement(" in post
+    assert post.count("integrity=\"sha384-") == 3, "each pinned KaTeX asset needs an SRI hash"
+
+    # Delimiters survive markdown; KaTeX consumes them in the browser.
+    assert "$$x = \\frac{a}{b}$$" in post
+    assert "\\(s = \\sum_{i=1}^{n} w_i c_i\\)" in post
+    # Markdown must not have eaten the backslashes or read _ as emphasis.
+    assert "<em>" not in post
+    assert "(s = " not in post.replace("\\(s = ", "")
+    # A delimiter merely mentioned in a code span stays code, not math.
+    assert "<code>$$</code>" in post
+
+    # The gym and the writing index carry no math and must not pay for KaTeX.
+    assert "katex" not in (out / "posts" / "index.html").read_text(encoding="utf-8").lower()
+    assert "katex" not in (ROOT / "web" / "index.html").read_text(encoding="utf-8").lower()
+
+
+def test_post_figures_are_copied_and_resolve_from_a_post_page(tmp_path: Path) -> None:
+    build_site = _build_site_module()
+    posts_dir = tmp_path / "posts-src"
+    (posts_dir / "assets").mkdir(parents=True)
+    (posts_dir / "assets" / "figure.svg").write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2"></svg>', encoding="utf-8"
+    )
+    (posts_dir / "figured.md").write_text(
+        "---\ntitle: Figured\ndate: 2026-01-02\ndescription: With a figure.\n---\n\n"
+        "![A caption](assets/figure.svg)\n",
+        encoding="utf-8",
+    )
+
+    out = tmp_path / "dist"
+    build_site.build_posts(out, posts_dir)
+
+    copied = out / "posts" / "assets" / "figure.svg"
+    assert copied.exists(), "post assets were not copied into the build"
+    post = (out / "posts" / "figured.html").read_text(encoding="utf-8")
+    assert '<img alt="A caption" src="assets/figure.svg"' in post
+    # The page sits at posts/<slug>.html, so the relative src resolves to the copy.
+    assert (out / "posts" / "figured.html").parent.joinpath("assets/figure.svg").exists()
+
+
+def test_real_post_assets_ship_with_the_site(tmp_path: Path) -> None:
+    """Whatever is in docs/posts/assets reaches the build, glob-driven."""
+    out = _build_site(tmp_path / "dist")
+    sources = [path for path in POSTS_SRC.glob("assets/**/*") if path.is_file()]
+    assert sources, "expected at least one file in docs/posts/assets"
+    for source in sources:
+        relative = source.relative_to(POSTS_SRC / "assets")
+        assert (out / "posts" / "assets" / relative).exists(), f"asset not shipped: {relative}"
+
+    # Every asset a post embeds must be one the build actually copied.
+    for page in (out / "posts").glob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        for name in re.findall(r'<img[^>]+src="assets/([^"]+)"', text):
+            assert (out / "posts" / "assets" / name).exists(), (
+                f"{page.name} embeds a missing asset: {name}"
+            )
+
+
+def test_post_index_survives_an_empty_posts_directory(tmp_path: Path) -> None:
+    build_site = _build_site_module()
+
+    out = tmp_path / "dist"
+    empty = tmp_path / "no-posts"
+    empty.mkdir()
+    assert build_site.build_posts(out, empty) == []
+    index = (out / "posts" / "index.html").read_text(encoding="utf-8")
+    assert "nothing published yet" in index
 
 
 def test_step_failures_and_busy_state_are_visible_and_retryable(tmp_path: Path) -> None:

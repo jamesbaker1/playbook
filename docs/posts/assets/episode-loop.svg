@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 660" role="img" aria-labelledby="fig1-title fig1-desc" font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace">
+  <title id="fig1-title">One episode in the Playbook legal gym: the matter package, eleven agent actions, and the scoring surfaces that produce a normalized score capped by the critical gate.</title>
+  <desc id="fig1-desc">Left: the matter package. Its documents are readable; hidden_facts.yaml (F), counterparty.yaml (kappa) and rubric.yaml (rho) are never observed. Middle: the agent's eleven actions in six groups — investigate, ask, work product, authority, negotiation, close — with their per-matter budgets, one action per step. Right: four scoring surfaces feed a raw score R, which is normalized by clip of R over max_score, then capped at 0.25 if any critical gate fires.</desc>
+
+  <defs>
+    <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#d8d4ca" stroke-width="1"/>
+    </pattern>
+    <marker id="ink-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a1916"/>
+    </marker>
+    <marker id="faint-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L9,5 L0,9 z" fill="#8a857a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1240" height="660" fill="#f7f5f0"/>
+
+  <!-- ============================================================= header -->
+  <text x="40" y="38" font-size="15" fill="#1a1916">One episode in the Playbook legal gym</text>
+  <text x="40" y="60" font-size="11" fill="#8a857a">matters/&lt;matter_id&gt;/  ·  src/playbook_legal/schemas.py  ·  src/playbook_legal/rewards.py</text>
+
+  <!-- =================================================== A: matter package -->
+  <text x="40" y="92" font-size="11" fill="#8a857a" letter-spacing="0.08em">MATTER PACKAGE</text>
+
+  <rect x="40" y="104" width="280" height="92" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="56" y="128" font-size="12" fill="#1a1916">documents/ — readable</text>
+  <text x="56" y="150" font-size="11" fill="#8a857a">instructions · playbook</text>
+  <text x="56" y="168" font-size="11" fill="#8a857a">msa · dpa</text>
+  <text x="56" y="188" font-size="11" fill="#8a857a">read_document · search_matter</text>
+
+  <rect x="40" y="216" width="280" height="188" fill="#f7f5f0"/>
+  <rect x="40" y="216" width="280" height="188" fill="url(#hatch)"/>
+  <rect x="40" y="216" width="280" height="188" fill="none" stroke="#8a857a" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="56" y="240" font-size="11" fill="#8a857a" letter-spacing="0.08em">HIDDEN — NEVER OBSERVED</text>
+  <text x="56" y="266" font-size="12" fill="#1a1916">hidden_facts.yaml   F</text>
+  <text x="56" y="284" font-size="11" fill="#8a857a">revealed only by ask_client</text>
+  <text x="56" y="312" font-size="12" fill="#1a1916">counterparty.yaml   κ</text>
+  <text x="56" y="330" font-size="11" fill="#8a857a">deterministic replies to</text>
+  <text x="56" y="346" font-size="11" fill="#8a857a">send_markup</text>
+  <text x="56" y="374" font-size="12" fill="#1a1916">rubric.yaml         ρ</text>
+  <text x="56" y="392" font-size="11" fill="#8a857a">anchors · concepts · gates</text>
+
+  <!-- A -> B -->
+  <text x="360" y="136" font-size="11" fill="#8a857a" text-anchor="middle">observation</text>
+  <line x1="322" y1="150" x2="392" y2="150" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <!-- ============================================================ B: agent -->
+  <text x="400" y="92" font-size="11" fill="#8a857a" letter-spacing="0.08em">AGENT — 11 ACTIONS, ONE PER STEP</text>
+
+  <rect x="400" y="104" width="400" height="396" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <line x1="400" y1="164" x2="800" y2="164" stroke="#d8d4ca" stroke-width="1"/>
+  <line x1="400" y1="232" x2="800" y2="232" stroke="#d8d4ca" stroke-width="1"/>
+  <line x1="400" y1="292" x2="800" y2="292" stroke="#d8d4ca" stroke-width="1"/>
+  <line x1="400" y1="362" x2="800" y2="362" stroke="#d8d4ca" stroke-width="1"/>
+  <line x1="400" y1="438" x2="800" y2="438" stroke="#d8d4ca" stroke-width="1"/>
+
+  <text x="416" y="132" font-size="11" fill="#8a857a">investigate</text>
+  <text x="516" y="132" font-size="12" fill="#1a1916">read_document</text>
+  <text x="516" y="152" font-size="12" fill="#1a1916">search_matter</text>
+
+  <text x="416" y="190" font-size="11" fill="#8a857a">ask</text>
+  <text x="516" y="190" font-size="12" fill="#1a1916">ask_client</text>
+  <text x="516" y="208" font-size="11" fill="#8a857a">maximum_client_questions:</text>
+  <text x="516" y="224" font-size="11" fill="#8a857a">4 (ten matters) · 3 (two)</text>
+
+  <text x="416" y="260" font-size="11" fill="#8a857a">work product</text>
+  <text x="516" y="260" font-size="12" fill="#1a1916">submit_issue   revise_issue</text>
+  <text x="516" y="280" font-size="12" fill="#1a1916">propose_redline   revise_redline</text>
+
+  <text x="416" y="320" font-size="11" fill="#8a857a">authority</text>
+  <text x="516" y="320" font-size="12" fill="#1a1916">escalate</text>
+  <text x="516" y="338" font-size="11" fill="#8a857a">maximum_escalations:</text>
+  <text x="516" y="354" font-size="11" fill="#8a857a">2 (one) · 1 (two) · unset on nine</text>
+
+  <text x="416" y="390" font-size="11" fill="#8a857a">negotiation</text>
+  <text x="516" y="390" font-size="12" fill="#1a1916">send_markup</text>
+  <text x="516" y="410" font-size="12" fill="#1a1916">accept_counterparty</text>
+  <text x="516" y="428" font-size="11" fill="#8a857a">only when counterparty.yaml ships</text>
+
+  <text x="416" y="470" font-size="11" fill="#8a857a">close</text>
+  <text x="516" y="470" font-size="12" fill="#1a1916">submit_final</text>
+
+  <text x="404" y="528" font-size="11" fill="#8a857a">maximum_steps: 30 (nine matters) · 34 (three)</text>
+
+  <!-- the loop -->
+  <path d="M800,462 L826,462 L826,560 L374,560 L374,462 L392,462" fill="none" stroke="#8a857a" stroke-width="1" marker-end="url(#faint-arrow)"/>
+  <text x="600" y="582" font-size="11" fill="#8a857a" text-anchor="middle">env applies the action → new observation → next step</text>
+
+  <!-- B -> C -->
+  <text x="830" y="136" font-size="11" fill="#8a857a" text-anchor="middle">actions</text>
+  <line x1="802" y1="150" x2="852" y2="150" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <!-- ========================================================= C: scoring -->
+  <text x="860" y="92" font-size="11" fill="#8a857a" letter-spacing="0.08em">SCORING SURFACES</text>
+
+  <rect x="860" y="104" width="340" height="216" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="876" y="130" font-size="12" fill="#1a1916">issues</text>
+  <text x="876" y="148" font-size="11" fill="#8a857a">credited by anchor citation</text>
+  <text x="876" y="178" font-size="12" fill="#1a1916">questions · escalations</text>
+  <text x="876" y="196" font-size="11" fill="#8a857a">matched by concept phrases</text>
+  <text x="876" y="226" font-size="12" fill="#1a1916">quotes</text>
+  <text x="876" y="244" font-size="11" fill="#8a857a">verbatim in the cited section</text>
+  <text x="876" y="274" font-size="12" fill="#1a1916">settlements</text>
+  <text x="876" y="292" font-size="11" fill="#8a857a">counterparty close vs. concepts</text>
+
+  <line x1="1030" y1="320" x2="1030" y2="344" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="860" y="346" width="340" height="56" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="876" y="370" font-size="12" fill="#1a1916">raw score R</text>
+  <text x="876" y="390" font-size="11" fill="#8a857a">Σ of every scored event's points</text>
+
+  <line x1="1030" y1="402" x2="1030" y2="426" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="860" y="428" width="340" height="56" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
+  <text x="876" y="452" font-size="12" fill="#1a1916">clip(R / max_score, 0, 1)</text>
+  <text x="876" y="472" font-size="11" fill="#8a857a">normalized_score</text>
+
+  <line x1="1030" y1="484" x2="1030" y2="508" stroke="#1a1916" stroke-width="1" marker-end="url(#ink-arrow)"/>
+
+  <rect x="860" y="510" width="340" height="76" fill="#f7f5f0" stroke="#b3372c" stroke-width="2"/>
+  <text x="876" y="534" font-size="11" fill="#1a1916">if any critical gate fires:</text>
+  <text x="876" y="556" font-size="13" fill="#b3372c">normalized = min(·, 0.25)</text>
+  <text x="876" y="576" font-size="11" fill="#8a857a">critical_failure_score_cap: 0.25</text>
+
+  <text x="860" y="612" font-size="11" fill="#8a857a">rewards.RewardEngine.result()</text>
+</svg>
