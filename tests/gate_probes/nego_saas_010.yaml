@@ -18,7 +18,7 @@
 # settlement_critical_failure_patterns. Text is matched after normalize_text().
 #
 # 2026-08-09: every sentence below was re-confirmed against the untruncated sweep
-# (.local/public-gate-probe-2026-08-08-full.md). Five probes that the 229-char
+# (documented in docs/instrument-audit-2026-08.md). Five probes that the 229-char
 # digest had cut mid-clause -- three incident_notice, one data_training, one
 # renewal_notice -- now carry the full verbatim text; no gate behaviour changed.
 probes:

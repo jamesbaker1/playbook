@@ -8,8 +8,13 @@ pip install -e ".[dev]"
 pytest
 ```
 
-CI runs `ruff check src tests training`, `pytest`, and `playbook-lint --all
-matters` on Python 3.11 and 3.12. All three must pass.
+CI runs `ruff check src tests training compiler web`, `python engine-worker/vendor.py
+--check`, `pytest`, and `playbook-lint --all matters` on Python 3.11 and 3.12. All
+four must pass. `make lint` runs the identical ruff scope plus the same matter lint,
+so a clean `make lint` covers CI's lint steps exactly — `web` included; keep it that
+way. A second CI job runs the web unit tests on Node 20 with `node --test
+tests/api_base.test.js tests/capture.test.js tests/citation_helpers.test.js
+tests/draft_store.test.js tests/score_helpers.test.js`.
 
 ## Contributing a matter
 

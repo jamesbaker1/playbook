@@ -40,6 +40,17 @@ default to `custom`, so pass `--split held-out` for private evaluation:
 | `critical_failure_free_rate` | Episodes with no gate tripped |
 | `completion_rate`, `steps` | Termination discipline and efficiency |
 
+## Trace retention
+
+Pass `--save-traces` to write every episode's replayable trace to
+`<out>/traces/<matter>-seed<seed>.trace.json` (the same trace format `playbook-eval`
+and `playbook-render` consume; the scorecard JSON then carries a `traces_dir` field).
+The flag is off by default, but from now on **every published row should ship its
+traces**, so any reader can re-derive the number instead of trusting it — replay the
+trace against the matter package and the score must come out identical. The v0.4.0
+rows predate this flag and retained no traces, so they are not independently
+re-scorable; that is a known defect of those results, not a property of the metric.
+
 ## Protocol
 
 - Report the aggregate **and** the per-matter rows; single-number comparisons hide

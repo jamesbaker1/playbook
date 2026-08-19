@@ -87,6 +87,14 @@ critical failures, perfect citation validity, and no unsupported issues — and
 still scores 0.474 against the reference's 0.985. The single-seed frontier rows
 are indicative, not settled.
 
+Every row above was measured under the pre-revision critical-failure gates. Those
+gates have since been migrated to structured guards as a declared instrument
+revision, following an adversarial audit
+([docs/instrument-audit-2026-08.md](docs/instrument-audit-2026-08.md)); the audit
+could not tell whether any measured critical failure was a phrasing artifact, only
+that the instrument could not rule it out. Critical-failure rates measured after
+the revision are not numerically comparable to this table without a re-run.
+
 ## The v0.3 scoring contract
 
 Credit is earned by **content**, never by guessing rubric internals:
@@ -111,6 +119,8 @@ Credit is earned by **content**, never by guessing rubric internals:
   counterparty included.
 
 ## Quick start
+
+Playbook is not yet published to PyPI; install it from a clone of this repository.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -212,9 +222,10 @@ A sealed held-out evaluation corpus is being authored in a separate private
 repository so published models can be scored on unseen work; until it lands,
 every number published here is measured on this public development split and
 should be read as such. Every matter ships a validated
-reference trajectory and adversarial bad trajectories in `examples/<matter_id>/`,
-enforced by CI (reference ≥ 0.7 with no critical failure; fabricated-quote and
-reversed-redline trajectories must trip the critical gate).
+reference trajectory and adversarial trajectories in `examples/<matter_id>/`,
+enforced by CI: the reference scores ≥ 0.7 with no critical failure, bad
+trajectories score below it, and any bad trajectory named `bad_critical_*` or
+containing `fabricated` must trip the critical gate.
 
 ## Repository map
 
@@ -223,9 +234,13 @@ src/playbook_legal/       Environment, scoring, schemas, linter, baseline, bench
 compiler/                 Matter-compilation pipeline and validation tools
 matters/                  Public synthetic matters (dev split)
 examples/<matter_id>/     Reference + adversarial trajectories per matter
+datasets/                 Variant family specs and the split registry
 web/                      Lightweight GitHub Pages client for the web gym
 engine-worker/            Canonical Python scoring API for Cloudflare Workers
 training/                 Modal-ready SFT / DPO / GRPO scaffolds (never auto-run)
+experiments/              Harvey LAB delta protocol harness and reports
+results/                  Published scorecards and pilot summaries
+scripts/                  Standalone build and analysis scripts
 tests/                    Environment, scoring, adversarial, lint, baseline tests
 docs/                     Architecture, environment API, scoring, evaluation, report
 SPEC.md                   Technical specification (v0.3 contract)
@@ -236,6 +251,8 @@ ROADMAP.md                Build plan and status
 Deeper reading: [web gym](docs/web-gym.md) · [architecture](docs/architecture.md) ·
 [environment API](docs/environment.md) · [scoring in depth](docs/scoring.md) ·
 [the critic](docs/critic.md) · [evaluation](docs/evaluation.md) ·
+[related work](docs/related-work.md) ·
+[the August 2026 gate audit](docs/instrument-audit-2026-08.md) ·
 [contributing](CONTRIBUTING.md)
 
 ## Design principles

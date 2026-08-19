@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Load a pinned Harvey LAB task as a runnable interactive Playbook episode."""
 
 from __future__ import annotations

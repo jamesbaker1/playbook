@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Create a run plan or calculate paired LAB/Playbook score deltas.
 
 No provider calls are made here. This keeps model runs subject to the project's

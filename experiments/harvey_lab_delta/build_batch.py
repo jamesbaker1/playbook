@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Build and validate the Harvey LAB -> Playbook interactive adaptation batch.
 
 The generated descriptors point to, but do not redistribute, LAB's Office documents.

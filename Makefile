@@ -4,7 +4,7 @@ test:
 	PYTHONPATH=src python -m pytest -q
 
 lint:
-	PYTHONPATH=src python -m ruff check src tests training
+	PYTHONPATH=src python -m ruff check src tests training compiler web
 	PYTHONPATH=src python -m playbook_legal.lint --all matters
 
 demo:

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /* Citation parsing and quote checks shared by the browser UI and unit tests. */
 (function (root, factory) {
   const api = factory();

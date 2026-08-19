@@ -23,6 +23,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+from playbook_legal import __version__
 from playbook_legal.env import PlaybookEnv
 from playbook_legal.export import convert
 
@@ -78,7 +79,7 @@ def _get(url: str, token: str) -> Any:
         headers={
             "Authorization": f"Bearer {token}",
             # Cloudflare's edge rejects the bare urllib user agent.
-            "User-Agent": "playbook-human-data/0.3",
+            "User-Agent": f"playbook-human-data/{__version__}",
         },
     )
     with urllib.request.urlopen(request, timeout=60) as response:

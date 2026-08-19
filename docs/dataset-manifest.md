@@ -18,8 +18,11 @@ build; it is not by itself approval to train.
 The registry assigns every matter to exactly one family and split. Generated families
 also carry `template_sha256`, the canonical hash of the seed package and reference
 trajectory. Registry validation rejects a template hash assigned to more than one split,
-even when its family and matter identifiers have been renamed. Sealed families expose
-only identifiers, content hashes, template lineage, and split—not matter contents.
+even when its family and matter identifiers have been renamed. When a sealed registry is
+published, sealed families are to expose only identifiers, content hashes, template
+lineage, and split—never matter contents. The mechanism exists and is tested
+(`sealed_matter_hashes` in `src/playbook_legal/dataset.py`), but no sealed registry
+artifact ships yet; one is published only when the private corpus clears review.
 
 ## Manifest fields
 

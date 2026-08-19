@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import random
 from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
@@ -41,7 +40,6 @@ class PlaybookEnv:
         self.counterparty = counterparty or {}
         self.negotiation_enabled = bool(self.counterparty.get("positions"))
         self.reward_engine = RewardEngine(rubric, documents, self.counterparty)
-        self._rng = random.Random()
         self._has_reset = False
         self._terminated = False
         self._truncated = False
@@ -100,7 +98,6 @@ class PlaybookEnv:
         return schemas
 
     def reset(self, *, seed: int | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
-        self._rng.seed(seed)
         self._seed = seed
         self._has_reset = True
         self._terminated = False

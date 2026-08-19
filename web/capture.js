@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /* Matter-scoped semantic interaction capture for synthetic Playbook matters.
  * Captures meaningful workspace events, never pixels, pointer trails, or keystrokes. */
 (function (root, factory) {

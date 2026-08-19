@@ -19,10 +19,20 @@ jobs:
       - name: Install
         run: pip install -e ".[dev,gym]"
       - name: Ruff
-        run: ruff check src tests training compiler
+        run: ruff check src tests training compiler web
       - name: Verify engine Worker vendor bundle
         run: python engine-worker/vendor.py --check
       - name: Tests
         run: pytest -q
       - name: Lint matters
         run: python -m playbook_legal.lint --all matters
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Web unit tests
+        run: node --test tests/api_base.test.js tests/capture.test.js tests/citation_helpers.test.js tests/draft_store.test.js tests/score_helpers.test.js

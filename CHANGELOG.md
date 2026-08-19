@@ -9,11 +9,15 @@
   training-family specs: bare regexes firing on *correct* work (state-then-negate
   analysis, belt-and-braces prohibitions, negations reusing a document's own operative
   words, savings clauses), while paraphrases of the sins they exist to catch slipped
-  through. All 106 gate patterns are now structured-guard entries (`negation_guard`,
-  `negation_scope`, `require_context`, `exclude_context`) and 88 trivial same-sin
+  through. Of the 121 gate-pattern entries in `matters/*/rubric.yaml`, 116 are now
+  structured-guard entries (`negation_guard`, `negation_scope`, `require_context`,
+  `exclude_context`), joined by seven more mapping-form entries in
+  `datasets/families/*.yaml` (six guard-bearing, one bounded plain pattern); the
+  remaining five stay plain strings by design, keeping their historical behavior
+  byte-identical where the bare pattern was already right. 88 trivial same-sin
   dodges (word-order, near-synonym, typographic-apostrophe variants) are closed.
 - Every probe sentence ships as a regression test: `tests/gate_probes/*.yaml`
-  (384 entries — 240 must-fire, 144 must-stay-silent) driven by
+  (406 entries — 247 must-fire, 159 must-stay-silent) driven by
   `tests/test_gate_probes.py` against the live rubrics.
 - Verified with zero behavior drift outside the gates: every reference and adversarial
   trajectory in `examples/` replays byte-identical (scores and gate attributions)
@@ -28,8 +32,8 @@
 - Known remaining gaps are cataloged, not hidden: dodges that need genuinely new gate
   concepts (including fabricated attributions in analysis prose, which only `quotes[]`
   is checked for), guard edge cases knowingly traded, and ~40 concept-list circularity
-  notes. See the migration verification report referenced in
-  `docs/progress-2026-08-08.md`.
+  notes. See the audit and migration write-up in
+  `docs/instrument-audit-2026-08.md`.
 
 ### Frontier reference rows (Claude Haiku 4.5, GPT-5.6-terra)
 

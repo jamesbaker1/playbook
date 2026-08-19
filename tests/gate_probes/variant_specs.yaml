@@ -25,8 +25,8 @@
 # tests/gate_probes/public_merger_target_011.yaml, where that gate actually lives.
 #
 # 2026-08-09: the three sentences the 229-char digest had cut (two FPs and the
-# nego-saas dodge) were restored to full verbatim text from the untruncated sweep.
-# No gate behaviour changed.
+# nego-saas dodge) were restored to full verbatim text from the untruncated sweep
+# (documented in docs/instrument-audit-2026-08.md). No gate behaviour changed.
 
 probes:
   # =================================================== nego-saas-authority.yaml

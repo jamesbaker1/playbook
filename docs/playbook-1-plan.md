@@ -30,7 +30,8 @@ search, ask, identify, draft, escalate, negotiate, or finish.
 > minimum-score filter to Workstream 4. The owner approved
 > Qwen/Qwen2.5-14B-Instruct as the student base; the teacher choice and paid
 > budget remain open. The sealed private corpus holds six verified held-out
-> families toward the 10-15 target. The binding constraints are now the
+> families against the frozen contract target of 15-30 families (ten reviewed
+> families is the interim floor for a first evaluation). The binding constraints are now the
 > teacher choice, qualified review capacity, and sealed-corpus completion.
 
 The repository already has the core environment needed for the experiment:
@@ -51,8 +52,9 @@ The limiting factors are evidence and data, not the basic environment:
 - no viable teacher has been identified (the 32B pilot failed the score bar);
 - the current human SFT artifact contains only one record;
 - qualified legal review capacity has not been named or budgeted; and
-- the sealed corpus holds six families against the 10-15 family, 50-100
-  episode evaluation target.
+- the sealed corpus holds six families against the frozen contract target of
+  15-30 families and 50-100 evaluation episodes, and against the ten-reviewed-family
+  interim floor for a first evaluation.
 
 ## Experiment contract
 
@@ -152,7 +154,9 @@ critical-failure rate is a rare-event metric, sealed evaluation families must
 be designed with enough temptation density — traps, prohibited concessions,
 escalation pressure — that the unmodified base model's critical-failure rate is
 well off the floor; a floor-effect metric cannot demonstrate improvement.
-Target 15-20 sealed families and the top of the 50-100 episode range.
+The frozen contract (`docs/playbook-1-experiment.yaml`, authoritative) targets
+15-30 sealed families and the top of the 50-100 episode range; ten reviewed
+families is the interim floor at which a first evaluation may run.
 
 ## Workstream 1: dataset representations
 
@@ -205,7 +209,8 @@ Initial target:
 - 20-30 training matter families;
 - 100-200 validated training variants;
 - 2,000-5,000 reviewed state-action examples; and
-- at least 10 sealed evaluation families yielding 50-100 evaluation episodes.
+- 15-30 sealed evaluation families yielding 50-100 evaluation episodes, with ten
+  reviewed families as the interim floor for the first evaluation.
 
 Family-level separation is mandatory. Variants of one latent template must not
 be divided between training and evaluation.
@@ -228,8 +233,11 @@ and a precondition for several required pair categories in Workstream 6.
 - Every variant passes matter lint and reference replay.
 - Required adversarial trajectories trip the intended gates.
 - Clean and restraint cases are represented.
-- The sealed registry exposes identifiers and hashes, not hidden evaluation
-  contents, to the training pipeline.
+- The sealed registry, when published, must expose identifiers and hashes, not
+  hidden evaluation contents, to the training pipeline. The mechanism is
+  implemented and tested (`sealed_matter_hashes` in
+  `src/playbook_legal/dataset.py`); no sealed registry artifact is published
+  yet, and one ships only when the private corpus clears review.
 
 ## Workstream 3: baselines
 
@@ -433,7 +441,8 @@ The first implementation package required no paid API or GPU work:
 The next no-cost repository package is:
 
 1. expand the family catalog from the current 12 training families (42 variants)
-   toward 20-30 training families and at least 10 sealed evaluation families;
+   toward 20-30 training families and the contract's 15-30 sealed evaluation
+   families (ten reviewed families is the interim floor for a first evaluation);
 2. materialize 100-200 semantically varied, lint-clean variants with replayed
    reference trajectories and adversarial gate coverage;
 3. build and verify candidate dataset releases, then measure family, action,

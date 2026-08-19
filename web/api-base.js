@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 (function (root, factory) {
   const api = factory();
   if (typeof module === "object" && module.exports) module.exports = api;

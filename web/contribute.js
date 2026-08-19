@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /* playbook web gym — opt-in trace contribution.
  *
  * Self-contained: app.js only calls window.playbookContribute(result,

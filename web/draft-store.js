@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /* IndexedDB-backed workspace drafts with a localStorage fallback. */
 (function (root, factory) {
   const api = factory();

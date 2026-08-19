@@ -1,7 +1,8 @@
 # MAUD-informed M&A matter pack
 
-The matters `public_merger_target_011`, `private_acquisition_buyer_012`, and the
-held-out `carveout_tsa_003` are entirely synthetic. No agreement text, annotation
+The matters `public_merger_target_011`, `private_acquisition_buyer_012`, and a
+private held-out carve-out/TSA matter (identifier withheld until the sealed
+registry is published) are entirely synthetic. No agreement text, annotation
 span, party name, or EDGAR language from MAUD is reproduced or required to solve
 them. MAUD supplies only an issue taxonomy and aggregate answer frequencies used
 to calibrate which counterparty positions are routine, which should draw one round
@@ -50,7 +51,7 @@ agent must review 8–12 deal points without turning every clause into an issue.
 | --- | --- | ---: | ---: | --- | --- |
 | `public_merger_target_011` | public dev | 9 | 0.9453 | critical | critical |
 | `private_acquisition_buyer_012` | public dev | 11 | 1.0000 | critical | critical |
-| `carveout_tsa_003` | private held-out | 12 | 0.9896 | critical | critical |
+| A private held-out carve-out/TSA matter (identifier withheld until the sealed registry is published) | private held-out | 12 | reference >0.9 | critical | critical |
 
 All three packages pass `playbook-lint`; all references terminate without a critical
 failure. The public and held-out trajectories are stored with their respective

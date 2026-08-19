@@ -8,7 +8,9 @@ Runners:
 - ``baseline``: runs a live OpenAI-compatible model via :mod:`playbook_legal.baseline`.
 
 Outputs ``<out>.json`` (full per-episode metrics plus aggregate) and ``<out>.md``
-(a readable table).
+(a readable table). With ``--save-traces`` each episode's replayable trace is also
+written to ``<out>/traces/<matter>-seed<seed>.trace.json`` so every published row
+can be re-scored from the trace instead of being taken on trust.
 """
 
 from __future__ import annotations
@@ -38,7 +40,13 @@ _COLUMNS = [
 ]
 
 
-def run_replay(matter_dir: Path, examples_root: Path, seed: int) -> dict[str, Any] | None:
+def run_replay(
+    matter_dir: Path,
+    examples_root: Path,
+    seed: int,
+    *,
+    trace_path: Path | None = None,
+) -> dict[str, Any] | None:
     actions_path = examples_root / matter_dir.name / "good.jsonl"
     if not actions_path.exists():
         return None
@@ -50,15 +58,23 @@ def run_replay(matter_dir: Path, examples_root: Path, seed: int) -> dict[str, An
         _, _, terminated, truncated, _ = env.step(json.loads(line))
         if terminated or truncated:
             break
+    if trace_path is not None:
+        env.save_trace(trace_path)
     return env.episode_result()
 
 
-def run_baseline(matter_dir: Path, seed: int, args: argparse.Namespace) -> dict[str, Any]:
+def run_baseline(
+    matter_dir: Path,
+    seed: int,
+    args: argparse.Namespace,
+    *,
+    trace_path: Path | None = None,
+) -> dict[str, Any]:
     from .baseline import build_client, run_episode
 
     client = build_client(args.base_url, os.environ.get("OPENAI_API_KEY"))
     env = PlaybookEnv.from_directory(matter_dir)
-    return run_episode(
+    result = run_episode(
         env,
         client,
         model=args.model,
@@ -66,6 +82,9 @@ def run_baseline(matter_dir: Path, seed: int, args: argparse.Namespace) -> dict[
         temperature=args.temperature,
         max_tokens=args.max_tokens,
     )
+    if trace_path is not None:
+        env.save_trace(trace_path)
+    return result
 
 
 def to_markdown(
@@ -124,6 +143,12 @@ def main() -> None:
         "full output window per request when unset",
     )
     parser.add_argument("--out", type=Path, default=Path("artifacts/scorecard"))
+    parser.add_argument(
+        "--save-traces",
+        action="store_true",
+        help="Retain each episode's replayable trace under <out>/traces/ so every "
+        "published row can be independently re-scored",
+    )
     args = parser.parse_args()
     split = args.split or ("dev" if args.matters == Path("matters") else "custom")
     family_registry = load_family_registry(args.family_registry) if args.family_registry else None
@@ -141,6 +166,7 @@ def main() -> None:
     # completed episode is checkpointed immediately and an interrupted sweep resumes
     # instead of repaying for finished work.
     partial_path = args.out.with_suffix(".partial.json")
+    traces_dir = args.out.with_suffix("") / "traces" if args.save_traces else None
     rows: list[dict[str, Any]] = []
     if partial_path.exists():
         rows = json.loads(partial_path.read_text(encoding="utf-8"))
@@ -153,15 +179,32 @@ def main() -> None:
         counterparty_path = matter_dir / "counterparty.yaml"
         counterparty = load_yaml(counterparty_path) if counterparty_path.exists() else {}
         for seed in args.seeds:
+            trace_path = (
+                traces_dir / f"{matter_dir.name}-seed{seed}.trace.json"
+                if traces_dir is not None
+                else None
+            )
             if (matter_dir.name, seed) in completed:
+                # A resumed episode is never re-run, so its trace can only exist if the
+                # interrupted run also wrote one. Resuming a no-trace checkpoint with
+                # --save-traces would publish traces_dir over a directory that cannot
+                # cover every row — refuse rather than assert coverage that is absent.
+                if trace_path is not None and not trace_path.exists():
+                    raise SystemExit(
+                        f"--save-traces: episode {matter_dir.name} seed {seed} was restored "
+                        f"from the checkpoint {partial_path} but has no trace at {trace_path}. "
+                        "Resumed episodes are not re-run, so that trace can never be written. "
+                        "Delete the partial checkpoint to re-run those episodes with traces, "
+                        "or rerun without --save-traces."
+                    )
                 continue
             if args.runner == "replay":
-                result = run_replay(matter_dir, args.examples, seed)
+                result = run_replay(matter_dir, args.examples, seed, trace_path=trace_path)
                 if result is None:
                     skipped.append(matter_dir.name)
                     break
             else:
-                result = run_baseline(matter_dir, seed, args)
+                result = run_baseline(matter_dir, seed, args, trace_path=trace_path)
             metrics = compute_metrics(result, rubric, counterparty)
             if family_registry is not None:
                 matter_id = str(metrics["matter_id"])
@@ -177,6 +220,21 @@ def main() -> None:
             rows.append(metrics)
             partial_path.parent.mkdir(parents=True, exist_ok=True)
             partial_path.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+
+    if traces_dir is not None:
+        # traces_dir is a coverage claim: every published row must be re-scorable from
+        # a file in it. Verify before emitting the field, never after.
+        missing = [
+            f"{row['matter_id']} seed {row['seed']}"
+            for row in rows
+            if not (traces_dir / f"{row['matter_id']}-seed{row['seed']}.trace.json").exists()
+        ]
+        if missing:
+            raise SystemExit(
+                f"--save-traces: {len(missing)} scorecard row(s) have no trace under "
+                f"{traces_dir}: {', '.join(missing)}. Refusing to publish a scorecard "
+                "claiming trace coverage it does not have."
+            )
 
     aggregate = aggregate_metrics(rows)
     uncertainty = (
@@ -194,6 +252,8 @@ def main() -> None:
         "uncertainty": uncertainty,
         "skipped": skipped,
     }
+    if traces_dir is not None:
+        payload["traces_dir"] = traces_dir.as_posix()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out.with_suffix(".json")
     md_path = args.out.with_suffix(".md")
@@ -207,6 +267,8 @@ def main() -> None:
         print(f"Skipped (no reference trajectory): {', '.join(skipped)}")
     print(json.dumps(aggregate, indent=2))
     print(f"Scorecard: {json_path} and {md_path}")
+    if traces_dir is not None:
+        print(f"Traces: {traces_dir}")
 
 
 if __name__ == "__main__":

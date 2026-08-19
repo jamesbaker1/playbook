@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /* playbook-traces — trace-collection endpoint for the web gym.
  *
  * POST /api/traces        public (CORS-limited): accept one episode trace

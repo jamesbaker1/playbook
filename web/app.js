@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 /* playbook web gym — static client for the canonical scoring service. */
 
 (async function () {

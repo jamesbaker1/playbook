@@ -14,7 +14,8 @@
 #
 # 2026-08-09: the four sentences the 229-char digest had cut (one
 # mae_disproportionate, one ordinary_course_consent, two fee_tail) were restored
-# to full verbatim text from the untruncated sweep. No gate behaviour changed;
+# to full verbatim text from the untruncated sweep (documented in
+# docs/instrument-audit-2026-08.md). No gate behaviour changed;
 # the ordinary_course_consent entry is no longer vacuous.
 
 probes:

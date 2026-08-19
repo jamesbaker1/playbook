@@ -7,6 +7,27 @@ approved paid model runs and human traces before results can be reported; W11 st
 requires review by a practicing M&A lawyer; deployed social-card unfurls require a
 post-deployment check. The detailed requirements remain below as the release audit.*
 
+**Addendum, 2026-08-19.** The header above is a 2026-08-02 snapshot; its specifics
+have moved. Re-verified in code today: **W14** — export pairs each action with the
+preceding observation, enforced by
+`tests/test_bench_export.py::test_export_pairs_actions_with_preceding_observations`
+(with `test_export_rejects_legacy_trace_without_initial_observation`); **W15** —
+the anchored-stuffing exploit is closed, enforced by
+`tests/test_adversarial.py::test_anchored_rubric_stuffing_without_reads_scores_far_below_reference`;
+**W16** — seeds are real, forwarded to every model request per
+`tests/test_baseline.py::test_seed_is_forwarded_to_every_model_request` (with
+`tests/test_bench_export.py::test_bench_rejects_duplicate_deterministic_replay_seeds`);
+**W18** — SPDX headers now cover 65/65 Python files across `src/`, `training/`,
+`compiler/`, and `engine-worker/src/`; **W20** — the vendored engine copy is
+verified in CI by the `python engine-worker/vendor.py --check` step in
+`.github/workflows/ci.yml`, which also lints `compiler/`. **W17** is now closed:
+`CITATION.cff` in this tree carries `version: 0.4.0` and
+`date-released: "2026-08-06"`.
+**W19**'s "2 matters" count is superseded by the sealed-corpus status recorded in
+`docs/report.md` §4 and `docs/playbook-1-plan.md` — six owner-reviewed families
+as of 2026-08-08, five more drafted and blocked at adversarial pre-review,
+against a frozen contract target of 15-30 families (interim floor: ten reviewed).
+
 ## W1. Link previews and favicon (plan A1)
 
 **Files:** `web/index.html`, `web/build_site.py`, new `web/favicon.svg`, new
