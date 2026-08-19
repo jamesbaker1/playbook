@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 856" role="img" aria-labelledby="fig3-title fig3-desc" font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace">
   <title id="fig3-title">Playbook-1: the five frozen conditions, the four release gates that compare state_action_sft with final_answer_sft, and the prerequisite that locks the DPO condition.</title>
-  <desc id="fig3-desc">Three conditions train or evaluate from playbook_1_base — base (no training), final_answer_sft and state_action_sft — while external_reference sits apart as the open-weight teacher reference, not a training control. Four release gates compare state_action_sft against final_answer_sft: critical_failure_rate (the primary gate, decided by a one-sided cluster-bootstrap CI excluding zero at 95 per cent), citation_validity with maximum regression 0.01, fabricated_quote_count with maximum regression 0, and completion_rate with maximum regression 0.02. state_action_sft_dpo is locked behind the prerequisite state_action_sft_clears_release_gates. Beating base is secondary reporting, not a gate.</desc>
+  <desc id="fig3-desc">Three conditions train or evaluate from playbook_1_base: base (no training), final_answer_sft and state_action_sft; external_reference sits apart as the open-weight teacher reference, not a training control. Four release gates compare state_action_sft against final_answer_sft: critical_failure_rate (the primary gate, decided by a one-sided cluster-bootstrap CI excluding zero at 95 per cent), citation_validity with maximum regression 0.01, fabricated_quote_count with maximum regression 0, and completion_rate with maximum regression 0.02. state_action_sft_dpo is locked behind the prerequisite state_action_sft_clears_release_gates. Beating base is secondary reporting, not a gate.</desc>
 
   <defs>
     <marker id="ink-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
@@ -11,18 +11,18 @@
   <rect x="0" y="0" width="1240" height="856" fill="#f7f5f0"/>
 
   <!-- ============================================================= header -->
-  <text x="40" y="38" font-size="15" fill="#1a1916">Playbook-1 — five frozen conditions and four release gates</text>
+  <text x="40" y="38" font-size="15" fill="#1a1916">Playbook-1: five frozen conditions and four release gates</text>
   <text x="40" y="60" font-size="11" fill="#8a857a">docs/playbook-1-experiment.yaml  ·  schema_version: playbook.experiment.v1  ·  status: frozen</text>
 
   <!-- ========================================================= conditions -->
   <text x="40" y="92" font-size="11" fill="#8a857a" letter-spacing="0.08em">CONDITIONS</text>
-  <text x="888" y="92" font-size="11" fill="#8a857a" letter-spacing="0.08em">SET APART — NOT A TRAINING CONDITION</text>
+  <text x="888" y="92" font-size="11" fill="#8a857a" letter-spacing="0.08em">SET APART · NOT A TRAINING CONDITION</text>
 
   <rect x="40" y="104" width="249" height="152" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
   <text x="54" y="130" font-size="13" fill="#1a1916">base</text>
   <text x="54" y="152" font-size="11" fill="#8a857a">training_view: none</text>
   <text x="54" y="170" font-size="11" fill="#8a857a">base_model_group: playbook_1_base</text>
-  <text x="54" y="194" font-size="11" fill="#8a857a">no training —</text>
+  <text x="54" y="194" font-size="11" fill="#8a857a">no training,</text>
   <text x="54" y="210" font-size="11" fill="#8a857a">the untrained control</text>
 
   <rect x="313" y="104" width="249" height="152" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
@@ -51,7 +51,7 @@
   <text x="904" y="170" font-size="11" fill="#8a857a">model_group: playbook_1_teacher</text>
   <text x="904" y="194" font-size="11" fill="#8a857a">role: open_weight_teacher_</text>
   <text x="904" y="210" font-size="11" fill="#8a857a" xml:space="preserve">      reference_not_training_control</text>
-  <text x="904" y="234" font-size="11" fill="#8a857a">teacher_model: null —</text>
+  <text x="904" y="234" font-size="11" fill="#8a857a">teacher_model: null,</text>
   <text x="904" y="250" font-size="11" fill="#8a857a">pending_owner_approval</text>
 
   <text x="40" y="280" font-size="11" fill="#8a857a">playbook_1_base: Qwen/Qwen2.5-14B-Instruct</text>
@@ -62,7 +62,7 @@
   <text x="726" y="286" font-size="11" fill="#8a857a">every release gate compares these two</text>
 
   <!-- ====================================================== release gates -->
-  <text x="40" y="308" font-size="11" fill="#8a857a" letter-spacing="0.08em">RELEASE GATES — ALL FOUR MUST CLEAR</text>
+  <text x="40" y="308" font-size="11" fill="#8a857a" letter-spacing="0.08em">RELEASE GATES: ALL FOUR MUST CLEAR</text>
 
   <rect x="40" y="316" width="1160" height="240" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
   <line x1="40" y1="376" x2="1200" y2="376" stroke="#d8d4ca" stroke-width="1"/>

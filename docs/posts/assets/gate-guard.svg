@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 720" role="img" aria-labelledby="fig2-title fig2-desc" font-family="ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace">
   <title id="fig2-title">One must-stay-silent probe traced through both evaluations: the bare regex fires and caps the episode at 0.25; the structured guard suppresses the match and the episode is scored normally.</title>
-  <desc id="fig2-desc">A probe sentence from tests/gate_probes/ai_saas_001.yaml — "No law prohibits all model training; the objection here is contractual, resting on playbook section 3" — contains the matched span "law prohibits all model training" preceded by the negator "No". Top path: the gate as a bare regex string, re.search finds the match, the gate fires, the episode is capped at 0.25 with critical set true. Bottom path: the gate as a mapping with negation_guard true, re.finditer finds the same match, _sentence_span builds the window from the sentence start to the match end, _NEGATOR finds "No" and the match is skipped, so no gate fires and the episode is scored normally.</desc>
+  <desc id="fig2-desc">A probe sentence from tests/gate_probes/ai_saas_001.yaml ("No law prohibits all model training; the objection here is contractual, resting on playbook section 3") contains the matched span "law prohibits all model training" preceded by the negator "No". Top path: the gate as a bare regex string, re.search finds the match, the gate fires, the episode is capped at 0.25 with critical set true. Bottom path: the gate as a mapping with negation_guard true, re.finditer finds the same match, _sentence_span builds the window from the sentence start to the match end, _NEGATOR finds "No" and the match is skipped, so no gate fires and the episode is scored normally.</desc>
 
   <defs>
     <marker id="ink-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
@@ -31,14 +31,14 @@
   <text y="158" font-size="13" fill="#1a1916" xml:space="preserve"><tspan x="64" textLength="23.4" lengthAdjust="spacing">No </tspan><tspan x="87.4" textLength="249.6" lengthAdjust="spacing">law prohibits all model training</tspan><tspan x="337" textLength="475.8" lengthAdjust="spacing">; the objection here is contractual, resting on playbook §3 …</tspan></text>
 
   <line x1="87.4" y1="165" x2="337" y2="165" stroke="#1a1916" stroke-width="1.5"/>
-  <text x="87.4" y="182" font-size="11" fill="#1a1916">pattern match — both paths find it here</text>
+  <text x="87.4" y="182" font-size="11" fill="#1a1916">pattern match: both paths find it here</text>
 
   <!-- spine -->
   <path d="M72,200 L72,288 L136,288" fill="none" stroke="#8a857a" stroke-width="1" marker-end="url(#faint-arrow)"/>
   <path d="M72,288 L72,444 L136,444" fill="none" stroke="#8a857a" stroke-width="1" marker-end="url(#faint-arrow)"/>
 
   <!-- ================================================ lane A: bare regex -->
-  <text x="140" y="232" font-size="11" fill="#8a857a" letter-spacing="0.08em">PRE-REVISION — THE GATE AS A BARE REGEX STRING</text>
+  <text x="140" y="232" font-size="11" fill="#8a857a" letter-spacing="0.08em">PRE-REVISION · THE GATE AS A BARE REGEX STRING</text>
 
   <rect x="140" y="240" width="204" height="96" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
   <text x="154" y="264" font-size="12" fill="#1a1916">spec: str</text>
@@ -59,7 +59,7 @@
   <rect x="606" y="240" width="238" height="96" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
   <text x="620" y="264" font-size="12" fill="#1a1916">match returned</text>
   <text x="620" y="286" font-size="11" fill="#8a857a">the string form takes no</text>
-  <text x="620" y="302" font-size="11" fill="#8a857a">guards — the sentence is</text>
+  <text x="620" y="302" font-size="11" fill="#8a857a">guards: the sentence is</text>
   <text x="620" y="318" font-size="11" fill="#8a857a">never read</text>
 
   <line x1="846" y1="288" x2="866" y2="288" stroke="#b3372c" stroke-width="1" marker-end="url(#accent-arrow)"/>
@@ -75,7 +75,7 @@
   <text x="1022" y="322" font-size="11" fill="#b3372c">critical = true</text>
 
   <!-- ========================================== lane B: structured guard -->
-  <text x="140" y="372" font-size="11" fill="#8a857a" letter-spacing="0.08em">AFTER — THE STRUCTURED GUARD</text>
+  <text x="140" y="372" font-size="11" fill="#8a857a" letter-spacing="0.08em">AFTER · THE STRUCTURED GUARD</text>
 
   <rect x="140" y="380" width="204" height="128" fill="#f7f5f0" stroke="#d8d4ca" stroke-width="1"/>
   <text x="154" y="404" font-size="12" fill="#1a1916">spec: dict</text>
@@ -123,7 +123,7 @@
   <text x="232" y="586" font-size="11" fill="#8a857a">drop a match when a negator sits between the start of its sentence and the end of the matched span</text>
 
   <text x="56" y="608" font-size="12" fill="#1a1916">negation_scope</text>
-  <text x="232" y="608" font-size="11" fill="#8a857a">where the guard window stops — "span" (default) at the end of the match, "before" at its start</text>
+  <text x="232" y="608" font-size="11" fill="#8a857a">where the guard window stops: "span" (default) at the end of the match, "before" at its start</text>
 
   <text x="56" y="630" font-size="12" fill="#1a1916">require_context</text>
   <text x="232" y="630" font-size="11" fill="#8a857a">fire only when this regex also matches in the sentence</text>
