@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_REPO_ID = "jamesbaker1/playbook"
+DEFAULT_REPO_ID = "jimbobjordan/playbook"
 DEFAULT_OUT = "build/hf"
 DEFAULT_CARD = "docs/hf-dataset-card.md"
 MANIFEST_NAME = "MANIFEST.sha256"
