@@ -1,0 +1,4579 @@
+{
+  "matter": "clean_msa_009",
+  "seed": 1,
+  "initial_observation": {
+    "matter": {
+      "matter_id": "clean_msa_009",
+      "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+      "practice_area": "technology_transactions",
+      "role": "Customer's technology-transactions counsel",
+      "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+    },
+    "documents": [
+      {
+        "id": "instructions",
+        "title": "Supervising Lawyer Instructions",
+        "sections": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ]
+      },
+      {
+        "id": "playbook",
+        "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+        "sections": [
+          "1",
+          "10",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "id": "msa",
+        "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+        "sections": [
+          "1.2",
+          "10.1",
+          "11.2",
+          "12.1",
+          "2.4",
+          "3.1",
+          "3.2",
+          "4.2",
+          "5.1",
+          "5.4",
+          "6.3",
+          "7.2",
+          "8.2",
+          "8.3",
+          "8.4",
+          "9.3"
+        ]
+      },
+      {
+        "id": "dpa",
+        "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+        "sections": [
+          "1.3",
+          "2.2",
+          "3.5",
+          "4.1",
+          "5.2",
+          "6.4",
+          "7.3"
+        ]
+      }
+    ],
+    "protocol": {
+      "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+      "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+      "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+      "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+      "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+      "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+    },
+    "action_schemas": {
+      "read_document": {
+        "description": "Read a document from the matter file, either in full or one numbered section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "document_id": {
+              "type": "string",
+              "description": "Document id from the index."
+            },
+            "section": {
+              "type": "string",
+              "description": "Optional section number such as '4.2'. Omit for full text."
+            }
+          },
+          "required": [
+            "document_id"
+          ]
+        }
+      },
+      "search_matter": {
+        "description": "Case-insensitive substring search across every document section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search phrase, three or more characters."
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      "ask_client": {
+        "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string",
+              "description": "The question, in plain language."
+            }
+          },
+          "required": [
+            "question"
+          ]
+        }
+      },
+      "escalate": {
+        "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Short label for the point escalated."
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why this exceeds your authority or departs from the playbook."
+            }
+          },
+          "required": [
+            "topic",
+            "reason"
+          ]
+        }
+      },
+      "submit_issue": {
+        "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Your own short label for this issue; reuse it in propose_redline."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              },
+              "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "revise_issue": {
+        "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of the issue to revise."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              }
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "propose_redline": {
+        "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of your submitted issue."
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "revise_redline": {
+        "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string"
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "submit_final": {
+        "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "summary": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "summary"
+          ]
+        }
+      }
+    },
+    "budgets": {
+      "steps_remaining": 30,
+      "client_questions_remaining": 4,
+      "escalations_remaining": 2
+    },
+    "learned_facts": {
+      "customer": "Meridian Freight Partners, LLC",
+      "provider": "Kestrel Transport Systems, Inc.",
+      "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+      "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+      "current_annual_fee": "$214,000 per Contract Year",
+      "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+      "current_term_end": "31 March 2027",
+      "governing_law": "New York",
+      "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+    },
+    "submitted_issue_ids": [],
+    "submitted_redline_issue_ids": [],
+    "submitted_escalation_topics": [],
+    "last_result": {
+      "message": "Matter opened."
+    }
+  },
+  "events": [
+    {
+      "step": 1,
+      "action": {
+        "type": "read_document",
+        "document_id": "playbook"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 29,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "playbook",
+          "section": null,
+          "content": "# Meridian Vendor Contract Playbook \u2014 Software and Data Services\n\nApproved by the General Counsel, rev. January 2026. Applies to logistics-technology,\nsoftware, and data-services vendors.\n\n## 1 How To Use This Playbook\n\nThe positions below are the standard positions Legal has approved. A provision that meets\nthe stated position is approved as written and needs no comment. Comments are not free:\nMeridian renews most of its vendors many times, and each round of markup costs schedule,\ngoodwill, and \u2014 in practice \u2014 pricing. Raise a point only where the paper departs from a\nposition stated below or creates a material risk this playbook does not address. Read the\nsections around a provision before concluding that it is deficient; several of the\nprotections below are deliberately located in their own sections.\n\n## 2 Data Ownership and Permitted Use\n\nMeridian must own Meridian Data. The vendor's rights in Meridian Data must be limited to\n(a) providing, securing, and supporting the services, and (b) compiling aggregated and\nde-identified information \u2014 including to operate, benchmark, and improve the services \u2014\nthat cannot be used to identify Meridian, its shippers, its carriers, or any individual.\nUse of Meridian Data to train, fine-tune, or otherwise develop machine-learning or\nartificial-intelligence models is prohibited unless separately approved in writing by the\nGeneral Counsel. A permitted-use clause granting exactly (a) and (b) and expressly\nprohibiting model training meets this position and requires no comment.\n\n## 3 Limitation of Liability\n\nA general cap equal to the fees paid in the twelve months preceding the claim is\nacceptable. Breach of confidentiality, Security Incidents and vendor data-protection\nbreaches, and the vendor's intellectual-property infringement indemnity must carry an\nenhanced cap of at least two times (200%) the fees paid in the preceding twelve months.\nThe enhanced cap may sit in its own section rather than inside the general cap, provided\nthe general cap is expressly made subject to it. Do not treat a fees-paid general cap as\ndeficient without reading the sections around it. A mutual exclusion of indirect,\nconsequential, and punitive damages is acceptable where it carves out indemnification\nobligations, breach of confidentiality, and the vendor's data-protection obligations.\n\n## 4 Security Program and Incident Notice\n\nThe vendor must maintain a recognized information-security program and furnish a current\nSOC 2 Type II report annually on request. An on-site audit right is preferred but is not\nrequired where the report obligation is present. The vendor must notify Meridian without\nundue delay and no later than 24 hours after it discovers or is notified of a Security\nIncident. Notice must not be conditioned on the vendor completing its investigation or on\nany determination that the incident is material. A 24-hour notice obligation measured from\ndiscovery meets this position. Notice obligations located in a data processing addendum\nsatisfy this position where the addendum controls over the main agreement on security\nsubject matter.\n\n## 5 Term, Renewal, and Price Protection\n\nAutomatic renewal is acceptable where (a) the nonrenewal notice period is 60 days or less\nand (b) renewal price increases are capped at 5% or less per renewal term. Meridian's\ncontract administrator calendars every renewal and nonrenewal notice date on execution, so\na notice period within that limit is an administrative matter and not a comment. A 60-day\nnonrenewal notice period is expressly within policy.\n\n## 6 Service Levels\n\nMinimum availability of 99.5% per calendar month, measured monthly, with service credits.\nService credits may be stated as Meridian's sole financial remedy for an availability\nfailure provided Meridian also has the right to terminate for chronic failure \u2014 three\nmissed months in any rolling six-month period \u2014 without charge and to recover prepaid,\nunused fees. Credits-as-sole-remedy plus a chronic-failure termination right meets this\nposition.\n\n## 7 Assignment and Change of Control\n\nAssignment requires Meridian's prior written consent, except that either party may assign\nthe agreement in its entirety to an Affiliate, or to a successor in a merger,\nreorganization, or sale of all or substantially all of its assets, on written notice.\nNotice-only assignment limited to Affiliates and successors is within policy.\n\n## 8 Order of Precedence\n\nThe data processing addendum must control over conflicting terms of the main agreement with\nrespect to privacy, data protection, and information security. An order-of-precedence\nclause that places the addendum first for that subject matter meets this position.\n\n## 9 Governing Law and Venue\n\nNew York law and exclusive venue in New York are the preferred positions.\n\n## 10 What To Escalate\n\nEscalate only: a departure from the model-training prohibition in Section 2; an enhanced\ncap below 200% or its absence; an indemnity running from Meridian that is uncapped; or a\nrequest to accept terms this playbook does not cover. If nothing departs from a position\nabove, no escalation is required \u2014 report that the paper is clear and close the file.\n"
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 2,
+      "action": {
+        "type": "read_document",
+        "document_id": "msa"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 28,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "msa",
+          "section": null,
+          "content": "# Kestrel Master Services Agreement\n\nExecuted 12 March 2024 between Kestrel Transport Systems, Inc. (\"Kestrel\") and Meridian\nFreight Partners, LLC (\"Meridian\"). Initial Term 1 April 2024 through 31 March 2027.\nText below is the operative agreement as negotiated, incorporating Amendment No. 1\n(fee schedule only, effective 1 April 2025).\n\n## 1.2 Services and Subscribed Modules\n\nKestrel will provide the Kestrel TMS platform and the modules identified in the applicable\nOrder Form. Meridian's current subscription covers the Load Tender, Carrier Settlement,\nFreight Audit, and Track-and-Trace modules. Additional modules, additional data feeds, and\nany expansion of the categories of data Meridian submits to the platform require a new or\namended Order Form signed by both parties.\n\n## 2.4 Fees; Renewal Pricing\n\nFees are stated in the applicable Order Form and are fixed for the term to which that Order\nForm applies. Kestrel may increase fees for any Renewal Term by not more than four percent\n(4%) over the fees payable for the immediately preceding term, and only on written notice\ndelivered at least ninety (90) days before the first day of that Renewal Term.\n\n## 3.1 Ownership of Meridian Data\n\nAs between the parties, Meridian owns and retains all right, title, and interest in\nMeridian Data, including all load, rate, shipper, carrier, and settlement records Meridian\nor its users submit to or generate through the Services. Kestrel acquires no license or\nother right in Meridian Data except the limited rights expressly granted in Section 3.2.\n\n## 3.2 Permitted Use of Meridian Data\n\nKestrel may access, host, copy, transmit, process, and display Meridian Data solely to\n(a) provide the Services to Meridian and its authorized users, (b) secure the Services and\nMeridian Data and investigate suspected security events, and (c) provide support,\ntroubleshooting, and configuration assistance requested by Meridian. Kestrel may also\ncompile aggregated and de-identified statistical information derived from Meridian Data,\nand use that information to operate, benchmark, and improve the Services, provided that the\ninformation is aggregated with data of other customers and cannot be used to identify\nMeridian, its shippers, its carriers, or any individual. Kestrel shall not use Meridian\nData, or anything derived from Meridian Data, to train, fine-tune, or otherwise develop any\nmachine-learning or artificial-intelligence model, and shall not sell, license, or\notherwise make Meridian Data available to any third party except a subprocessor engaged in\naccordance with the DPA.\n\n## 4.2 Confidential Information\n\nEach party will protect the other party's Confidential Information using at least\nreasonable care and no less care than it uses to protect its own confidential information\nof like importance, and will use it only for purposes of this Agreement. Confidentiality\nobligations survive for three years after termination and, with respect to Meridian Data\nand either party's trade secrets, for so long as the information remains a trade secret.\n\n## 5.1 Availability Commitment and Service Credits\n\nKestrel will make the Services available at least 99.5% of the minutes in each calendar\nmonth, excluding scheduled maintenance announced at least five business days in advance.\nIf Kestrel fails to meet that commitment in a month, Meridian is entitled to the service\ncredit calculated under the Service Level Exhibit, and that credit is Meridian's sole\nfinancial remedy for that availability failure, except as provided in Section 5.4.\n\n## 5.4 Chronic Failure\n\nIf Kestrel fails to meet the availability commitment in any three months within a rolling\nsix-month period, Meridian may terminate the affected Services or this Agreement in whole\non thirty (30) days written notice, without charge or termination fee, and Kestrel will\nrefund prepaid fees for the terminated portion of the term. Service credits earned are in\naddition to, and not in substitution for, that termination right.\n\n## 6.3 Information Security Program\n\nKestrel will maintain an information-security program that meets the requirements of the\nDPA, will maintain SOC 2 Type II certification for the Services, and will furnish its\nthen-current report to Meridian annually on request. Kestrel's obligation to notify\nMeridian of a Security Incident is governed by the DPA and is measured from Kestrel's\ndiscovery of the incident.\n\n## 7.2 Infringement Indemnity\n\nKestrel will defend Meridian against any third-party claim that the Services, as furnished\nby Kestrel and used in accordance with this Agreement, infringe a United States patent,\ncopyright, trademark, or trade secret, and will pay damages finally awarded or amounts\nKestrel agrees in settlement. Meridian gives no reciprocal infringement indemnity, and\nMeridian's indemnification obligations under this Agreement are limited to claims arising\nfrom Meridian Data that Meridian had no right to submit.\n\n## 8.2 General Limitation of Liability\n\nSubject to Section 8.4, and except for Meridian's obligation to pay fees, neither party's\ntotal aggregate liability arising out of or relating to this Agreement will exceed the fees\npaid by Meridian under this Agreement in the twelve (12) months preceding the event giving\nrise to the claim.\n\n## 8.3 Exclusion of Indirect Damages\n\nNeither party will be liable for indirect, incidental, special, consequential, exemplary,\nor punitive damages, or for lost profits or lost revenue. This exclusion does not apply to\namounts payable to a third party under Section 7.2, to a party's breach of Section 4.2, or\nto Kestrel's obligations under the DPA.\n\n## 8.4 Enhanced Cap for Confidentiality, Security, and Indemnity Claims\n\nNotwithstanding Section 8.2, each party's total aggregate liability for (a) breach of its\nconfidentiality obligations under Section 4.2, (b) Kestrel's obligations arising from a\nSecurity Incident or its breach of the DPA, and (c) Kestrel's indemnification obligations\nunder Section 7.2, will not exceed two hundred percent (200%) of the fees paid by Meridian\nunder this Agreement in the twelve (12) months preceding the event giving rise to the\nclaim. This Section 8.4 states a separate and higher cap and does not reduce or merge into\nthe cap in Section 8.2.\n\n## 9.3 Term; Automatic Renewal\n\nThe Initial Term is stated above. Following the Initial Term, this Agreement renews\nautomatically for successive Renewal Terms of twelve (12) months each, or for the period\nstated in a signed Renewal Order Form, unless either party delivers written notice of\nnonrenewal at least sixty (60) days before the last day of the then-current term. Either\nparty may give that notice; no cause is required.\n\n## 10.1 Assignment\n\nNeither party may assign this Agreement or any right under it, by operation of law or\notherwise, without the other party's prior written consent, except that either party may\nassign this Agreement in its entirety to an Affiliate, or to a successor in connection with\na merger, reorganization, or sale of all or substantially all of its assets, on written\nnotice to the other party. Any other purported assignment is void. This Agreement binds\npermitted successors and assigns.\n\n## 11.2 Order of Precedence\n\nIf there is a conflict among the documents comprising this Agreement, the following order\ncontrols: (a) the DPA, with respect to privacy, data protection, and information security;\n(b) the applicable Order Form, with respect to modules, fees, and term; and (c) the body of\nthis Agreement.\n\n## 12.1 Governing Law; Venue\n\nThis Agreement is governed by the laws of the State of New York, without regard to its\nconflict-of-laws principles. The parties submit to the exclusive jurisdiction of the state\nand federal courts located in New York County, New York.\n"
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 3,
+      "action": {
+        "type": "read_document",
+        "document_id": "dpa"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 27,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "dpa",
+          "section": null,
+          "content": "# Kestrel Data Processing Addendum\n\nExecuted 12 March 2024 as an addendum to the Kestrel Master Services Agreement. Text below\nis the operative addendum as negotiated.\n\n## 1.3 Scope and Roles\n\nThis DPA applies to Kestrel's processing of Meridian Data that constitutes personal\ninformation, including driver, dispatcher, and shipper contact records processed through\nthe Services. Meridian is the controller and business; Kestrel is the processor and service\nprovider and processes personal information only on Meridian's documented instructions.\n\n## 2.2 Permitted Processing\n\nKestrel will process Meridian Data only to provide, secure, and support the Services and to\ncompile aggregated and de-identified statistical information as permitted by Section 3.2 of\nthe Agreement. Kestrel will not retain, use, or disclose Meridian Data for any other\npurpose, will not sell or share it, and will not combine it with data from other sources\nexcept to produce aggregated and de-identified information that cannot identify Meridian,\nits shippers, its carriers, or any individual. Kestrel will not use Meridian Data to train,\nfine-tune, or otherwise develop any machine-learning or artificial-intelligence model.\n\n## 3.5 Security Measures\n\nKestrel will maintain administrative, technical, and physical safeguards appropriate to the\nrisk, including encryption of Meridian Data in transit and at rest, role-based access\ncontrol, multifactor authentication for administrative access, logging, and annual\npenetration testing. Kestrel will furnish its current SOC 2 Type II report and a summary of\nits most recent penetration test to Meridian annually on request, and will permit an\non-site assessment following a Security Incident affecting Meridian Data.\n\n## 4.1 Security Incident Notice\n\nKestrel will notify Meridian of a Security Incident without undue delay and in any event no\nlater than twenty-four (24) hours after Kestrel discovers, or is notified by a subprocessor\nof, the Security Incident. Notice is not conditioned on Kestrel completing its\ninvestigation or on any determination that the Security Incident is material. The notice\nwill describe what Kestrel then knows, and Kestrel will provide updates as its\ninvestigation progresses and reasonable cooperation with Meridian's own notification and\nremediation obligations, in each case at Kestrel's expense.\n\n## 5.2 Subprocessors\n\nKestrel maintains a current list of subprocessors and will give Meridian at least thirty\n(30) days written notice before engaging a new subprocessor for Meridian Data. Meridian may\nobject on reasonable data-protection grounds; if the parties cannot resolve the objection,\nMeridian may terminate the affected Services without penalty and receive a refund of\nprepaid, unused fees. Kestrel remains liable for the acts and omissions of its\nsubprocessors to the same extent as for its own.\n\n## 6.4 Return and Deletion\n\nOn Meridian's request at any time, and in any event within thirty (30) days after\ntermination or expiration of the Agreement, Kestrel will return Meridian Data in a\nstructured, machine-readable format and will then delete its copies, other than copies held\nin routine backups, which Kestrel will delete on the ordinary backup cycle and will keep\nsubject to this DPA until deleted. Kestrel will certify deletion in writing on request.\n\n## 7.3 Order of Precedence\n\nThis DPA controls over any conflicting term of the Agreement with respect to privacy, data\nprotection, and information security. In all other respects the Agreement remains in full\nforce.\n"
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 4,
+      "action": {
+        "type": "search_matter",
+        "query": "model training"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 26,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "query": "model training",
+          "hits": [
+            {
+              "document_id": "playbook",
+              "section": "2",
+              "snippet": " the General Counsel. A permitted-use clause granting exactly (a) and (b) and expressly prohibiting model training meets this position and requires no comment."
+            }
+          ],
+          "hit_count": 1
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "hit_count": 1
+      }
+    },
+    {
+      "step": 5,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "model_training_prohibition",
+        "title": "Model Training Prohibition",
+        "severity": "high",
+        "citations": [
+          "msa \u00a73.2",
+          "dpa \u00a72.2"
+        ],
+        "analysis": "The playbook prohibits the vendor from using Meridian Data to train, fine-tune, or otherwise develop machine-learning or artificial-intelligence models without explicit approval from the General Counsel. Both the MSA and DPA contain prohibitions on model training that align with this requirement.",
+        "recommendation": "No action needed; the prohibitions on model training are consistent with the playbook.",
+        "quotes": [
+          {
+            "citation": "msa \u00a73.2",
+            "text": "Kestrel shall not use Meridian Data, or anything derived from Meridian Data, to train, fine-tune, or otherwise develop any machine-learning or artificial-intelligence model, and shall not sell, license, or otherwise make Meridian Data available to any third party except a subprocessor engaged in accordance with the DPA."
+          },
+          {
+            "citation": "dpa \u00a72.2",
+            "text": "Kestrel will not use Meridian Data to train, fine-tune, or otherwise develop any machine-learning or artificial-intelligence model."
+          }
+        ]
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 25,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [
+          "model_training_prohibition"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "model_training_prohibition"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_issue",
+          "criterion": "model_training_prohibition",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "action": {
+        "type": "search_matter",
+        "query": "enhanced cap"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 24,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [
+          "model_training_prohibition"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "query": "enhanced cap",
+          "hits": [
+            {
+              "document_id": "playbook",
+              "section": "3",
+              "snippet": "ta-protection breaches, and the vendor's intellectual-property infringement indemnity must carry an enhanced cap of at least two times (200%) the fees paid in the preceding twelve months. The enhanced cap may sit"
+            },
+            {
+              "document_id": "msa",
+              "section": "8.4",
+              "snippet": "## 8.4 Enhanced Cap for Confidentiality, Security, and Indemnity Claims  Notwithstanding Section 8.2, each party's tota"
+            }
+          ],
+          "hit_count": 2
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "hit_count": 2
+      }
+    },
+    {
+      "step": 7,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "enhanced_liability_caps",
+        "title": "Enhanced Liability Caps",
+        "severity": "low",
+        "citations": [
+          "msa \u00a78.4"
+        ],
+        "analysis": "The playbook mandates an enhanced cap of at least 200% of the fees paid in the preceding twelve months for certain types of claims, specifically breach of confidentiality, security incidents, and indemnity obligations. The MSA includes an enhanced cap for these specific claims, which is consistent with the playbook.",
+        "recommendation": "No action needed; the enhanced liability caps are consistent with the playbook.",
+        "quotes": [
+          {
+            "citation": "msa \u00a78.4",
+            "text": "Notwithstanding Section 8.2, each party's total aggregate liability for (a) breach of its confidentiality obligations under Section 4.2, (b) Kestrel's obligations arising from a Security Incident or its breach of the DPA, and (c) Kestrel's indemnification obligations under Section 7.2, will not exceed two hundred percent (200%) of the fees paid by Meridian under this Agreement in the twelve (12) months preceding the event giving rise to the claim."
+          }
+        ]
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 23,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [
+          "model_training_prohibition",
+          "enhanced_liability_caps"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "enhanced_liability_caps"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_issue",
+          "criterion": "enhanced_liability_caps",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        }
+      }
+    },
+    {
+      "step": 8,
+      "action": {
+        "type": "search_matter",
+        "query": "automatic renewal"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 22,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [
+          "model_training_prohibition",
+          "enhanced_liability_caps"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "query": "automatic renewal",
+          "hits": [
+            {
+              "document_id": "playbook",
+              "section": "5",
+              "snippet": "## 5 Term, Renewal, and Price Protection  Automatic renewal is acceptable where (a) the nonrenewal notice period is 60 days or less and (b) renewal price incre"
+            },
+            {
+              "document_id": "msa",
+              "section": "9.3",
+              "snippet": "## 9.3 Term; Automatic Renewal  The Initial Term is stated above. Following the Initial Term, this Agreement renews automatically "
+            }
+          ],
+          "hit_count": 2
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "hit_count": 2
+      }
+    },
+    {
+      "step": 9,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "automatic_renewal_terms",
+        "title": "Automatic Renewal Terms",
+        "severity": "low",
+        "citations": [
+          "msa \u00a79.3"
+        ],
+        "analysis": "The playbook allows for automatic renewal where the nonrenewal notice period is 60 days or less and renewal price increases are capped at 5% or less per renewal term. The MSA specifies a nonrenewal notice period of 60 days, which is acceptable according to the playbook.",
+        "recommendation": "No action needed; the automatic renewal terms are consistent with the playbook.",
+        "quotes": [
+          {
+            "citation": "msa \u00a79.3",
+            "text": "Following the Initial Term, this Agreement renews automatically for successive Renewal Terms of twelve (12) months each, or for the period stated in a signed Renewal Order Form, unless either party delivers written notice of nonrenewal at least sixty (60) days before the last day of the then-current term."
+          }
+        ]
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 21,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [
+          "model_training_prohibition",
+          "enhanced_liability_caps",
+          "automatic_renewal_terms"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "automatic_renewal_terms"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_issue",
+          "criterion": "automatic_renewal_terms",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        }
+      }
+    },
+    {
+      "step": 10,
+      "action": {
+        "type": "submit_final",
+        "summary": "After reviewing the MSA and DPA against the client playbook, no material issues were found that depart from the playbook positions. The prohibitions on model training, enhanced liability caps, and automatic renewal terms are all consistent with the playbook. No further action is recommended."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "clean_msa_009",
+          "title": "Customer-Side Confirmation Review of a TMS Renewal (Existing Paper)",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Meridian is extending an existing transportation-management subscription for a further 24 months on flat fees. The underlying Master Services Agreement and Data Processing Addendum were negotiated in 2024 by the client's prior outside counsel and are not being reopened. Read the operative paper against the client playbook and confirm whether any material issue exists. Ask only the client questions that could change the recommendation, propose replacement language only where a provision actually departs from a playbook position, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Vendor Contract Playbook (Software and Data Services)",
+            "sections": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "Kestrel Master Services Agreement (As Negotiated, In Effect)",
+            "sections": [
+              "1.2",
+              "10.1",
+              "11.2",
+              "12.1",
+              "2.4",
+              "3.1",
+              "3.2",
+              "4.2",
+              "5.1",
+              "5.4",
+              "6.3",
+              "7.2",
+              "8.2",
+              "8.3",
+              "8.4",
+              "9.3"
+            ]
+          },
+          {
+            "id": "dpa",
+            "title": "Kestrel Data Processing Addendum (As Negotiated, In Effect)",
+            "sections": [
+              "1.3",
+              "2.2",
+              "3.5",
+              "4.1",
+              "5.2",
+              "6.4",
+              "7.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 20,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Meridian Freight Partners, LLC",
+          "provider": "Kestrel Transport Systems, Inc.",
+          "instrument": "Renewal Order Form No. 2 to the Kestrel Master Services Agreement",
+          "original_paper": "MSA and DPA executed 12 March 2024; negotiated for Meridian by Dunmore & Reeve LLP, the client's prior outside counsel.",
+          "current_annual_fee": "$214,000 per Contract Year",
+          "renewal_value": "approximately $428,000 over a 24-month Renewal Term at flat fees",
+          "current_term_end": "31 March 2027",
+          "governing_law": "New York",
+          "leverage": "Moderate. Meridian could migrate to a competing TMS but would rather not; there is no deadline pressure, and the nonrenewal notice date is not until 30 January 2027."
+        },
+        "submitted_issue_ids": [
+          "model_training_prohibition",
+          "enhanced_liability_caps",
+          "automatic_renewal_terms"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Final work product submitted."
+        }
+      },
+      "reward": 1.5,
+      "terminated": true,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": 1.5,
+          "missing_issues": [],
+          "matched_concepts": [
+            "no material issues",
+            "consistent with the playbook"
+          ],
+          "concept_points": 0.5
+        },
+        "result": {
+          "matter_id": "clean_msa_009",
+          "raw_score": 0.0,
+          "max_score": 2.5,
+          "normalized_score": 0.0,
+          "critical_failure": false,
+          "terminated": true,
+          "truncated": false,
+          "steps": 10,
+          "breakdown": {
+            "asked_questions": [],
+            "questions_asked_total": 0,
+            "raised_escalations": [],
+            "escalations_total": 0,
+            "matched_issues": [],
+            "matched_redlines": [],
+            "settled_issues": [],
+            "valid_citation_count": 4,
+            "invalid_citations": [],
+            "unsupported_issues": [
+              "model_training_prohibition",
+              "enhanced_liability_caps",
+              "automatic_renewal_terms"
+            ],
+            "fabricated_quotes": [],
+            "read_citations": [
+              "dpa \u00a71.3",
+              "dpa \u00a72.2",
+              "dpa \u00a73.5",
+              "dpa \u00a74.1",
+              "dpa \u00a75.2",
+              "dpa \u00a76.4",
+              "dpa \u00a77.3",
+              "dpa \u00a7full",
+              "msa \u00a71.2",
+              "msa \u00a710.1",
+              "msa \u00a711.2",
+              "msa \u00a712.1",
+              "msa \u00a72.4",
+              "msa \u00a73.1",
+              "msa \u00a73.2",
+              "msa \u00a74.2",
+              "msa \u00a75.1",
+              "msa \u00a75.4",
+              "msa \u00a76.3",
+              "msa \u00a77.2",
+              "msa \u00a78.2",
+              "msa \u00a78.3",
+              "msa \u00a78.4",
+              "msa \u00a79.3",
+              "msa \u00a7full",
+              "playbook \u00a71",
+              "playbook \u00a710",
+              "playbook \u00a72",
+              "playbook \u00a73",
+              "playbook \u00a74",
+              "playbook \u00a75",
+              "playbook \u00a76",
+              "playbook \u00a77",
+              "playbook \u00a78",
+              "playbook \u00a79",
+              "playbook \u00a7full"
+            ],
+            "reward_events": [
+              {
+                "type": "unsupported_issue",
+                "criterion": "model_training_prohibition",
+                "points": -0.5,
+                "reason": "no cited provision matches a scored issue's operative anchor"
+              },
+              {
+                "type": "unsupported_issue",
+                "criterion": "enhanced_liability_caps",
+                "points": -0.5,
+                "reason": "no cited provision matches a scored issue's operative anchor"
+              },
+              {
+                "type": "unsupported_issue",
+                "criterion": "automatic_renewal_terms",
+                "points": -0.5,
+                "reason": "no cited provision matches a scored issue's operative anchor"
+              },
+              {
+                "type": "final_submission",
+                "criterion": "final",
+                "points": 1.5,
+                "missing_issues": [],
+                "matched_concepts": [
+                  "no material issues",
+                  "consistent with the playbook"
+                ],
+                "concept_points": 0.5
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "result": {
+    "matter_id": "clean_msa_009",
+    "raw_score": 0.0,
+    "max_score": 2.5,
+    "normalized_score": 0.0,
+    "critical_failure": false,
+    "terminated": true,
+    "truncated": false,
+    "steps": 10,
+    "breakdown": {
+      "asked_questions": [],
+      "questions_asked_total": 0,
+      "raised_escalations": [],
+      "escalations_total": 0,
+      "matched_issues": [],
+      "matched_redlines": [],
+      "settled_issues": [],
+      "valid_citation_count": 4,
+      "invalid_citations": [],
+      "unsupported_issues": [
+        "model_training_prohibition",
+        "enhanced_liability_caps",
+        "automatic_renewal_terms"
+      ],
+      "fabricated_quotes": [],
+      "read_citations": [
+        "dpa \u00a71.3",
+        "dpa \u00a72.2",
+        "dpa \u00a73.5",
+        "dpa \u00a74.1",
+        "dpa \u00a75.2",
+        "dpa \u00a76.4",
+        "dpa \u00a77.3",
+        "dpa \u00a7full",
+        "msa \u00a71.2",
+        "msa \u00a710.1",
+        "msa \u00a711.2",
+        "msa \u00a712.1",
+        "msa \u00a72.4",
+        "msa \u00a73.1",
+        "msa \u00a73.2",
+        "msa \u00a74.2",
+        "msa \u00a75.1",
+        "msa \u00a75.4",
+        "msa \u00a76.3",
+        "msa \u00a77.2",
+        "msa \u00a78.2",
+        "msa \u00a78.3",
+        "msa \u00a78.4",
+        "msa \u00a79.3",
+        "msa \u00a7full",
+        "playbook \u00a71",
+        "playbook \u00a710",
+        "playbook \u00a72",
+        "playbook \u00a73",
+        "playbook \u00a74",
+        "playbook \u00a75",
+        "playbook \u00a76",
+        "playbook \u00a77",
+        "playbook \u00a78",
+        "playbook \u00a79",
+        "playbook \u00a7full"
+      ],
+      "reward_events": [
+        {
+          "type": "unsupported_issue",
+          "criterion": "model_training_prohibition",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        },
+        {
+          "type": "unsupported_issue",
+          "criterion": "enhanced_liability_caps",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        },
+        {
+          "type": "unsupported_issue",
+          "criterion": "automatic_renewal_terms",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        },
+        {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": 1.5,
+          "missing_issues": [],
+          "matched_concepts": [
+            "no material issues",
+            "consistent with the playbook"
+          ],
+          "concept_points": 0.5
+        }
+      ]
+    }
+  }
+}

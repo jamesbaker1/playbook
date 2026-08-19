@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Open-weight rows re-measured on the revised instrument, with traces
+
+- Qwen2.5-7B/14B/32B and the reference replay re-measured 2026-08-19 under the
+  post-revision gates with `--save-traces` (96 episodes, 96 retained traces,
+  round-trip re-scores verified): `results/postrevision-2026-08/`. Its README
+  decomposes gate-attributable movement from sampling variance per row (the 32B
+  reproduced the v0.4.0 trajectories bitwise; 14B and 7B largely resampled).
+  Frontier rows pending. The v0.4.0 rows are untouched and remain the published
+  pre-revision measurement.
+
 ### Instrument revision: public-corpus critical-failure gates migrated to structured guards
 
 - An adversarial probe of every gate pattern in the public corpus replay-confirmed

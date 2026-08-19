@@ -1,0 +1,2862 @@
+{
+  "matter": "health_saas_006",
+  "seed": 2,
+  "initial_observation": {
+    "matter": {
+      "matter_id": "health_saas_006",
+      "title": "Customer-Side Review of Wellness-Benefits Platform Subscription and Data Exhibit",
+      "practice_area": "technology_transactions",
+      "role": "Customer's technology-transactions counsel",
+      "assignment": "Review the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Develop the facts you need before grading severity, identify and prioritize material issues, propose targeted redlines for the most important data-handling terms, and submit a concise supervising-lawyer summary."
+    },
+    "documents": [
+      {
+        "id": "instructions",
+        "title": "Supervising Lawyer Instructions",
+        "sections": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      {
+        "id": "playbook",
+        "title": "Beacon Manufacturing Employee Data Protection Playbook",
+        "sections": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8"
+        ]
+      },
+      {
+        "id": "agreement",
+        "title": "VitalPath Subscription Agreement",
+        "sections": [
+          "1.1",
+          "10.3",
+          "12.2",
+          "13.1",
+          "2.1",
+          "3.1",
+          "4.2",
+          "5.2",
+          "7.3",
+          "8.4"
+        ]
+      },
+      {
+        "id": "exhibit",
+        "title": "VitalPath Data Handling Exhibit",
+        "sections": [
+          "1.2",
+          "2.1",
+          "3.2",
+          "4.1",
+          "5.3",
+          "6.1",
+          "7.2",
+          "8.3"
+        ]
+      }
+    ],
+    "protocol": {
+      "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+      "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+      "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+      "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+      "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+      "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+    },
+    "action_schemas": {
+      "read_document": {
+        "description": "Read a document from the matter file, either in full or one numbered section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "document_id": {
+              "type": "string",
+              "description": "Document id from the index."
+            },
+            "section": {
+              "type": "string",
+              "description": "Optional section number such as '4.2'. Omit for full text."
+            }
+          },
+          "required": [
+            "document_id"
+          ]
+        }
+      },
+      "search_matter": {
+        "description": "Case-insensitive substring search across every document section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search phrase, three or more characters."
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      "ask_client": {
+        "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string",
+              "description": "The question, in plain language."
+            }
+          },
+          "required": [
+            "question"
+          ]
+        }
+      },
+      "escalate": {
+        "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Short label for the point escalated."
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why this exceeds your authority or departs from the playbook."
+            }
+          },
+          "required": [
+            "topic",
+            "reason"
+          ]
+        }
+      },
+      "submit_issue": {
+        "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Your own short label for this issue; reuse it in propose_redline."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              },
+              "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "revise_issue": {
+        "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of the issue to revise."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              }
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "propose_redline": {
+        "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of your submitted issue."
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "revise_redline": {
+        "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string"
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "submit_final": {
+        "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "summary": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "summary"
+          ]
+        }
+      }
+    },
+    "budgets": {
+      "steps_remaining": 30,
+      "client_questions_remaining": 4,
+      "escalations_remaining": 2
+    },
+    "learned_facts": {
+      "customer": "Beacon Manufacturing Company (self-insured employer, approximately 8,000 employees)",
+      "provider": "VitalPath Inc.",
+      "deal_value": "$300,000 per year over a three-year initial term",
+      "governing_law": "Illinois",
+      "leverage": "Moderate; Beacon is a meaningful account but its benefits calendar constrains negotiation length"
+    },
+    "submitted_issue_ids": [],
+    "submitted_redline_issue_ids": [],
+    "submitted_escalation_topics": [],
+    "last_result": {
+      "message": "Matter opened."
+    }
+  },
+  "events": [
+    {
+      "step": 1,
+      "action": {
+        "type": "read_document",
+        "document_id": "playbook",
+        "section": "4"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "health_saas_006",
+          "title": "Customer-Side Review of Wellness-Benefits Platform Subscription and Data Exhibit",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Review the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Develop the facts you need before grading severity, identify and prioritize material issues, propose targeted redlines for the most important data-handling terms, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Beacon Manufacturing Employee Data Protection Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "agreement",
+            "title": "VitalPath Subscription Agreement",
+            "sections": [
+              "1.1",
+              "10.3",
+              "12.2",
+              "13.1",
+              "2.1",
+              "3.1",
+              "4.2",
+              "5.2",
+              "7.3",
+              "8.4"
+            ]
+          },
+          {
+            "id": "exhibit",
+            "title": "VitalPath Data Handling Exhibit",
+            "sections": [
+              "1.2",
+              "2.1",
+              "3.2",
+              "4.1",
+              "5.3",
+              "6.1",
+              "7.2",
+              "8.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 29,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Beacon Manufacturing Company (self-insured employer, approximately 8,000 employees)",
+          "provider": "VitalPath Inc.",
+          "deal_value": "$300,000 per year over a three-year initial term",
+          "governing_law": "Illinois",
+          "leverage": "Moderate; Beacon is a meaningful account but its benefits calendar constrains negotiation length"
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "playbook",
+          "section": "4",
+          "content": "## 4 Retention and Deletion\n\nThe vendor must delete or return all employee data within 60 days after expiration or\ntermination and must certify the deletion in writing. Backup and archival copies must be\ncovered, with a defined purge cycle if immediate deletion is impracticable. Retention beyond\nthe 60-day window is acceptable only under a specific legal hold or an identified legal\nrequirement, only for the period that requirement runs, and only under the continuing\nsecurity and confidentiality obligations of the agreement. Open-ended retention for\nunspecified legal purposes, or retention governed solely by the vendor's own schedule, is\nnot acceptable."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 2,
+      "action": {
+        "type": "read_document",
+        "document_id": "agreement",
+        "section": "13.1"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "health_saas_006",
+          "title": "Customer-Side Review of Wellness-Benefits Platform Subscription and Data Exhibit",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Review the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Develop the facts you need before grading severity, identify and prioritize material issues, propose targeted redlines for the most important data-handling terms, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Beacon Manufacturing Employee Data Protection Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "agreement",
+            "title": "VitalPath Subscription Agreement",
+            "sections": [
+              "1.1",
+              "10.3",
+              "12.2",
+              "13.1",
+              "2.1",
+              "3.1",
+              "4.2",
+              "5.2",
+              "7.3",
+              "8.4"
+            ]
+          },
+          {
+            "id": "exhibit",
+            "title": "VitalPath Data Handling Exhibit",
+            "sections": [
+              "1.2",
+              "2.1",
+              "3.2",
+              "4.1",
+              "5.3",
+              "6.1",
+              "7.2",
+              "8.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 28,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Beacon Manufacturing Company (self-insured employer, approximately 8,000 employees)",
+          "provider": "VitalPath Inc.",
+          "deal_value": "$300,000 per year over a three-year initial term",
+          "governing_law": "Illinois",
+          "leverage": "Moderate; Beacon is a meaningful account but its benefits calendar constrains negotiation length"
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "agreement",
+          "section": "13.1",
+          "content": "## 13.1 Incorporation and Precedence\n\nThe Data Handling Exhibit is incorporated into and forms part of this Agreement. With\nrespect to its subject matter, the Data Handling Exhibit controls over any conflicting term\nof this Agreement."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 3,
+      "action": {
+        "type": "read_document",
+        "document_id": "exhibit",
+        "section": "4.1"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "health_saas_006",
+          "title": "Customer-Side Review of Wellness-Benefits Platform Subscription and Data Exhibit",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Review the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Develop the facts you need before grading severity, identify and prioritize material issues, propose targeted redlines for the most important data-handling terms, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Beacon Manufacturing Employee Data Protection Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "agreement",
+            "title": "VitalPath Subscription Agreement",
+            "sections": [
+              "1.1",
+              "10.3",
+              "12.2",
+              "13.1",
+              "2.1",
+              "3.1",
+              "4.2",
+              "5.2",
+              "7.3",
+              "8.4"
+            ]
+          },
+          {
+            "id": "exhibit",
+            "title": "VitalPath Data Handling Exhibit",
+            "sections": [
+              "1.2",
+              "2.1",
+              "3.2",
+              "4.1",
+              "5.3",
+              "6.1",
+              "7.2",
+              "8.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 27,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Beacon Manufacturing Company (self-insured employer, approximately 8,000 employees)",
+          "provider": "VitalPath Inc.",
+          "deal_value": "$300,000 per year over a three-year initial term",
+          "governing_law": "Illinois",
+          "leverage": "Moderate; Beacon is a meaningful account but its benefits calendar constrains negotiation length"
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "exhibit",
+          "section": "4.1",
+          "content": "## 4.1 Retention and Post-Termination Handling\n\nProvider will retain Employee Data during the Subscription Term and thereafter for so long as\nProvider determines retention is necessary or appropriate for legal, regulatory, audit, or\ndispute-resolution purposes. Following expiration or termination, Provider will make Employee\nData available for Customer export for thirty (30) days, after which Provider will delete\nEmployee Data in accordance with Provider's standard retention schedule then in effect.\nProvider has no obligation to certify deletion or to delete Employee Data held in backup,\narchival, log, or aggregated form."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 4,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "data_retention_policy",
+        "title": "Inconsistent Data Retention Policy",
+        "severity": "high",
+        "citations": [
+          "playbook \u00a74",
+          "exhibit \u00a74.1"
+        ],
+        "analysis": "The Playbook mandates that all employee data must be deleted or returned within 60 days after expiration or termination, with backup and archival copies covered under a defined purge cycle if immediate deletion is impractical. However, the Data Handling Exhibit allows for indefinite retention of data based on Provider's discretion for unspecified legal, regulatory, audit, or dispute-resolution purposes, and does not require certification of deletion or deletion of data held in backup, archival, log, or aggregated form.",
+        "recommendation": "The Data Handling Exhibit should align with the Playbook's strict requirements for data retention and deletion.",
+        "quotes": [
+          {
+            "citation": "playbook \u00a74",
+            "text": "The vendor must delete or return all employee data within 60 days after expiration or termination and must certify the deletion in writing. Backup and archival copies must be covered, with a defined purge cycle if immediate deletion is impractical."
+          },
+          {
+            "citation": "exhibit \u00a74.1",
+            "text": "Provider will retain Employee Data during the Subscription Term and thereafter for so long as Provider determines retention is necessary or appropriate for legal, regulatory, audit, or dispute-resolution purposes. Following expiration or termination, Provider will make Employee Data available for Customer export for thirty (30) days, after which Provider will delete Employee Data in accordance with Provider's standard retention schedule then in effect. Provider has no obligation to certify deletion or to delete Employee Data held in backup, archival, log, or aggregated form."
+          }
+        ]
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "health_saas_006",
+          "title": "Customer-Side Review of Wellness-Benefits Platform Subscription and Data Exhibit",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Review the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Develop the facts you need before grading severity, identify and prioritize material issues, propose targeted redlines for the most important data-handling terms, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Beacon Manufacturing Employee Data Protection Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "agreement",
+            "title": "VitalPath Subscription Agreement",
+            "sections": [
+              "1.1",
+              "10.3",
+              "12.2",
+              "13.1",
+              "2.1",
+              "3.1",
+              "4.2",
+              "5.2",
+              "7.3",
+              "8.4"
+            ]
+          },
+          {
+            "id": "exhibit",
+            "title": "VitalPath Data Handling Exhibit",
+            "sections": [
+              "1.2",
+              "2.1",
+              "3.2",
+              "4.1",
+              "5.3",
+              "6.1",
+              "7.2",
+              "8.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 26,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Beacon Manufacturing Company (self-insured employer, approximately 8,000 employees)",
+          "provider": "VitalPath Inc.",
+          "deal_value": "$300,000 per year over a three-year initial term",
+          "governing_law": "Illinois",
+          "leverage": "Moderate; Beacon is a meaningful account but its benefits calendar constrains negotiation length"
+        },
+        "submitted_issue_ids": [
+          "data_retention_policy"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "data_retention_policy"
+        }
+      },
+      "reward": 1.125,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "issue",
+          "criterion": "retention_deletion",
+          "points": 1.125,
+          "components": {
+            "base": 1.0,
+            "severity": 0.25,
+            "citations": 0.25,
+            "concepts": 0.375,
+            "quotes": -0.75
+          },
+          "matched_concepts": [
+            "60 days",
+            "deletion",
+            "certification"
+          ],
+          "quotes": [
+            {
+              "citation": "playbook \u00a74",
+              "status": "fabricated"
+            },
+            {
+              "citation": "exhibit \u00a74.1",
+              "status": "verified"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 5,
+      "action": {
+        "type": "propose_redline",
+        "issue_id": "data_retention_policy",
+        "document_id": "exhibit",
+        "section": "4.1",
+        "replacement_text": "Provider will retain Employee Data during the Subscription Term and thereafter for sixty (60) days following expiration or termination, after which Provider will delete Employee Data in accordance with the following process: (i) Provider will certify in writing that all Employee Data has been deleted or returned to Customer; (ii) Provider will ensure that all backup, archival, log, and aggregated forms of Employee Data are also deleted or returned to Customer within ninety (90) days following expiration or termination; and (iii) Provider will not retain Employee Data for any longer than necessary for legal, regulatory, audit, or dispute-resolution purposes, and will provide written notice to Customer prior to retaining Employee Data beyond the sixty (60) day period.",
+        "rationale": "This proposed redline aligns the Data Handling Exhibit with the strict requirements outlined in the Playbook for data retention and deletion, ensuring that all employee data is deleted or returned within 60 days after expiration or termination, with backup and archival copies covered under a defined purge cycle if immediate deletion is impractical."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "health_saas_006",
+          "title": "Customer-Side Review of Wellness-Benefits Platform Subscription and Data Exhibit",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Review the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Develop the facts you need before grading severity, identify and prioritize material issues, propose targeted redlines for the most important data-handling terms, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Beacon Manufacturing Employee Data Protection Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "agreement",
+            "title": "VitalPath Subscription Agreement",
+            "sections": [
+              "1.1",
+              "10.3",
+              "12.2",
+              "13.1",
+              "2.1",
+              "3.1",
+              "4.2",
+              "5.2",
+              "7.3",
+              "8.4"
+            ]
+          },
+          {
+            "id": "exhibit",
+            "title": "VitalPath Data Handling Exhibit",
+            "sections": [
+              "1.2",
+              "2.1",
+              "3.2",
+              "4.1",
+              "5.3",
+              "6.1",
+              "7.2",
+              "8.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 25,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Beacon Manufacturing Company (self-insured employer, approximately 8,000 employees)",
+          "provider": "VitalPath Inc.",
+          "deal_value": "$300,000 per year over a three-year initial term",
+          "governing_law": "Illinois",
+          "leverage": "Moderate; Beacon is a meaningful account but its benefits calendar constrains negotiation length"
+        },
+        "submitted_issue_ids": [
+          "data_retention_policy"
+        ],
+        "submitted_redline_issue_ids": [
+          "data_retention_policy"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Redline submitted.",
+          "issue_id": "data_retention_policy"
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "redline",
+          "criterion": "retention_deletion",
+          "points": 0.0,
+          "matched_redline_concepts": []
+        }
+      }
+    },
+    {
+      "step": 6,
+      "action": {
+        "type": "submit_final",
+        "summary": "Reviewed the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Identified and prioritized a high-severity issue regarding inconsistent data retention policies. Proposed a redline to align the Data Handling Exhibit with the Playbook's strict requirements for data retention and deletion."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "health_saas_006",
+          "title": "Customer-Side Review of Wellness-Benefits Platform Subscription and Data Exhibit",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions counsel",
+          "assignment": "Review the VitalPath Subscription Agreement and Data Handling Exhibit against Beacon's Employee Data Protection Playbook. Develop the facts you need before grading severity, identify and prioritize material issues, propose targeted redlines for the most important data-handling terms, and submit a concise supervising-lawyer summary."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Beacon Manufacturing Employee Data Protection Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "agreement",
+            "title": "VitalPath Subscription Agreement",
+            "sections": [
+              "1.1",
+              "10.3",
+              "12.2",
+              "13.1",
+              "2.1",
+              "3.1",
+              "4.2",
+              "5.2",
+              "7.3",
+              "8.4"
+            ]
+          },
+          {
+            "id": "exhibit",
+            "title": "VitalPath Data Handling Exhibit",
+            "sections": [
+              "1.2",
+              "2.1",
+              "3.2",
+              "4.1",
+              "5.3",
+              "6.1",
+              "7.2",
+              "8.3"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 24,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Beacon Manufacturing Company (self-insured employer, approximately 8,000 employees)",
+          "provider": "VitalPath Inc.",
+          "deal_value": "$300,000 per year over a three-year initial term",
+          "governing_law": "Illinois",
+          "leverage": "Moderate; Beacon is a meaningful account but its benefits calendar constrains negotiation length"
+        },
+        "submitted_issue_ids": [
+          "data_retention_policy"
+        ],
+        "submitted_redline_issue_ids": [
+          "data_retention_policy"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Final work product submitted."
+        }
+      },
+      "reward": -0.75,
+      "terminated": true,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -0.75,
+          "missing_issues": [
+            "breach_notice",
+            "deid_secondary_use",
+            "personnel_access"
+          ]
+        },
+        "result": {
+          "matter_id": "health_saas_006",
+          "raw_score": 0.375,
+          "max_score": 16.5,
+          "normalized_score": 0.0227,
+          "critical_failure": true,
+          "terminated": true,
+          "truncated": false,
+          "steps": 6,
+          "breakdown": {
+            "asked_questions": [],
+            "questions_asked_total": 0,
+            "raised_escalations": [],
+            "escalations_total": 0,
+            "matched_issues": [
+              "retention_deletion"
+            ],
+            "matched_redlines": [
+              "retention_deletion"
+            ],
+            "settled_issues": [],
+            "valid_citation_count": 2,
+            "invalid_citations": [],
+            "unsupported_issues": [],
+            "fabricated_quotes": [
+              "playbook \u00a74"
+            ],
+            "read_citations": [
+              "agreement \u00a713.1",
+              "exhibit \u00a74.1",
+              "playbook \u00a74"
+            ],
+            "reward_events": [
+              {
+                "type": "issue",
+                "criterion": "retention_deletion",
+                "points": 1.125,
+                "components": {
+                  "base": 1.0,
+                  "severity": 0.25,
+                  "citations": 0.25,
+                  "concepts": 0.375,
+                  "quotes": -0.75
+                },
+                "matched_concepts": [
+                  "60 days",
+                  "deletion",
+                  "certification"
+                ],
+                "quotes": [
+                  {
+                    "citation": "playbook \u00a74",
+                    "status": "fabricated"
+                  },
+                  {
+                    "citation": "exhibit \u00a74.1",
+                    "status": "verified"
+                  }
+                ]
+              },
+              {
+                "type": "redline",
+                "criterion": "retention_deletion",
+                "points": 0.0,
+                "matched_redline_concepts": []
+              },
+              {
+                "type": "final_submission",
+                "criterion": "final",
+                "points": -0.75,
+                "missing_issues": [
+                  "breach_notice",
+                  "deid_secondary_use",
+                  "personnel_access"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "result": {
+    "matter_id": "health_saas_006",
+    "raw_score": 0.375,
+    "max_score": 16.5,
+    "normalized_score": 0.0227,
+    "critical_failure": true,
+    "terminated": true,
+    "truncated": false,
+    "steps": 6,
+    "breakdown": {
+      "asked_questions": [],
+      "questions_asked_total": 0,
+      "raised_escalations": [],
+      "escalations_total": 0,
+      "matched_issues": [
+        "retention_deletion"
+      ],
+      "matched_redlines": [
+        "retention_deletion"
+      ],
+      "settled_issues": [],
+      "valid_citation_count": 2,
+      "invalid_citations": [],
+      "unsupported_issues": [],
+      "fabricated_quotes": [
+        "playbook \u00a74"
+      ],
+      "read_citations": [
+        "agreement \u00a713.1",
+        "exhibit \u00a74.1",
+        "playbook \u00a74"
+      ],
+      "reward_events": [
+        {
+          "type": "issue",
+          "criterion": "retention_deletion",
+          "points": 1.125,
+          "components": {
+            "base": 1.0,
+            "severity": 0.25,
+            "citations": 0.25,
+            "concepts": 0.375,
+            "quotes": -0.75
+          },
+          "matched_concepts": [
+            "60 days",
+            "deletion",
+            "certification"
+          ],
+          "quotes": [
+            {
+              "citation": "playbook \u00a74",
+              "status": "fabricated"
+            },
+            {
+              "citation": "exhibit \u00a74.1",
+              "status": "verified"
+            }
+          ]
+        },
+        {
+          "type": "redline",
+          "criterion": "retention_deletion",
+          "points": 0.0,
+          "matched_redline_concepts": []
+        },
+        {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -0.75,
+          "missing_issues": [
+            "breach_notice",
+            "deid_secondary_use",
+            "personnel_access"
+          ]
+        }
+      ]
+    }
+  }
+}

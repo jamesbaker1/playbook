@@ -1,0 +1,93 @@
+{
+  "split": "dev",
+  "matters": 12,
+  "instrument": "post-revision (structured critical-failure guards)",
+  "note": "Pooled means over all episodes per model; 32B pools a single seed. Critical-failure CI is a 95% cluster bootstrap resampled by matter family. Measured on the post-revision instrument; not comparable to results/v0.4.0.",
+  "models": [
+    {
+      "label": "Expert reference (replay)",
+      "seeds": [
+        0
+      ],
+      "episodes": 12,
+      "normalized_score": 0.9851,
+      "critical_failure_rate": 0.0,
+      "critical_failures": 0,
+      "citation_validity": 1.0,
+      "issue_recall": 0.9167,
+      "question_recall": 0.9583,
+      "unsupported_issue_count": 0.0,
+      "steps": 22.6,
+      "completion_rate": 1.0,
+      "protocol_failures": 0,
+      "critical_failure_ci95": null
+    },
+    {
+      "label": "Qwen2.5-32B-Instruct",
+      "seeds": [
+        0
+      ],
+      "episodes": 12,
+      "normalized_score": 0.0761,
+      "critical_failure_rate": 0.3333,
+      "critical_failures": 4,
+      "citation_validity": 1.0,
+      "issue_recall": 0.2083,
+      "question_recall": 0.0,
+      "unsupported_issue_count": 0.9167,
+      "steps": 8.5,
+      "completion_rate": 1.0,
+      "protocol_failures": 3,
+      "critical_failure_ci95": [
+        0.0833,
+        0.5833
+      ]
+    },
+    {
+      "label": "Qwen2.5-14B-Instruct",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "episodes": 36,
+      "normalized_score": 0.1425,
+      "critical_failure_rate": 0.3056,
+      "critical_failures": 11,
+      "citation_validity": 1.0,
+      "issue_recall": 0.3199,
+      "question_recall": 0.0069,
+      "unsupported_issue_count": 0.4167,
+      "steps": 8.3,
+      "completion_rate": 1.0,
+      "protocol_failures": 1,
+      "critical_failure_ci95": [
+        0.1111,
+        0.5278
+      ]
+    },
+    {
+      "label": "Qwen2.5-7B-Instruct",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "episodes": 36,
+      "normalized_score": 0.0335,
+      "critical_failure_rate": 0.0833,
+      "critical_failures": 3,
+      "citation_validity": 0.9444,
+      "issue_recall": 0.1032,
+      "question_recall": 0.0394,
+      "unsupported_issue_count": 0.8333,
+      "steps": 9.6,
+      "completion_rate": 0.9722,
+      "protocol_failures": 3,
+      "critical_failure_ci95": [
+        0.0,
+        0.2222
+      ]
+    }
+  ]
+}

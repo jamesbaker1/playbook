@@ -1,0 +1,3181 @@
+{
+  "matter": "source_license_008",
+  "seed": 2,
+  "initial_observation": {
+    "matter": {
+      "matter_id": "source_license_008",
+      "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+      "practice_area": "technology_transactions",
+      "role": "Licensee's technology-transactions counsel",
+      "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+    },
+    "documents": [
+      {
+        "id": "instructions",
+        "title": "Supervising Lawyer Instructions",
+        "sections": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      {
+        "id": "playbook",
+        "title": "Copperline Open Source and Inbound Licensing Policy",
+        "sections": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      },
+      {
+        "id": "license",
+        "title": "Kestrel Analytics Embedded SDK License Agreement",
+        "sections": [
+          "1.1",
+          "10.1",
+          "12.1",
+          "14.2",
+          "2.1",
+          "2.2",
+          "3.1",
+          "5.2",
+          "6.3",
+          "7.1",
+          "7.2",
+          "8.3",
+          "9.1"
+        ]
+      },
+      {
+        "id": "memo",
+        "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+        "sections": [
+          "1.1",
+          "2.1",
+          "2.2",
+          "3.1",
+          "4.1",
+          "4.2"
+        ]
+      }
+    ],
+    "protocol": {
+      "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+      "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+      "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+      "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+      "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+      "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+    },
+    "action_schemas": {
+      "read_document": {
+        "description": "Read a document from the matter file, either in full or one numbered section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "document_id": {
+              "type": "string",
+              "description": "Document id from the index."
+            },
+            "section": {
+              "type": "string",
+              "description": "Optional section number such as '4.2'. Omit for full text."
+            }
+          },
+          "required": [
+            "document_id"
+          ]
+        }
+      },
+      "search_matter": {
+        "description": "Case-insensitive substring search across every document section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search phrase, three or more characters."
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      "ask_client": {
+        "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string",
+              "description": "The question, in plain language."
+            }
+          },
+          "required": [
+            "question"
+          ]
+        }
+      },
+      "escalate": {
+        "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Short label for the point escalated."
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why this exceeds your authority or departs from the playbook."
+            }
+          },
+          "required": [
+            "topic",
+            "reason"
+          ]
+        }
+      },
+      "submit_issue": {
+        "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Your own short label for this issue; reuse it in propose_redline."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              },
+              "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "revise_issue": {
+        "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of the issue to revise."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              }
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "propose_redline": {
+        "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of your submitted issue."
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "revise_redline": {
+        "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string"
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "submit_final": {
+        "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "summary": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "summary"
+          ]
+        }
+      }
+    },
+    "budgets": {
+      "steps_remaining": 30,
+      "client_questions_remaining": 4,
+      "escalations_remaining": 2
+    },
+    "learned_facts": {
+      "licensee": "Copperline Devices Inc.",
+      "licensor": "Kestrel Analytics, Inc.",
+      "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+      "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+      "governing_law": "Delaware",
+      "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+    },
+    "submitted_issue_ids": [],
+    "submitted_redline_issue_ids": [],
+    "submitted_escalation_topics": [],
+    "last_result": {
+      "message": "Matter opened."
+    }
+  },
+  "events": [
+    {
+      "step": 1,
+      "action": {
+        "type": "read_document",
+        "document_id": "license",
+        "section": "1.1"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "source_license_008",
+          "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+          "practice_area": "technology_transactions",
+          "role": "Licensee's technology-transactions counsel",
+          "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Copperline Open Source and Inbound Licensing Policy",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "license",
+            "title": "Kestrel Analytics Embedded SDK License Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "12.1",
+              "14.2",
+              "2.1",
+              "2.2",
+              "3.1",
+              "5.2",
+              "6.3",
+              "7.1",
+              "7.2",
+              "8.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "memo",
+            "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "3.1",
+              "4.1",
+              "4.2"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 29,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "licensee": "Copperline Devices Inc.",
+          "licensor": "Kestrel Analytics, Inc.",
+          "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+          "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+          "governing_law": "Delaware",
+          "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "license",
+          "section": "1.1",
+          "content": "## 1.1 Definitions\n\n\"Licensed Software\" means the Kestrel Embedded Analytics SDK in the form delivered by\nLicensor, including the object-code libraries, the browser-side dashboard bundle, and the\naccompanying documentation. \"Product\" means Licensee's commercially distributed hardware\ndevice and the firmware installed on it. \"Distributable Code\" means those components of\nthe Licensed Software identified in Exhibit A as redistributable."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 2,
+      "action": {
+        "type": "read_document",
+        "document_id": "playbook",
+        "section": "3"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "source_license_008",
+          "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+          "practice_area": "technology_transactions",
+          "role": "Licensee's technology-transactions counsel",
+          "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Copperline Open Source and Inbound Licensing Policy",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "license",
+            "title": "Kestrel Analytics Embedded SDK License Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "12.1",
+              "14.2",
+              "2.1",
+              "2.2",
+              "3.1",
+              "5.2",
+              "6.3",
+              "7.1",
+              "7.2",
+              "8.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "memo",
+            "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "3.1",
+              "4.1",
+              "4.2"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 28,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "licensee": "Copperline Devices Inc.",
+          "licensor": "Kestrel Analytics, Inc.",
+          "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+          "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+          "governing_law": "Delaware",
+          "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "playbook",
+          "section": "3",
+          "content": "## 3 Third-Party Notices and Attribution\n\nWhere a Product includes third-party software, Copperline must deliver the required\ncopyright notices and license texts with the Product. Each inbound agreement must\n(a) require the vendor to supply a notice file and an attribution manifest listing every\nthird-party component and its license, (b) permit Copperline to reproduce third-party\nnotices in Product documentation, firmware, and companion applications without further\nconsent, and (c) require the manifest to be updated at each release. Contractual\nrestrictions on including third-party notices with the Product are unacceptable."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 3,
+      "action": {
+        "type": "search_matter",
+        "query": "third-party notices"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "source_license_008",
+          "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+          "practice_area": "technology_transactions",
+          "role": "Licensee's technology-transactions counsel",
+          "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Copperline Open Source and Inbound Licensing Policy",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "license",
+            "title": "Kestrel Analytics Embedded SDK License Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "12.1",
+              "14.2",
+              "2.1",
+              "2.2",
+              "3.1",
+              "5.2",
+              "6.3",
+              "7.1",
+              "7.2",
+              "8.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "memo",
+            "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "3.1",
+              "4.1",
+              "4.2"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 27,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "licensee": "Copperline Devices Inc.",
+          "licensor": "Kestrel Analytics, Inc.",
+          "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+          "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+          "governing_law": "Delaware",
+          "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "query": "third-party notices",
+          "hits": [
+            {
+              "document_id": "playbook",
+              "section": "3",
+              "snippet": "## 3 Third-Party Notices and Attribution  Where a Product includes third-party software, Copperline must deliver the require"
+            }
+          ],
+          "hit_count": 1
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "hit_count": 1
+      }
+    },
+    {
+      "step": 4,
+      "action": {
+        "type": "ask_client",
+        "question": "Does the Kestrel Analytics SDK include any third-party software components?"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "source_license_008",
+          "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+          "practice_area": "technology_transactions",
+          "role": "Licensee's technology-transactions counsel",
+          "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Copperline Open Source and Inbound Licensing Policy",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "license",
+            "title": "Kestrel Analytics Embedded SDK License Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "12.1",
+              "14.2",
+              "2.1",
+              "2.2",
+              "3.1",
+              "5.2",
+              "6.3",
+              "7.1",
+              "7.2",
+              "8.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "memo",
+            "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "3.1",
+              "4.1",
+              "4.2"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 26,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "licensee": "Copperline Devices Inc.",
+          "licensor": "Kestrel Analytics, Inc.",
+          "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+          "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+          "governing_law": "Delaware",
+          "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "question": "Does the Kestrel Analytics SDK include any third-party software components?",
+          "answer": "The client has no responsive information beyond the matter file."
+        }
+      },
+      "reward": -0.1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": false,
+        "reward": {
+          "type": "off_rubric_question",
+          "criterion": "does the kestrel analytics sdk include any third-party software components?",
+          "points": -0.1
+        }
+      }
+    },
+    {
+      "step": 5,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "sdk_third_party",
+        "title": "Third-Party Software Components in Kestrel SDK",
+        "severity": "high",
+        "citations": [
+          "license \u00a71.1",
+          "playbook \u00a73"
+        ],
+        "analysis": "The Kestrel Analytics SDK may include third-party software components, which could introduce licensing obligations and compliance risks for Copperline Devices Inc. The policy requires delivering third-party notices and attributions with the product, and permits reproducing these notices in documentation and firmware without further consent. However, the current agreement does not explicitly address third-party components.",
+        "recommendation": "We should confirm whether the SDK includes third-party components and ensure that any such components are properly disclosed and attributed in accordance with our policy."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "source_license_008",
+          "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+          "practice_area": "technology_transactions",
+          "role": "Licensee's technology-transactions counsel",
+          "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Copperline Open Source and Inbound Licensing Policy",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "license",
+            "title": "Kestrel Analytics Embedded SDK License Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "12.1",
+              "14.2",
+              "2.1",
+              "2.2",
+              "3.1",
+              "5.2",
+              "6.3",
+              "7.1",
+              "7.2",
+              "8.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "memo",
+            "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "3.1",
+              "4.1",
+              "4.2"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 25,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "licensee": "Copperline Devices Inc.",
+          "licensor": "Kestrel Analytics, Inc.",
+          "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+          "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+          "governing_law": "Delaware",
+          "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+        },
+        "submitted_issue_ids": [
+          "sdk_third_party"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "sdk_third_party"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_issue",
+          "criterion": "sdk_third_party",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "action": {
+        "type": "escalate",
+        "topic": "third_party_components",
+        "reason": "The current agreement does not explicitly address third-party components, which could introduce licensing obligations and compliance risks for Copperline Devices Inc."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "source_license_008",
+          "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+          "practice_area": "technology_transactions",
+          "role": "Licensee's technology-transactions counsel",
+          "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Copperline Open Source and Inbound Licensing Policy",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "license",
+            "title": "Kestrel Analytics Embedded SDK License Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "12.1",
+              "14.2",
+              "2.1",
+              "2.2",
+              "3.1",
+              "5.2",
+              "6.3",
+              "7.1",
+              "7.2",
+              "8.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "memo",
+            "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "3.1",
+              "4.1",
+              "4.2"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 24,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 1
+        },
+        "learned_facts": {
+          "licensee": "Copperline Devices Inc.",
+          "licensor": "Kestrel Analytics, Inc.",
+          "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+          "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+          "governing_law": "Delaware",
+          "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+        },
+        "submitted_issue_ids": [
+          "sdk_third_party"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [
+          "third_party_components"
+        ],
+        "last_result": {
+          "topic": "third_party_components",
+          "guidance": "Noted. Proceed in accordance with the playbook and flag it in your final summary."
+        }
+      },
+      "reward": -0.25,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": false,
+        "reward": {
+          "type": "off_rubric_escalation",
+          "criterion": "third_party_components the current agreement does not explicitly address third-p",
+          "points": -0.25
+        }
+      }
+    },
+    {
+      "step": 7,
+      "action": {
+        "type": "submit_final",
+        "summary": "Reviewed the Kestrel Analytics SDK license against Copperline's open source and inbound licensing policy. Identified potential issues related to third-party software components, which were escalated to the supervising lawyer. No other material issues were found."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "source_license_008",
+          "title": "Customer-Side Inbound SDK License and Open Source Compliance Review",
+          "practice_area": "technology_transactions",
+          "role": "Licensee's technology-transactions counsel",
+          "assignment": "Review the inbound Kestrel SDK license against the client's open source and inbound licensing policy, reading the engineering due-diligence memorandum for the composition facts the vendor paper does not disclose. Identify and prioritize material issues, ask only necessary client questions, propose targeted redlines where the supervising lawyer has asked for drafting, and submit a concise supervising-lawyer update."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Copperline Open Source and Inbound Licensing Policy",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "license",
+            "title": "Kestrel Analytics Embedded SDK License Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "12.1",
+              "14.2",
+              "2.1",
+              "2.2",
+              "3.1",
+              "5.2",
+              "6.3",
+              "7.1",
+              "7.2",
+              "8.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "memo",
+            "title": "Engineering Due-Diligence Memorandum on kestrel-sdk 4.2.0",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "3.1",
+              "4.1",
+              "4.2"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 23,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 1
+        },
+        "learned_facts": {
+          "licensee": "Copperline Devices Inc.",
+          "licensor": "Kestrel Analytics, Inc.",
+          "product": "Halyard-2 industrial sensor gateway, firmware redistributed to end customers",
+          "deal_value": "$200,000 annual license fee plus $0.85 per-unit royalty",
+          "governing_law": "Delaware",
+          "leverage": "Moderate. A competing analytics SDK exists, but migration, requalification, and field testing take roughly six months."
+        },
+        "submitted_issue_ids": [
+          "sdk_third_party"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [
+          "third_party_components"
+        ],
+        "last_result": {
+          "message": "Final work product submitted."
+        }
+      },
+      "reward": -1.0,
+      "terminated": true,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -1.0,
+          "missing_issues": [
+            "attribution_notices",
+            "copyleft_conveyance",
+            "ip_indemnity_warranty",
+            "patent_rights"
+          ]
+        },
+        "result": {
+          "matter_id": "source_license_008",
+          "raw_score": -1.85,
+          "max_score": 15.5,
+          "normalized_score": 0.0,
+          "critical_failure": false,
+          "terminated": true,
+          "truncated": false,
+          "steps": 7,
+          "breakdown": {
+            "asked_questions": [],
+            "questions_asked_total": 1,
+            "raised_escalations": [],
+            "escalations_total": 1,
+            "matched_issues": [],
+            "matched_redlines": [],
+            "settled_issues": [],
+            "valid_citation_count": 2,
+            "invalid_citations": [],
+            "unsupported_issues": [
+              "sdk_third_party"
+            ],
+            "fabricated_quotes": [],
+            "read_citations": [
+              "license \u00a71.1",
+              "playbook \u00a73"
+            ],
+            "reward_events": [
+              {
+                "type": "off_rubric_question",
+                "criterion": "does the kestrel analytics sdk include any third-party software components?",
+                "points": -0.1
+              },
+              {
+                "type": "unsupported_issue",
+                "criterion": "sdk_third_party",
+                "points": -0.5,
+                "reason": "no cited provision matches a scored issue's operative anchor"
+              },
+              {
+                "type": "off_rubric_escalation",
+                "criterion": "third_party_components the current agreement does not explicitly address third-p",
+                "points": -0.25
+              },
+              {
+                "type": "final_submission",
+                "criterion": "final",
+                "points": -1.0,
+                "missing_issues": [
+                  "attribution_notices",
+                  "copyleft_conveyance",
+                  "ip_indemnity_warranty",
+                  "patent_rights"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "result": {
+    "matter_id": "source_license_008",
+    "raw_score": -1.85,
+    "max_score": 15.5,
+    "normalized_score": 0.0,
+    "critical_failure": false,
+    "terminated": true,
+    "truncated": false,
+    "steps": 7,
+    "breakdown": {
+      "asked_questions": [],
+      "questions_asked_total": 1,
+      "raised_escalations": [],
+      "escalations_total": 1,
+      "matched_issues": [],
+      "matched_redlines": [],
+      "settled_issues": [],
+      "valid_citation_count": 2,
+      "invalid_citations": [],
+      "unsupported_issues": [
+        "sdk_third_party"
+      ],
+      "fabricated_quotes": [],
+      "read_citations": [
+        "license \u00a71.1",
+        "playbook \u00a73"
+      ],
+      "reward_events": [
+        {
+          "type": "off_rubric_question",
+          "criterion": "does the kestrel analytics sdk include any third-party software components?",
+          "points": -0.1
+        },
+        {
+          "type": "unsupported_issue",
+          "criterion": "sdk_third_party",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        },
+        {
+          "type": "off_rubric_escalation",
+          "criterion": "third_party_components the current agreement does not explicitly address third-p",
+          "points": -0.25
+        },
+        {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -1.0,
+          "missing_issues": [
+            "attribution_notices",
+            "copyleft_conveyance",
+            "ip_indemnity_warranty",
+            "patent_rights"
+          ]
+        }
+      ]
+    }
+  }
+}

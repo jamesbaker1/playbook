@@ -1,0 +1,3209 @@
+{
+  "matter": "msa_provider_004",
+  "seed": 2,
+  "initial_observation": {
+    "matter": {
+      "matter_id": "msa_provider_004",
+      "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+      "practice_area": "technology_transactions",
+      "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+      "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+    },
+    "documents": [
+      {
+        "id": "instructions",
+        "title": "Meridian General Counsel Instructions",
+        "sections": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      {
+        "id": "playbook",
+        "title": "Meridian Deal Desk Concession Playbook",
+        "sections": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8"
+        ]
+      },
+      {
+        "id": "terms",
+        "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+        "sections": [
+          "1.1",
+          "11.1",
+          "11.2",
+          "12.1",
+          "13.1",
+          "15.2",
+          "4.1",
+          "4.3",
+          "5.1",
+          "6.1",
+          "9.1"
+        ]
+      },
+      {
+        "id": "markup",
+        "title": "Calloway Markup Memorandum",
+        "sections": [
+          "1.1",
+          "2.1",
+          "2.2",
+          "2.3",
+          "2.4",
+          "2.5",
+          "3.1"
+        ]
+      }
+    ],
+    "protocol": {
+      "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+      "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+      "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+      "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+      "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+      "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+    },
+    "action_schemas": {
+      "read_document": {
+        "description": "Read a document from the matter file, either in full or one numbered section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "document_id": {
+              "type": "string",
+              "description": "Document id from the index."
+            },
+            "section": {
+              "type": "string",
+              "description": "Optional section number such as '4.2'. Omit for full text."
+            }
+          },
+          "required": [
+            "document_id"
+          ]
+        }
+      },
+      "search_matter": {
+        "description": "Case-insensitive substring search across every document section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search phrase, three or more characters."
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      "ask_client": {
+        "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string",
+              "description": "The question, in plain language."
+            }
+          },
+          "required": [
+            "question"
+          ]
+        }
+      },
+      "escalate": {
+        "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Short label for the point escalated."
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why this exceeds your authority or departs from the playbook."
+            }
+          },
+          "required": [
+            "topic",
+            "reason"
+          ]
+        }
+      },
+      "submit_issue": {
+        "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Your own short label for this issue; reuse it in propose_redline."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              },
+              "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "revise_issue": {
+        "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of the issue to revise."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              }
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "propose_redline": {
+        "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of your submitted issue."
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "revise_redline": {
+        "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string"
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "submit_final": {
+        "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "summary": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "summary"
+          ]
+        }
+      }
+    },
+    "budgets": {
+      "steps_remaining": 30,
+      "client_questions_remaining": 4,
+      "escalations_remaining": 2
+    },
+    "learned_facts": {
+      "provider": "Meridian AI Corp (40 employees, Series A)",
+      "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+      "deal_value": "USD 900,000 per year, three-year initial term",
+      "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+      "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+      "governing_law": "Delaware"
+    },
+    "submitted_issue_ids": [],
+    "submitted_redline_issue_ids": [],
+    "submitted_escalation_topics": [],
+    "last_result": {
+      "message": "Matter opened."
+    }
+  },
+  "events": [
+    {
+      "step": 1,
+      "action": {
+        "type": "read_document",
+        "document_id": "terms",
+        "section": "11.2"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "msa_provider_004",
+          "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+          "practice_area": "technology_transactions",
+          "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+          "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Meridian General Counsel Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Deal Desk Concession Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "terms",
+            "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+            "sections": [
+              "1.1",
+              "11.1",
+              "11.2",
+              "12.1",
+              "13.1",
+              "15.2",
+              "4.1",
+              "4.3",
+              "5.1",
+              "6.1",
+              "9.1"
+            ]
+          },
+          {
+            "id": "markup",
+            "title": "Calloway Markup Memorandum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "3.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 29,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "provider": "Meridian AI Corp (40 employees, Series A)",
+          "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+          "deal_value": "USD 900,000 per year, three-year initial term",
+          "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+          "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+          "governing_law": "Delaware"
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "terms",
+          "section": "11.2",
+          "content": "## 11.2 Exclusions from the Limitation\n\nThe limitation in Section 11.1 does not apply to Customer's payment obligations, either party's\nfraud or willful misconduct, or Customer's breach of the Platform use restrictions."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 2,
+      "action": {
+        "type": "search_matter",
+        "query": "payment obligations"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "msa_provider_004",
+          "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+          "practice_area": "technology_transactions",
+          "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+          "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Meridian General Counsel Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Deal Desk Concession Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "terms",
+            "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+            "sections": [
+              "1.1",
+              "11.1",
+              "11.2",
+              "12.1",
+              "13.1",
+              "15.2",
+              "4.1",
+              "4.3",
+              "5.1",
+              "6.1",
+              "9.1"
+            ]
+          },
+          {
+            "id": "markup",
+            "title": "Calloway Markup Memorandum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "3.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 28,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "provider": "Meridian AI Corp (40 employees, Series A)",
+          "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+          "deal_value": "USD 900,000 per year, three-year initial term",
+          "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+          "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+          "governing_law": "Delaware"
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "query": "payment obligations",
+          "hits": [
+            {
+              "document_id": "playbook",
+              "section": "2",
+              "snippet": " aggregate cap at fees paid or payable in the trailing twelve months, with the usual exclusions for payment obligations, fraud, and willful misconduct.  COUNTER any customer demand for uncapped, unlimited, or \"unlimited"
+            },
+            {
+              "document_id": "terms",
+              "section": "11.2",
+              "snippet": "## 11.2 Exclusions from the Limitation  The limitation in Section 11.1 does not apply to Customer's payment obligations, either party's fraud or willful misconduct, or Customer's breach of the Platform use restrictions."
+            }
+          ],
+          "hit_count": 2
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "hit_count": 2
+      }
+    },
+    {
+      "step": 3,
+      "action": {
+        "type": "ask_client",
+        "question": "Is the customer requesting an uncapped liability for payment obligations?"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "msa_provider_004",
+          "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+          "practice_area": "technology_transactions",
+          "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+          "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Meridian General Counsel Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Deal Desk Concession Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "terms",
+            "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+            "sections": [
+              "1.1",
+              "11.1",
+              "11.2",
+              "12.1",
+              "13.1",
+              "15.2",
+              "4.1",
+              "4.3",
+              "5.1",
+              "6.1",
+              "9.1"
+            ]
+          },
+          {
+            "id": "markup",
+            "title": "Calloway Markup Memorandum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "3.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 27,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "provider": "Meridian AI Corp (40 employees, Series A)",
+          "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+          "deal_value": "USD 900,000 per year, three-year initial term",
+          "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+          "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+          "governing_law": "Delaware"
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "question": "Is the customer requesting an uncapped liability for payment obligations?",
+          "answer": "The client has no responsive information beyond the matter file."
+        }
+      },
+      "reward": -0.1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": false,
+        "reward": {
+          "type": "off_rubric_question",
+          "criterion": "is the customer requesting an uncapped liability for payment obligations?",
+          "points": -0.1
+        }
+      }
+    },
+    {
+      "step": 4,
+      "action": {
+        "type": "read_document",
+        "document_id": "playbook",
+        "section": "2"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "msa_provider_004",
+          "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+          "practice_area": "technology_transactions",
+          "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+          "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Meridian General Counsel Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Deal Desk Concession Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "terms",
+            "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+            "sections": [
+              "1.1",
+              "11.1",
+              "11.2",
+              "12.1",
+              "13.1",
+              "15.2",
+              "4.1",
+              "4.3",
+              "5.1",
+              "6.1",
+              "9.1"
+            ]
+          },
+          {
+            "id": "markup",
+            "title": "Calloway Markup Memorandum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "3.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 26,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "provider": "Meridian AI Corp (40 employees, Series A)",
+          "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+          "deal_value": "USD 900,000 per year, three-year initial term",
+          "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+          "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+          "governing_law": "Delaware"
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "playbook",
+          "section": "2",
+          "content": "## 2 Liability and Indemnity\n\nStandard position: mutual aggregate cap at fees paid or payable in the trailing twelve months,\nwith the usual exclusions for payment obligations, fraud, and willful misconduct.\n\nCOUNTER any customer demand for uncapped, unlimited, or \"unlimited as to amount\" liability for\ndata, confidentiality, security, or privacy claims. The approved fallback is a supercap of three\ntimes (3x) the trailing twelve-month fees, applied to breach of confidentiality obligations,\nSecurity Incidents, and Provider's IP indemnity, with the general cap otherwise unchanged. Deal\ndesk may sign the 3x supercap without escalation.\n\nESCALATE any residual demand for uncapped or unlimited exposure in any category. Uncapped\nliability has never been approved on any Meridian order: our insurance tower does not respond\nabove its limits, an uncapped indemnity is a going-concern exposure for a company of our size,\nand it is a diligence disclosure item in any financing. Do not agree to a supercap above 3x, and\ndo not accept \"direct damages are uncapped\" or \"the cap does not apply to Section X\" drafting\nthat reaches the same result by another route."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 5,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "uncapped_liability",
+        "title": "Customer Request for Uncapped Liability for Payment Obligations",
+        "severity": "high",
+        "citations": [
+          "terms \u00a711.2"
+        ],
+        "analysis": "The customer's markup memorandum requests an uncapped liability for payment obligations, which is contrary to the standard position in the Meridian Standard Terms for Enterprise Platform Services v4.2. The terms currently exclude payment obligations from the limitation clause, but the customer seeks to remove this exclusion.",
+        "recommendation": "Reject the customer's request for an uncapped liability for payment obligations. The standard position is to maintain the exclusion of payment obligations from the limitation clause.",
+        "quotes": [
+          {
+            "citation": "terms \u00a711.2",
+            "text": "The limitation in Section 11.1 does not apply to Customer's payment obligations, either party's fraud or willful misconduct, or Customer's breach of the Platform use restrictions."
+          }
+        ]
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "msa_provider_004",
+          "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+          "practice_area": "technology_transactions",
+          "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+          "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Meridian General Counsel Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Deal Desk Concession Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "terms",
+            "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+            "sections": [
+              "1.1",
+              "11.1",
+              "11.2",
+              "12.1",
+              "13.1",
+              "15.2",
+              "4.1",
+              "4.3",
+              "5.1",
+              "6.1",
+              "9.1"
+            ]
+          },
+          {
+            "id": "markup",
+            "title": "Calloway Markup Memorandum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "3.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 25,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "provider": "Meridian AI Corp (40 employees, Series A)",
+          "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+          "deal_value": "USD 900,000 per year, three-year initial term",
+          "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+          "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+          "governing_law": "Delaware"
+        },
+        "submitted_issue_ids": [
+          "uncapped_liability"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "uncapped_liability"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_issue",
+          "criterion": "uncapped_liability",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "action": {
+        "type": "propose_redline",
+        "issue_id": "uncapped_liability",
+        "document_id": "terms",
+        "section": "11.2",
+        "replacement_text": "The limitation in Section 11.1 applies to Customer's payment obligations, unless such obligations arise from fraud or willful misconduct by Meridian AI Corp.",
+        "rationale": "This redline maintains the exclusion of fraud and willful misconduct while clarifying that the limitation applies to payment obligations."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "msa_provider_004",
+          "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+          "practice_area": "technology_transactions",
+          "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+          "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Meridian General Counsel Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Deal Desk Concession Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "terms",
+            "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+            "sections": [
+              "1.1",
+              "11.1",
+              "11.2",
+              "12.1",
+              "13.1",
+              "15.2",
+              "4.1",
+              "4.3",
+              "5.1",
+              "6.1",
+              "9.1"
+            ]
+          },
+          {
+            "id": "markup",
+            "title": "Calloway Markup Memorandum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "3.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 24,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "provider": "Meridian AI Corp (40 employees, Series A)",
+          "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+          "deal_value": "USD 900,000 per year, three-year initial term",
+          "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+          "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+          "governing_law": "Delaware"
+        },
+        "submitted_issue_ids": [
+          "uncapped_liability"
+        ],
+        "submitted_redline_issue_ids": [
+          "uncapped_liability"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Redline submitted.",
+          "issue_id": "uncapped_liability"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_redline",
+          "criterion": "uncapped_liability",
+          "points": -0.5,
+          "reason": "redline matches no submitted issue label and no operative anchor"
+        }
+      }
+    },
+    {
+      "step": 7,
+      "action": {
+        "type": "submit_final",
+        "summary": "We have addressed the customer's markup memorandum by rejecting their request for an uncapped liability for payment obligations. We have proposed a redline that maintains the exclusion of fraud and willful misconduct while clarifying that the limitation applies to payment obligations. This aligns with our standard position and the Meridian Deal Desk Concession Playbook."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "msa_provider_004",
+          "title": "Provider-Side Response to Customer Markup of AI Platform Terms",
+          "practice_area": "technology_transactions",
+          "role": "Provider's technology-transactions counsel (Meridian AI Corp)",
+          "assignment": "Respond to the customer's markup memorandum on behalf of the provider. Take a position on each requested change - accept, counter, or escalate - grounded in the deal desk concession playbook, propose counter-language only where the playbook authorizes a fallback, ask the business team only questions that could change the position, and close with a short memorandum to the general counsel identifying the items that require CEO sign-off."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Meridian General Counsel Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Meridian Deal Desk Concession Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "id": "terms",
+            "title": "Meridian Standard Terms for Enterprise Platform Services v4.2",
+            "sections": [
+              "1.1",
+              "11.1",
+              "11.2",
+              "12.1",
+              "13.1",
+              "15.2",
+              "4.1",
+              "4.3",
+              "5.1",
+              "6.1",
+              "9.1"
+            ]
+          },
+          {
+            "id": "markup",
+            "title": "Calloway Markup Memorandum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "3.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 23,
+          "client_questions_remaining": 3,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "provider": "Meridian AI Corp (40 employees, Series A)",
+          "customer": "Calloway Retail Group, Inc. (Fortune-500 retailer)",
+          "deal_value": "USD 900,000 per year, three-year initial term",
+          "significance": "Largest order in the provider's history; approximately 30 percent of forecast ARR",
+          "leverage": "Weak to moderate - the customer has alternatives, the provider needs the logo",
+          "governing_law": "Delaware"
+        },
+        "submitted_issue_ids": [
+          "uncapped_liability"
+        ],
+        "submitted_redline_issue_ids": [
+          "uncapped_liability"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Final work product submitted."
+        }
+      },
+      "reward": -0.75,
+      "terminated": true,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -0.75,
+          "missing_issues": [
+            "audit_rights",
+            "exclusivity_escalation",
+            "feedback_ip",
+            "liability_supercap"
+          ],
+          "missed_escalations": [
+            "esc_exclusivity"
+          ],
+          "missed_critical_escalations": []
+        },
+        "result": {
+          "matter_id": "msa_provider_004",
+          "raw_score": -1.85,
+          "max_score": 17.75,
+          "normalized_score": 0.0,
+          "critical_failure": false,
+          "terminated": true,
+          "truncated": false,
+          "steps": 7,
+          "breakdown": {
+            "asked_questions": [],
+            "questions_asked_total": 1,
+            "raised_escalations": [],
+            "escalations_total": 0,
+            "matched_issues": [],
+            "matched_redlines": [],
+            "settled_issues": [],
+            "valid_citation_count": 1,
+            "invalid_citations": [],
+            "unsupported_issues": [
+              "uncapped_liability"
+            ],
+            "fabricated_quotes": [],
+            "read_citations": [
+              "playbook \u00a72",
+              "terms \u00a711.2"
+            ],
+            "reward_events": [
+              {
+                "type": "off_rubric_question",
+                "criterion": "is the customer requesting an uncapped liability for payment obligations?",
+                "points": -0.1
+              },
+              {
+                "type": "unsupported_issue",
+                "criterion": "uncapped_liability",
+                "points": -0.5,
+                "reason": "no cited provision matches a scored issue's operative anchor"
+              },
+              {
+                "type": "unsupported_redline",
+                "criterion": "uncapped_liability",
+                "points": -0.5,
+                "reason": "redline matches no submitted issue label and no operative anchor"
+              },
+              {
+                "type": "final_submission",
+                "criterion": "final",
+                "points": -0.75,
+                "missing_issues": [
+                  "audit_rights",
+                  "exclusivity_escalation",
+                  "feedback_ip",
+                  "liability_supercap"
+                ],
+                "missed_escalations": [
+                  "esc_exclusivity"
+                ],
+                "missed_critical_escalations": []
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "result": {
+    "matter_id": "msa_provider_004",
+    "raw_score": -1.85,
+    "max_score": 17.75,
+    "normalized_score": 0.0,
+    "critical_failure": false,
+    "terminated": true,
+    "truncated": false,
+    "steps": 7,
+    "breakdown": {
+      "asked_questions": [],
+      "questions_asked_total": 1,
+      "raised_escalations": [],
+      "escalations_total": 0,
+      "matched_issues": [],
+      "matched_redlines": [],
+      "settled_issues": [],
+      "valid_citation_count": 1,
+      "invalid_citations": [],
+      "unsupported_issues": [
+        "uncapped_liability"
+      ],
+      "fabricated_quotes": [],
+      "read_citations": [
+        "playbook \u00a72",
+        "terms \u00a711.2"
+      ],
+      "reward_events": [
+        {
+          "type": "off_rubric_question",
+          "criterion": "is the customer requesting an uncapped liability for payment obligations?",
+          "points": -0.1
+        },
+        {
+          "type": "unsupported_issue",
+          "criterion": "uncapped_liability",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        },
+        {
+          "type": "unsupported_redline",
+          "criterion": "uncapped_liability",
+          "points": -0.5,
+          "reason": "redline matches no submitted issue label and no operative anchor"
+        },
+        {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -0.75,
+          "missing_issues": [
+            "audit_rights",
+            "exclusivity_escalation",
+            "feedback_ip",
+            "liability_supercap"
+          ],
+          "missed_escalations": [
+            "esc_exclusivity"
+          ],
+          "missed_critical_escalations": []
+        }
+      ]
+    }
+  }
+}

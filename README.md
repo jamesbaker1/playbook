@@ -94,6 +94,11 @@ revision, following an adversarial audit
 could not tell whether any measured critical failure was a phrasing artifact, only
 that the instrument could not rule it out. Critical-failure rates measured after
 the revision are not numerically comparable to this table without a re-run.
+The open-weight rows have now been re-measured on the revised instrument with
+per-episode traces retained — see
+[`results/postrevision-2026-08/`](results/postrevision-2026-08/), whose README
+also decomposes how much of each movement is gate-attributable; the frontier
+rows will follow.
 
 ## The v0.3 scoring contract
 

@@ -1,0 +1,3380 @@
+{
+  "matter": "fintech_vendor_007",
+  "seed": 0,
+  "initial_observation": {
+    "matter": {
+      "matter_id": "fintech_vendor_007",
+      "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+      "practice_area": "technology_transactions",
+      "role": "Customer's technology-transactions and vendor-contracting counsel",
+      "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+    },
+    "documents": [
+      {
+        "id": "instructions",
+        "title": "Supervising Lawyer Instructions",
+        "sections": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      {
+        "id": "playbook",
+        "title": "Brightline Third-Party Risk Management Playbook",
+        "sections": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      },
+      {
+        "id": "msa",
+        "title": "LedgerSync Master Services Agreement",
+        "sections": [
+          "1.1",
+          "10.1",
+          "10.2",
+          "11.1",
+          "11.2",
+          "11.3",
+          "12.1",
+          "13.4",
+          "3.2",
+          "7.2",
+          "7.3",
+          "9.1"
+        ]
+      },
+      {
+        "id": "addendum",
+        "title": "Compliance and Information Security Addendum",
+        "sections": [
+          "1.1",
+          "2.1",
+          "2.3",
+          "3.1",
+          "3.2",
+          "4.1",
+          "4.2",
+          "5.1"
+        ]
+      },
+      {
+        "id": "service_description",
+        "title": "Service Description for LedgerSync Reconcile",
+        "sections": [
+          "1.1",
+          "1.2",
+          "1.3",
+          "2.1"
+        ]
+      }
+    ],
+    "protocol": {
+      "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+      "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+      "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+      "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+      "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+      "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+    },
+    "action_schemas": {
+      "read_document": {
+        "description": "Read a document from the matter file, either in full or one numbered section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "document_id": {
+              "type": "string",
+              "description": "Document id from the index."
+            },
+            "section": {
+              "type": "string",
+              "description": "Optional section number such as '4.2'. Omit for full text."
+            }
+          },
+          "required": [
+            "document_id"
+          ]
+        }
+      },
+      "search_matter": {
+        "description": "Case-insensitive substring search across every document section.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search phrase, three or more characters."
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      "ask_client": {
+        "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string",
+              "description": "The question, in plain language."
+            }
+          },
+          "required": [
+            "question"
+          ]
+        }
+      },
+      "escalate": {
+        "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "Short label for the point escalated."
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why this exceeds your authority or departs from the playbook."
+            }
+          },
+          "required": [
+            "topic",
+            "reason"
+          ]
+        }
+      },
+      "submit_issue": {
+        "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Your own short label for this issue; reuse it in propose_redline."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              },
+              "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "revise_issue": {
+        "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of the issue to revise."
+            },
+            "title": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
+            "citations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "analysis": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "quotes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "citation": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "citation",
+                  "text"
+                ]
+              }
+            }
+          },
+          "required": [
+            "issue_id",
+            "title",
+            "severity",
+            "citations",
+            "analysis",
+            "recommendation"
+          ]
+        }
+      },
+      "propose_redline": {
+        "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string",
+              "description": "Label of your submitted issue."
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "revise_redline": {
+        "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issue_id": {
+              "type": "string"
+            },
+            "document_id": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "replacement_text": {
+              "type": "string"
+            },
+            "rationale": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "issue_id",
+            "document_id",
+            "section",
+            "replacement_text",
+            "rationale"
+          ]
+        }
+      },
+      "submit_final": {
+        "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "summary": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "summary"
+          ]
+        }
+      }
+    },
+    "budgets": {
+      "steps_remaining": 30,
+      "client_questions_remaining": 4,
+      "escalations_remaining": 2
+    },
+    "learned_facts": {
+      "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+      "vendor": "LedgerSync Corp.",
+      "service": "Automated daily reconciliation of Brightline's core payment ledger",
+      "deal_value": "Approximately $550,000 per year",
+      "governing_law": "New York",
+      "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+    },
+    "submitted_issue_ids": [],
+    "submitted_redline_issue_ids": [],
+    "submitted_escalation_topics": [],
+    "last_result": {
+      "message": "Matter opened."
+    }
+  },
+  "events": [
+    {
+      "step": 1,
+      "action": {
+        "type": "read_document",
+        "document_id": "msa",
+        "section": "10.1"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "fintech_vendor_007",
+          "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions and vendor-contracting counsel",
+          "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Brightline Third-Party Risk Management Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "LedgerSync Master Services Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "10.2",
+              "11.1",
+              "11.2",
+              "11.3",
+              "12.1",
+              "13.4",
+              "3.2",
+              "7.2",
+              "7.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "addendum",
+            "title": "Compliance and Information Security Addendum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.3",
+              "3.1",
+              "3.2",
+              "4.1",
+              "4.2",
+              "5.1"
+            ]
+          },
+          {
+            "id": "service_description",
+            "title": "Service Description for LedgerSync Reconcile",
+            "sections": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "2.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 29,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+          "vendor": "LedgerSync Corp.",
+          "service": "Automated daily reconciliation of Brightline's core payment ledger",
+          "deal_value": "Approximately $550,000 per year",
+          "governing_law": "New York",
+          "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+        },
+        "submitted_issue_ids": [],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "msa",
+          "section": "10.1",
+          "content": "## 10.1 Exclusion of Certain Damages\n\nNeither party will be liable for indirect, incidental, special, consequential, or punitive\ndamages, for lost profits, lost revenue, or lost business, or for any fines, penalties,\nassessments, or similar amounts imposed by any governmental, regulatory, or\nself-regulatory authority, in each case however arising and whether or not the party has\nbeen advised of the possibility of such damages."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 2,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "exclusion_of_damages",
+        "title": "Exclusion of Certain Damages Clause",
+        "severity": "high",
+        "citations": [
+          "msa \u00a710.1"
+        ],
+        "analysis": "The exclusion of certain damages clause in Section 10.1 of the MSA broadly limits LedgerSync's liability for various types of damages, including those that could arise from breaches of the agreement that impact Brightline's core operations. This poses a significant risk given the critical nature of the automated daily reconciliation service provided by LedgerSync.",
+        "recommendation": "We should seek to negotiate a narrower scope of excluded damages or remove this clause entirely to better protect Brightline's interests.",
+        "quotes": [
+          {
+            "citation": "msa \u00a710.1",
+            "text": "Neither party will be liable for indirect, incidental, special, consequential, or punitive damages, for lost profits, lost revenue, or lost business, or for any fines, penalties, assessments, or similar amounts imposed by any governmental, regulatory, or self-regulatory authority, in each case however arising and whether or not the party has been advised of the possibility of such damages."
+          }
+        ]
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "fintech_vendor_007",
+          "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions and vendor-contracting counsel",
+          "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Brightline Third-Party Risk Management Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "LedgerSync Master Services Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "10.2",
+              "11.1",
+              "11.2",
+              "11.3",
+              "12.1",
+              "13.4",
+              "3.2",
+              "7.2",
+              "7.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "addendum",
+            "title": "Compliance and Information Security Addendum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.3",
+              "3.1",
+              "3.2",
+              "4.1",
+              "4.2",
+              "5.1"
+            ]
+          },
+          {
+            "id": "service_description",
+            "title": "Service Description for LedgerSync Reconcile",
+            "sections": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "2.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 28,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+          "vendor": "LedgerSync Corp.",
+          "service": "Automated daily reconciliation of Brightline's core payment ledger",
+          "deal_value": "Approximately $550,000 per year",
+          "governing_law": "New York",
+          "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+        },
+        "submitted_issue_ids": [
+          "exclusion_of_damages"
+        ],
+        "submitted_redline_issue_ids": [],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "exclusion_of_damages"
+        }
+      },
+      "reward": 1.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "issue",
+          "criterion": "regulatory_fines_cap",
+          "points": 1.0,
+          "components": {
+            "base": 0.75,
+            "severity": 0.0,
+            "citations": 0.0,
+            "concepts": 0.0,
+            "quotes": 0.25
+          },
+          "missing_citations": [
+            "playbook \u00a77"
+          ],
+          "matched_concepts": [],
+          "quotes": [
+            {
+              "citation": "msa \u00a710.1",
+              "status": "verified"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 3,
+      "action": {
+        "type": "propose_redline",
+        "issue_id": "exclusion_of_damages",
+        "document_id": "msa",
+        "section": "10.1",
+        "replacement_text": "Neither party will be liable for indirect, incidental, special, or punitive damages, except for lost profits, lost revenue, or lost business directly resulting from a breach of this Agreement by the breaching party.",
+        "rationale": "This redline preserves the exclusion of certain damages while ensuring that Brightline can recover lost profits, revenue, or business directly attributable to LedgerSync's breach, which is crucial given the critical nature of the services provided."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "fintech_vendor_007",
+          "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions and vendor-contracting counsel",
+          "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Brightline Third-Party Risk Management Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "LedgerSync Master Services Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "10.2",
+              "11.1",
+              "11.2",
+              "11.3",
+              "12.1",
+              "13.4",
+              "3.2",
+              "7.2",
+              "7.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "addendum",
+            "title": "Compliance and Information Security Addendum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.3",
+              "3.1",
+              "3.2",
+              "4.1",
+              "4.2",
+              "5.1"
+            ]
+          },
+          {
+            "id": "service_description",
+            "title": "Service Description for LedgerSync Reconcile",
+            "sections": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "2.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 27,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+          "vendor": "LedgerSync Corp.",
+          "service": "Automated daily reconciliation of Brightline's core payment ledger",
+          "deal_value": "Approximately $550,000 per year",
+          "governing_law": "New York",
+          "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+        },
+        "submitted_issue_ids": [
+          "exclusion_of_damages"
+        ],
+        "submitted_redline_issue_ids": [
+          "exclusion_of_damages"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Redline submitted.",
+          "issue_id": "exclusion_of_damages"
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unscored_redline",
+          "criterion": "regulatory_fines_cap",
+          "points": 0.0
+        }
+      }
+    },
+    {
+      "step": 4,
+      "action": {
+        "type": "read_document",
+        "document_id": "addendum",
+        "section": "4.1"
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "fintech_vendor_007",
+          "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions and vendor-contracting counsel",
+          "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Brightline Third-Party Risk Management Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "LedgerSync Master Services Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "10.2",
+              "11.1",
+              "11.2",
+              "11.3",
+              "12.1",
+              "13.4",
+              "3.2",
+              "7.2",
+              "7.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "addendum",
+            "title": "Compliance and Information Security Addendum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.3",
+              "3.1",
+              "3.2",
+              "4.1",
+              "4.2",
+              "5.1"
+            ]
+          },
+          {
+            "id": "service_description",
+            "title": "Service Description for LedgerSync Reconcile",
+            "sections": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "2.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 26,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+          "vendor": "LedgerSync Corp.",
+          "service": "Automated daily reconciliation of Brightline's core payment ledger",
+          "deal_value": "Approximately $550,000 per year",
+          "governing_law": "New York",
+          "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+        },
+        "submitted_issue_ids": [
+          "exclusion_of_damages"
+        ],
+        "submitted_redline_issue_ids": [
+          "exclusion_of_damages"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "document_id": "addendum",
+          "section": "4.1",
+          "content": "## 4.1 Compliance with Laws\n\nEach party will comply with the laws applicable to it in its performance of the Agreement.\nCustomer is solely responsible for determining the legal and regulatory requirements\napplicable to Customer's business and for making any filing, notification, or report\nrequired of Customer by Customer's regulators or by any financial institution with which\nCustomer contracts."
+        }
+      },
+      "reward": 0.0,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true
+      }
+    },
+    {
+      "step": 5,
+      "action": {
+        "type": "submit_issue",
+        "issue_id": "compliance_with_laws",
+        "title": "Compliance with Laws Clause",
+        "severity": "medium",
+        "citations": [
+          "addendum \u00a74.1"
+        ],
+        "analysis": "Section 4.1 of the Compliance and Information Security Addendum places sole responsibility on Brightline for determining legal and regulatory requirements applicable to its business and for making any required filings, notifications, or reports. This could lead to an imbalance in responsibilities and potential risks if LedgerSync's actions inadvertently cause Brightline to violate regulations.",
+        "recommendation": "We should seek to clarify the responsibilities of both parties regarding compliance with laws and ensure that LedgerSync is also accountable for its actions that could affect Brightline's compliance status.",
+        "quotes": [
+          {
+            "citation": "addendum \u00a74.1",
+            "text": "Each party will comply with the laws applicable to it in its performance of the Agreement. Customer is solely responsible for determining the legal and regulatory requirements applicable to Customer's business and for making any filing, notification, or report required of Customer by Customer's regulators or by any financial institution with which Customer contracts."
+          }
+        ]
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "fintech_vendor_007",
+          "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions and vendor-contracting counsel",
+          "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Brightline Third-Party Risk Management Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "LedgerSync Master Services Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "10.2",
+              "11.1",
+              "11.2",
+              "11.3",
+              "12.1",
+              "13.4",
+              "3.2",
+              "7.2",
+              "7.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "addendum",
+            "title": "Compliance and Information Security Addendum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.3",
+              "3.1",
+              "3.2",
+              "4.1",
+              "4.2",
+              "5.1"
+            ]
+          },
+          {
+            "id": "service_description",
+            "title": "Service Description for LedgerSync Reconcile",
+            "sections": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "2.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 25,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+          "vendor": "LedgerSync Corp.",
+          "service": "Automated daily reconciliation of Brightline's core payment ledger",
+          "deal_value": "Approximately $550,000 per year",
+          "governing_law": "New York",
+          "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+        },
+        "submitted_issue_ids": [
+          "exclusion_of_damages",
+          "compliance_with_laws"
+        ],
+        "submitted_redline_issue_ids": [
+          "exclusion_of_damages"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Issue submitted.",
+          "issue_id": "compliance_with_laws"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_issue",
+          "criterion": "compliance_with_laws",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "action": {
+        "type": "propose_redline",
+        "issue_id": "compliance_with_laws",
+        "document_id": "addendum",
+        "section": "4.1",
+        "replacement_text": "Each party will comply with the laws applicable to it in its performance of the Agreement. Both parties agree to cooperate and communicate regarding any legal and regulatory requirements that may affect the other party's compliance status. Customer is responsible for determining the legal and regulatory requirements applicable to its business and for making any filing, notification, or report required of it by its regulators or by any financial institution with which it contracts.",
+        "rationale": "This redline ensures that both parties are accountable for their actions and encourages cooperation and communication regarding compliance matters, reducing the risk of inadvertent violations due to lack of coordination."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "fintech_vendor_007",
+          "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions and vendor-contracting counsel",
+          "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Brightline Third-Party Risk Management Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "LedgerSync Master Services Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "10.2",
+              "11.1",
+              "11.2",
+              "11.3",
+              "12.1",
+              "13.4",
+              "3.2",
+              "7.2",
+              "7.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "addendum",
+            "title": "Compliance and Information Security Addendum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.3",
+              "3.1",
+              "3.2",
+              "4.1",
+              "4.2",
+              "5.1"
+            ]
+          },
+          {
+            "id": "service_description",
+            "title": "Service Description for LedgerSync Reconcile",
+            "sections": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "2.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 24,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+          "vendor": "LedgerSync Corp.",
+          "service": "Automated daily reconciliation of Brightline's core payment ledger",
+          "deal_value": "Approximately $550,000 per year",
+          "governing_law": "New York",
+          "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+        },
+        "submitted_issue_ids": [
+          "exclusion_of_damages",
+          "compliance_with_laws"
+        ],
+        "submitted_redline_issue_ids": [
+          "exclusion_of_damages",
+          "compliance_with_laws"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Redline submitted.",
+          "issue_id": "compliance_with_laws"
+        }
+      },
+      "reward": -0.5,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "unsupported_redline",
+          "criterion": "compliance_with_laws",
+          "points": -0.5,
+          "reason": "redline matches no submitted issue label and no operative anchor"
+        }
+      }
+    },
+    {
+      "step": 7,
+      "action": {
+        "type": "submit_final",
+        "summary": "In reviewing the LedgerSync master agreement, compliance addendum, and service description, two key issues were identified and addressed: the exclusion of certain damages clause and the compliance with laws clause. For the exclusion of certain damages clause, we proposed a redline to preserve exclusions while allowing recovery for lost profits, revenue, or business directly attributable to LedgerSync's breach. For the compliance with laws clause, we proposed a redline to ensure both parties are accountable and encourage cooperation on compliance matters. These changes aim to better protect Brightline's interests and align with the third-party risk management playbook."
+      },
+      "observation": {
+        "matter": {
+          "matter_id": "fintech_vendor_007",
+          "title": "Customer-Side Review of a Critical-Vendor Agreement at a Regulated Fintech",
+          "practice_area": "technology_transactions",
+          "role": "Customer's technology-transactions and vendor-contracting counsel",
+          "assignment": "Review the LedgerSync master agreement, compliance addendum, and service description against Brightline's third-party risk management playbook. Identify and prioritize the material gaps, ask only the client questions that could change the ask list, propose targeted redlines for the items worth spending leverage on, and submit a closing summary written for Brightline's Third-Party Risk Committee."
+        },
+        "documents": [
+          {
+            "id": "instructions",
+            "title": "Supervising Lawyer Instructions",
+            "sections": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "id": "playbook",
+            "title": "Brightline Third-Party Risk Management Playbook",
+            "sections": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7"
+            ]
+          },
+          {
+            "id": "msa",
+            "title": "LedgerSync Master Services Agreement",
+            "sections": [
+              "1.1",
+              "10.1",
+              "10.2",
+              "11.1",
+              "11.2",
+              "11.3",
+              "12.1",
+              "13.4",
+              "3.2",
+              "7.2",
+              "7.3",
+              "9.1"
+            ]
+          },
+          {
+            "id": "addendum",
+            "title": "Compliance and Information Security Addendum",
+            "sections": [
+              "1.1",
+              "2.1",
+              "2.3",
+              "3.1",
+              "3.2",
+              "4.1",
+              "4.2",
+              "5.1"
+            ]
+          },
+          {
+            "id": "service_description",
+            "title": "Service Description for LedgerSync Reconcile",
+            "sections": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "2.1"
+            ]
+          }
+        ],
+        "protocol": {
+          "citation_format": "Cite provisions as '<document_id> \u00a7<section>', for example 'msa \u00a74.2'.",
+          "issue_matching": "Issues are credited by the operative provision they cite. List the single provision your issue targets as the FIRST citation.",
+          "quotes": "Optional 'quotes' entries must reproduce cited section text verbatim. A quotation that does not appear in the cited section is a critical failure.",
+          "questions": "ask_client takes a natural-language question. Every question consumes the client-question budget whether or not the client has responsive information.",
+          "labels": "issue_id is your own label. Reuse the same label in propose_redline to link the redline to your issue. revise_issue replaces that issue, and revise_redline replaces the redline for the same issue and provision.",
+          "escalation": "Escalations are budgeted. Escalate departures from non-negotiable positions and requests beyond your authority. Both failing to escalate and over-escalating are scored."
+        },
+        "action_schemas": {
+          "read_document": {
+            "description": "Read a document from the matter file, either in full or one numbered section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "document_id": {
+                  "type": "string",
+                  "description": "Document id from the index."
+                },
+                "section": {
+                  "type": "string",
+                  "description": "Optional section number such as '4.2'. Omit for full text."
+                }
+              },
+              "required": [
+                "document_id"
+              ]
+            }
+          },
+          "search_matter": {
+            "description": "Case-insensitive substring search across every document section.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search phrase, three or more characters."
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          },
+          "ask_client": {
+            "description": "Ask the client one natural-language factual question. Every question consumes budget, so ask only questions that could change the negotiating position.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "The question, in plain language."
+                }
+              },
+              "required": [
+                "question"
+              ]
+            }
+          },
+          "escalate": {
+            "description": "Escalate one point to the supervising lawyer or the client's decision maker. Every escalation consumes budget, so escalate only departures from a non-negotiable position or requests that exceed your authority.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Short label for the point escalated."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Why this exceeds your authority or departs from the playbook."
+                }
+              },
+              "required": [
+                "topic",
+                "reason"
+              ]
+            }
+          },
+          "submit_issue": {
+            "description": "Submit one material issue. Cite the single operative provision the issue targets as the FIRST citation, in the form '<document_id> \u00a7<section>'. Optional quotes must reproduce cited section text verbatim.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Your own short label for this issue; reuse it in propose_redline."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Provision citations such as 'msa \u00a74.2'. Operative provision first."
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  },
+                  "description": "Optional verbatim quotations supporting the issue. Text must appear verbatim in the cited section; paraphrase belongs in analysis."
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "revise_issue": {
+            "description": "Replace a previously submitted issue with a revised version. The issue_id must identify an existing issue. Only the latest version is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of the issue to revise."
+                },
+                "title": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "critical"
+                  ]
+                },
+                "citations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "analysis": {
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": "string"
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "citation": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "citation",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "issue_id",
+                "title",
+                "severity",
+                "citations",
+                "analysis",
+                "recommendation"
+              ]
+            }
+          },
+          "propose_redline": {
+            "description": "Propose replacement language for one section. Target the operative provision of the issue; link it to your submitted issue by reusing your issue_id label.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "description": "Label of your submitted issue."
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "revise_redline": {
+            "description": "Replace the latest redline for an existing issue and provision. Only the latest version for that issue/document/section target is used for scoring.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "issue_id": {
+                  "type": "string"
+                },
+                "document_id": {
+                  "type": "string"
+                },
+                "section": {
+                  "type": "string"
+                },
+                "replacement_text": {
+                  "type": "string"
+                },
+                "rationale": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "issue_id",
+                "document_id",
+                "section",
+                "replacement_text",
+                "rationale"
+              ]
+            }
+          },
+          "submit_final": {
+            "description": "Submit the final summary for the supervising lawyer and end the episode. Submit only after all issues and redlines are in.",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "summary"
+              ]
+            }
+          }
+        },
+        "budgets": {
+          "steps_remaining": 23,
+          "client_questions_remaining": 4,
+          "escalations_remaining": 2
+        },
+        "learned_facts": {
+          "customer": "Brightline Payments Inc., a state-chartered fintech operating through a bank partnership",
+          "vendor": "LedgerSync Corp.",
+          "service": "Automated daily reconciliation of Brightline's core payment ledger",
+          "deal_value": "Approximately $550,000 per year",
+          "governing_law": "New York",
+          "leverage": "Moderate. LedgerSync wants the account, and regulator and bank-partner expectations strengthen the ask, but Brightline is migrating off an incumbent provider on a schedule."
+        },
+        "submitted_issue_ids": [
+          "exclusion_of_damages",
+          "compliance_with_laws"
+        ],
+        "submitted_redline_issue_ids": [
+          "exclusion_of_damages",
+          "compliance_with_laws"
+        ],
+        "submitted_escalation_topics": [],
+        "last_result": {
+          "message": "Final work product submitted."
+        }
+      },
+      "reward": -0.25,
+      "terminated": true,
+      "truncated": false,
+      "info": {
+        "valid": true,
+        "reward": {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -0.25,
+          "missing_issues": [
+            "incident_notice",
+            "regulator_examination",
+            "security_standard",
+            "termination_assistance"
+          ]
+        },
+        "result": {
+          "matter_id": "fintech_vendor_007",
+          "raw_score": -0.25,
+          "max_score": 16.5,
+          "normalized_score": 0.0,
+          "critical_failure": false,
+          "terminated": true,
+          "truncated": false,
+          "steps": 7,
+          "breakdown": {
+            "asked_questions": [],
+            "questions_asked_total": 0,
+            "raised_escalations": [],
+            "escalations_total": 0,
+            "matched_issues": [
+              "regulatory_fines_cap"
+            ],
+            "matched_redlines": [
+              "regulatory_fines_cap"
+            ],
+            "settled_issues": [],
+            "valid_citation_count": 2,
+            "invalid_citations": [],
+            "unsupported_issues": [
+              "compliance_with_laws"
+            ],
+            "fabricated_quotes": [],
+            "read_citations": [
+              "addendum \u00a74.1",
+              "msa \u00a710.1"
+            ],
+            "reward_events": [
+              {
+                "type": "issue",
+                "criterion": "regulatory_fines_cap",
+                "points": 1.0,
+                "components": {
+                  "base": 0.75,
+                  "severity": 0.0,
+                  "citations": 0.0,
+                  "concepts": 0.0,
+                  "quotes": 0.25
+                },
+                "missing_citations": [
+                  "playbook \u00a77"
+                ],
+                "matched_concepts": [],
+                "quotes": [
+                  {
+                    "citation": "msa \u00a710.1",
+                    "status": "verified"
+                  }
+                ]
+              },
+              {
+                "type": "unscored_redline",
+                "criterion": "regulatory_fines_cap",
+                "points": 0.0
+              },
+              {
+                "type": "unsupported_issue",
+                "criterion": "compliance_with_laws",
+                "points": -0.5,
+                "reason": "no cited provision matches a scored issue's operative anchor"
+              },
+              {
+                "type": "unsupported_redline",
+                "criterion": "compliance_with_laws",
+                "points": -0.5,
+                "reason": "redline matches no submitted issue label and no operative anchor"
+              },
+              {
+                "type": "final_submission",
+                "criterion": "final",
+                "points": -0.25,
+                "missing_issues": [
+                  "incident_notice",
+                  "regulator_examination",
+                  "security_standard",
+                  "termination_assistance"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "result": {
+    "matter_id": "fintech_vendor_007",
+    "raw_score": -0.25,
+    "max_score": 16.5,
+    "normalized_score": 0.0,
+    "critical_failure": false,
+    "terminated": true,
+    "truncated": false,
+    "steps": 7,
+    "breakdown": {
+      "asked_questions": [],
+      "questions_asked_total": 0,
+      "raised_escalations": [],
+      "escalations_total": 0,
+      "matched_issues": [
+        "regulatory_fines_cap"
+      ],
+      "matched_redlines": [
+        "regulatory_fines_cap"
+      ],
+      "settled_issues": [],
+      "valid_citation_count": 2,
+      "invalid_citations": [],
+      "unsupported_issues": [
+        "compliance_with_laws"
+      ],
+      "fabricated_quotes": [],
+      "read_citations": [
+        "addendum \u00a74.1",
+        "msa \u00a710.1"
+      ],
+      "reward_events": [
+        {
+          "type": "issue",
+          "criterion": "regulatory_fines_cap",
+          "points": 1.0,
+          "components": {
+            "base": 0.75,
+            "severity": 0.0,
+            "citations": 0.0,
+            "concepts": 0.0,
+            "quotes": 0.25
+          },
+          "missing_citations": [
+            "playbook \u00a77"
+          ],
+          "matched_concepts": [],
+          "quotes": [
+            {
+              "citation": "msa \u00a710.1",
+              "status": "verified"
+            }
+          ]
+        },
+        {
+          "type": "unscored_redline",
+          "criterion": "regulatory_fines_cap",
+          "points": 0.0
+        },
+        {
+          "type": "unsupported_issue",
+          "criterion": "compliance_with_laws",
+          "points": -0.5,
+          "reason": "no cited provision matches a scored issue's operative anchor"
+        },
+        {
+          "type": "unsupported_redline",
+          "criterion": "compliance_with_laws",
+          "points": -0.5,
+          "reason": "redline matches no submitted issue label and no operative anchor"
+        },
+        {
+          "type": "final_submission",
+          "criterion": "final",
+          "points": -0.25,
+          "missing_issues": [
+            "incident_notice",
+            "regulator_examination",
+            "security_standard",
+            "termination_assistance"
+          ]
+        }
+      ]
+    }
+  }
+}
